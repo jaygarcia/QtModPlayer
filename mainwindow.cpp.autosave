@@ -33,6 +33,7 @@ void MainWindow::addChildren() {
     /** Song information Layout **/
     QWidget *songInfoWidget = new QWidget(this);
     QHBoxLayout *songInfoLayout = new QHBoxLayout();
+    songInfoLayout->setGeometry();
     songInfoWidget->setLayout(songInfoLayout);
     songInfoLayout->setSpacing(0);
 
