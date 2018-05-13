@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-05-13T12:28:56
+# Project created by QtCreator 2018-05-13T13:20:02
 #
 #-------------------------------------------------
 
@@ -8,7 +8,10 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = newb
+include(resources/QtAwesome/QtAwesome.pri)
+
+
+TARGET = QtModPlayer
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -30,5 +33,5 @@ SOURCES += \
 HEADERS += \
         mainwindow.h
 
-FORMS += \
-        mainwindow.ui
+RESOURCES += qdarkstyle/style.qrc
+
