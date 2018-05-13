@@ -6,6 +6,8 @@
 #include <QTextStream>
 #include <QtAwesome.h>
 
+//#define DARKTHEME
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -15,6 +17,7 @@ int main(int argc, char *argv[])
     QtAwesome* awesome = new QtAwesome( qApp );
     awesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
 
+#ifdef DARKTHEME
     // Begin: Load the stylesheet
     QFile f(":qdarkstyle/style.qss");
     if (!f.exists())     {
@@ -27,7 +30,7 @@ int main(int argc, char *argv[])
         qApp->setStyleSheet(ts.readAll());
     }
     // End: Load the stylesheet
-
+#endif
 
     return a.exec();
 }
