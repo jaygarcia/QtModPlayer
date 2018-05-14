@@ -14,9 +14,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    QtAwesome* awesome = new QtAwesome( qApp );
-    awesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
-
 #ifdef DARKTHEME
     // Begin: Load the stylesheet
     QFile f(":qdarkstyle/style.qss");

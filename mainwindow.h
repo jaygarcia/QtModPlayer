@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
-
+#include <QtAwesome.h>
 
 class MainWindow : public QMainWindow
 {
@@ -11,10 +11,12 @@ class MainWindow : public QMainWindow
 
 private:
     QLabel *songLabel;
+    QtAwesome *qtAwesome;
 
     void configure();
     void addChildren();
-
+    QWidget *buildSongInformationUI();
+    QWidget *buildPlayerControlUI();
 
 public:
     MainWindow(QWidget *parent = 0);
