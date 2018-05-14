@@ -32,13 +32,13 @@ void MainWindow::addChildren() {
 
     /** Song information Layout **/
     QWidget *songInfoWidget = new QWidget(this);
+    songInfoWidget->setStyleSheet("background-color: #F0F");
     QHBoxLayout *songInfoLayout = new QHBoxLayout();
+//    songInfoLayout->setGeometry();
     songInfoWidget->setLayout(songInfoLayout);
-    songInfoLayout->setSpacing(0);
+    songInfoLayout->setSpacing(10);
 
-//    songInfoWidget->setStyleSheet("background-color: red; margin:0");
-
-    songInfoLayout->setAlignment(Qt::AlignCenter);
+    songInfoLayout->setAlignment(Qt::AlignHCenter);
 
     // TODO: Make public
     int labelWidth = 35;
@@ -52,7 +52,7 @@ void MainWindow::addChildren() {
 
     QSlider *songSlider = new QSlider(Qt::Horizontal, songInfoWidget);
     songInfoLayout->addWidget(songSlider);
-    songSlider->setStyleSheet("background-color: #0FF");
+    songSlider->setStyleSheet("font-size: 10px; background-color: #0FF");
 //    songInfoLayout->
 
     // TODO: Make public
@@ -60,7 +60,7 @@ void MainWindow::addChildren() {
     songEndLabel->setText("EE:EE");
     songEndLabel->setAlignment(Qt::AlignCenter);
     songEndLabel->setFixedWidth(labelWidth);
-    songEndLabel->setStyleSheet("font-size: 10px; background-color: yellow; margin:0");
+    songEndLabel->setStyleSheet("font-size: 10px; background-color: yellow;");
     songInfoLayout->addWidget(songEndLabel);
 
 
