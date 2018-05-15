@@ -11,6 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 include(resources/QtAwesome/QtAwesome.pri)
 
 
+INCLUDEPATH += QtDarkStyle
+
+
 TARGET = QtModPlayer
 TEMPLATE = app
 
@@ -28,10 +31,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        QtDarkStyle/DarkStyle.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    QtDarkStyle/DarkStyle.h
 
-RESOURCES += qdarkstyle/style.qrc
+RESOURCES += \
+        QtDarkStyle/darkstyle.qrc
 

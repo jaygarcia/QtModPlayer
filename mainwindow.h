@@ -15,8 +15,11 @@ private:
 
     void configure();
     void addChildren();
+
     QWidget *buildSongInformationUI();
     QWidget *buildPlayerControlUI();
+    QPushButton *buildButton(const char *iconType);
+    QWidget *buildBottomControlUI();
 
 public:
     MainWindow(QWidget *parent = 0);

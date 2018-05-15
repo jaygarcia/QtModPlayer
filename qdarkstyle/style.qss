@@ -517,7 +517,7 @@ QToolButton#qt_toolbar_ext_button {
 
 QPushButton {
     color: #eff0f1;
-    background-color: #31363b;
+    background-color: #1d5370;
     border-width: 1px;
     border-color: #76797C;
     border-style: solid;

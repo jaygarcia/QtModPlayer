@@ -30,15 +30,21 @@ void MainWindow::addChildren() {
 
     songLabel = new QLabel(centralWidget);
     songLabel->setText("0BiT - Fax Spider 2.1 kg.xm");
-    songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    songLabel->setStyleSheet("font-size: 12px;");
+//    songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     songLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(songLabel);
 
     QWidget *songInfoWidget = this->buildSongInformationUI();
-    mainLayout->addWidget(songInfoWidget, 1, Qt::AlignTop);
+    mainLayout->addWidget(songInfoWidget, 0, Qt::AlignTop);
+//    songInfoWidget->setStyleSheet("background-color: #F99");
 
     QWidget *songControlWidget = this->buildPlayerControlUI();
     mainLayout->addWidget(songControlWidget, 1, Qt::AlignTop);
+
+    QWidget *bottomWidget = this->buildBottomControlUI();
+    mainLayout->addWidget(bottomWidget);
+
 
     centralWidget->setLayout(mainLayout);
 
@@ -49,13 +55,11 @@ QWidget *MainWindow::buildSongInformationUI() {
 
     /** Song information Layout **/
     QWidget *songInfoWidget = new QWidget(this);
-    songInfoWidget->setStyleSheet("font-size: 10px;");
-    QHBoxLayout *songInfoLayout = new QHBoxLayout();
-//    songInfoLayout->setGeometry();
-    songInfoWidget->setLayout(songInfoLayout);
-    songInfoLayout->setSpacing(10);
 
-    songInfoLayout->setAlignment(Qt::AlignHCenter);
+    QHBoxLayout *songInfoLayout = new QHBoxLayout();
+    songInfoWidget->setLayout(songInfoLayout);
+
+    songInfoLayout->setAlignment(Qt::AlignCenter);
 
     // TODO: Make public
     int labelWidth = 35;
@@ -63,16 +67,19 @@ QWidget *MainWindow::buildSongInformationUI() {
     songStartLabel->setText("SS:SS");
     songStartLabel->setAlignment(Qt::AlignJustify);
     songStartLabel->setFixedWidth(labelWidth);
+    songStartLabel->setStyleSheet("font-size: 10px;");
     songInfoLayout->addWidget(songStartLabel);
 
 
     QSlider *songSlider = new QSlider(Qt::Horizontal, songInfoWidget);
+    songSlider->setStyleSheet("QSlider {height: 5px}");
+//    songSlider->setStyleSheet("QSlider::handle:horizontal {width: 5px;}");
     songInfoLayout->addWidget(songSlider);
 
     // TODO: Make public
     QLabel *songEndLabel = new QLabel(songInfoWidget);
     songEndLabel->setText("EE:EE");
-    songEndLabel->setAlignment(Qt::AlignCenter);
+    songEndLabel->setAlignment(Qt::AlignJustify);
     songEndLabel->setFixedWidth(labelWidth);
     songEndLabel->setStyleSheet("font-size: 10px;");
     songInfoLayout->addWidget(songEndLabel);
@@ -84,31 +91,78 @@ QWidget *MainWindow::buildPlayerControlUI() {
     QWidget *widget = new QWidget(this);
 
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->setAlignment(Qt::AlignCenter);
+    layout->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+    layout->setSpacing(0);
     widget->setLayout(layout);
 
 
-    QPushButton *repeatButton = new QPushButton(this->qtAwesome->icon("redo"), "");
+    QPushButton *repeatButton = this->buildButton("refresh");
     layout->addWidget(repeatButton);
 
-    QSpacerItem *spacer = new QSpacerItem(10, 10);
+
+    QSpacerItem *spacer = new QSpacerItem(30, 10);
     layout->addItem(spacer);
 
 
-    QPushButton *rewindButton = new QPushButton(this->qtAwesome->icon("stepbackward"), "");
+    QPushButton *rewindButton = this->buildButton("backward");
     layout->addWidget(rewindButton);
 
-    QPushButton *playButton = new QPushButton(this->qtAwesome->icon("play"), "");
+    QPushButton *playButton = this->buildButton("play");
     layout->addWidget(playButton);
 
-    QPushButton *fastForwardButton = new QPushButton(this->qtAwesome->icon("stepforward"), "");
+    QPushButton *fastForwardButton = this->buildButton("forward");
     layout->addWidget(fastForwardButton);
 
+    layout->addItem(spacer);
+
+    QPushButton *shuffleButton = this->buildButton("random");
+    layout->addWidget(shuffleButton);
 
 
-    widget->setStyleSheet("background-color: #AAF");
+//    widget->setStyleSheet("background-color: #AAF");
     return widget;
 }
+
+QPushButton * MainWindow::buildButton(const char * iconType) {
+    const char * baseButtonStyle = "color: #FEFEFE; height: 30px; width: 30px; ";
+
+    QVariantMap options;
+    options.insert("color" , QColor(200,200,200));
+    options.insert("color-active", QColor(200,200,200));
+
+    QPushButton *button = new QPushButton(this->qtAwesome->icon(iconType, options), "");
+
+    button->setStyleSheet(baseButtonStyle);
+    return button;
+}
+
+QWidget *MainWindow::buildBottomControlUI() {
+    QWidget *widget = new QWidget(this);
+
+    widget->setLayout(new QHBoxLayout());
+    widget->layout()->setAlignment(Qt::AlignHCenter);
+
+    QPushButton *playlistButton = this->buildButton("reorder");
+    widget->layout()->addWidget(playlistButton);
+
+    QVariantMap options;
+    options.insert("color" , QColor(200,200,200));
+    options.insert("color-active", QColor(200,200,200));
+
+    QPushButton *volumeLow = new QPushButton(this->qtAwesome->icon("volumedown", options), "");
+    volumeLow->setStyleSheet("border-radius:99px");
+    widget->layout()->addWidget(volumeLow);
+
+    QSlider *volumeSlider = new QSlider(Qt::Horizontal);
+    widget->layout()->addWidget(volumeSlider);
+
+    QPushButton *volumeHigh = new QPushButton(this->qtAwesome->icon("volumeup", options), "");
+    volumeHigh->setStyleSheet("border-radius:99px");
+    widget->layout()->addWidget(volumeHigh);
+
+    return widget;
+}
+
 
 // Destructor
 MainWindow::~MainWindow()
