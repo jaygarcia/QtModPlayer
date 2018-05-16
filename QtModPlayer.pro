@@ -32,11 +32,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        QtDarkStyle/DarkStyle.cpp
+        QtDarkStyle/DarkStyle.cpp \
+    playerwidget.cpp
 
 HEADERS += \
         mainwindow.h \
-    QtDarkStyle/DarkStyle.h
+    QtDarkStyle/DarkStyle.h \
+    playerwidget.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc
