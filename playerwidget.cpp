@@ -11,20 +11,20 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 
 
 void PlayerWidget::configure() {
-    this->setFixedSize(300, 155);
+//    this->setFixedSize(300, 155);
 
 }
 
 
 //https://github.com/gamecreature/QtAwesome
 void PlayerWidget::addChildren() {
-    QWidget *centralWidget = new QWidget(this);
+//    QWidget *centralWidget = new QWidget(this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setGeometry(this->geometry());
     mainLayout->setSpacing(0);
 
-    songLabel = new QLabel(centralWidget);
+    songLabel = new QLabel(this);
     songLabel->setText("0BiT - Fax Spider 2.1 kg.xm");
     songLabel->setStyleSheet("font-size: 12px;");
 //    songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -43,7 +43,7 @@ void PlayerWidget::addChildren() {
     mainLayout->addWidget(bottomWidget);
 //    bottomWidget->setStyleSheet("background-color: #AAF");
 
-    centralWidget->setLayout(mainLayout);
+    this->setLayout(mainLayout);
 
     //this belongs to MainWindow
 //    this->setCentralWidget(centralWidget);

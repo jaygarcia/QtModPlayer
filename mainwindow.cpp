@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(playerWidget);
 
     this->setAnimated(true);
-    this->setFixedSize(300, 155);
+    this->setFixedSize(300, 150);
 
     this->setWindowTitle("QtModPlayer");
 
