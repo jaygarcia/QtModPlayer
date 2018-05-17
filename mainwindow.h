@@ -12,6 +12,9 @@ private:
 
 public:
     MainWindow(QWidget *parent = 0);
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
+
     ~MainWindow();
 };
 

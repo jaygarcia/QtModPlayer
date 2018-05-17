@@ -1,0 +1,13 @@
+prefix=/www/qt/libopenmpt-0.3.9_/build
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libmodplug
+Description: The ModPlug mod file playing library (emulated via libopenmpt).
+Version: 0.8.8.5
+Requires.private: libopenmpt
+Libs: -L${libdir} -lmodplug
+Libs.private: 
+Cflags: -I${includedir}
+
