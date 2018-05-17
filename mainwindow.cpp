@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->setFixedSize(300, 150);
 
     this->setWindowTitle("QtModPlayer");
-
 }
 
 

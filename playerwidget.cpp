@@ -12,7 +12,6 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 
 void PlayerWidget::configure() {
 //    this->setFixedSize(300, 155);
-
 }
 
 
@@ -44,9 +43,6 @@ void PlayerWidget::addChildren() {
 //    bottomWidget->setStyleSheet("background-color: #AAF");
 
     this->setLayout(mainLayout);
-
-    //this belongs to MainWindow
-//    this->setCentralWidget(centralWidget);
 }
 
 QWidget *PlayerWidget::buildSongInformationUI() {
