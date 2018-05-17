@@ -33,13 +33,22 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         QtDarkStyle/DarkStyle.cpp \
-    playerwidget.cpp
+    playerwidget.cpp \
+    utilities.cpp
 
 HEADERS += \
         mainwindow.h \
     QtDarkStyle/DarkStyle.h \
-    playerwidget.h
+    playerwidget.h \
+    utilities.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc
 
+
+macx: LIBS += -L$$PWD/libraries/libopenmpt/lib/ -lopenmpt
+
+INCLUDEPATH += $$PWD/libraries/libopenmpt/include
+DEPENDPATH += $$PWD/libraries/libopenmpt/include
+
+macx: PRE_TARGETDEPS += $$PWD/libraries/libopenmpt/lib/libopenmpt.a

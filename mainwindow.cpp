@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "playerwidget.h"
+#include "utilities.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,8 +14,35 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("QtModPlayer");
 
+    this->setAcceptDrops(true);
+
 }
 
+// Todo: Move to playlist?
+void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
+    if (e->mimeData()->hasUrls()) {
+        e->acceptProposedAction();
+    }
+}
+
+
+void MainWindow::dropEvent(QDropEvent *e) {
+    foreach (const QUrl &url, e->mimeData()->urls()) {
+        QString droppedFileName = url.toLocalFile();
+
+        QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
+        qDebug() << "\n*********************************\n";
+
+        if (droppedFileInfo->isDir()) {
+            qDebug() << "Dropped dir :: " << droppedFileName;
+            Utilities::traverseDirectories(droppedFileName);
+        }
+
+        if (droppedFileInfo->isFile()) {
+            qDebug() << "Dropped file:" << droppedFileName;
+        }
+    }
+}
 
 
 // Destructor
