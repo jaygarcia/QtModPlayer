@@ -35,7 +35,7 @@ void MainWindow::dropEvent(QDropEvent *e) {
 
         if (droppedFileInfo->isDir()) {
             qDebug() << "Dropped dir :: " << droppedFileName;
-            Utilities::traverseDirectories(droppedFileName);
+            Utilities::traverseDirectoriesAndTestFiles(droppedFileName);
         }
 
         if (droppedFileInfo->isFile()) {

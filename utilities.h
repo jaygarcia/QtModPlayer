@@ -11,7 +11,7 @@ class Utilities : public QObject
     Q_OBJECT
 public:
     explicit Utilities();
-    static void traverseDirectories(const QString dirName);
+    static void traverseDirectoriesAndTestFiles(const QString dirName);
 
 
 
