@@ -12,21 +12,23 @@ void Utilities::traverseDirectories(const QString dirName) {
     while (iterator->hasNext()) {
         QFileInfo *fileInfo = new QFileInfo(iterator->next());
         if (fileInfo->isFile()) {
-            qDebug() << "File: " << fileInfo->absoluteFilePath();
+//            qDebug() << "File: " << fileInfo->absoluteFilePath();
 
             QString filePath = fileInfo->absoluteFilePath();
             const char *fileString = filePath.toUtf8();
 
             std::ifstream file(fileString, std::ios::binary);
 
-            try {
-                openmpt::module mod(file);
-                qDebug() << "Good file " << fileString;
+            int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
+            if (goodLoad == openmpt::probe_file_header_result_success) {
+//                qDebug() << "Good file " << fileString;
             }
-            catch(openmpt::exception *e) {
-                qDebug() << "BAD FILE " << fileString;
-            }
+            else {
+//                qDebug() << "BAD FILE " << fileString;
 
+                printf("Bad file :: %s\n", fileString);
+                fflush(stdout);
+            }
 
 
 
