@@ -10,14 +10,9 @@
 class ThreadedModFileCheckResults : public QObject {
     Q_OBJECT
 
-private :
-    QVector<QString> m_goodFiles;
-    QVector<QString> m_badFiles;
-    int64_t m_totalFiles;
-    int64_t m_goodFileCount;
-    int64_t m_badFileCount;
 
 public :
+
     QVector<QString> goodFiles() const;
     void setGoodFiles(const QVector<QString> &goodFiles);
 
@@ -32,6 +27,14 @@ public :
 
     int64_t badFileCount() const;
     void setBadFileCount(const int64_t &badFileCount);
+
+
+private :
+    QVector<QString> m_goodFiles;
+    QVector<QString> m_badFiles;
+    int64_t m_totalFiles;
+    int64_t m_goodFileCount;
+    int64_t m_badFileCount;
 };
 
 
@@ -40,16 +43,20 @@ class ThreadedModFileCheck : public QObject
     Q_OBJECT
 
 public:
+    ThreadedModFileCheck(QVector<QString> droppedFiles);
     void run();
-    QString m_dirName;
 
 private:
-    int64_t countFiles();
+    void searchDirectoryForFiles(QString dirName);
+    void queryAllDroppedItems();
+    QVector<QString> allFiles;
+    QVector<QString> m_droppedFiles;
+
 
 signals:
     void filesCounted(const int64_t &filesCounted);
     void fileCheckPercentUpdate(int8_t &);
-    void fileCheckComplete(QObject* = 0); // <-- To do, find out how to pass a signal
+    void fileCheckComplete(ThreadedModFileCheckResults* = 0); // <-- To do, find out how to pass a signal
 };
 
 

@@ -31,34 +31,35 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
 
 
 void MainWindow::dropEvent(QDropEvent *e) {
+
+    // Todo: refactor so we can use a mixture of folders and files!
+
+    QVector<QString> droppedFiles;
     foreach (const QUrl &url, e->mimeData()->urls()) {
-        QString droppedFileName = url.toLocalFile();
-
-        QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
-        qDebug() << "\n*********************************\n";
-
-        if (droppedFileInfo->isDir()) {
-            qDebug() << "Dropped dir :: " << droppedFileName;
-
-            QThread *thread = new QThread();
-            ThreadedModFileCheck *checker = new ThreadedModFileCheck();
-            connect(thread, &QThread::finished, checker, &QObject::deleteLater);
-
-            checker->m_dirName = droppedFileName;
-            checker->moveToThread(thread);
-
-            connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
-
-            connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, [=](int8_t &pctComplete) {
-                qDebug() << "pct complete" << pctComplete;
-            });
-            thread->start();
-        }
-
-        if (droppedFileInfo->isFile()) {
-            qDebug() << "Dropped file:" << droppedFileName;
-        }
+        droppedFiles.push_back(url.toLocalFile());
     }
+
+
+    QThread *thread = new QThread();
+    ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
+    connect(thread, &QThread::finished, checker, &QObject::deleteLater);
+
+    checker->moveToThread(thread);
+
+    connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
+
+    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, [=](int8_t &pctComplete) {
+        qDebug() << "pct complete" << pctComplete;
+    });
+
+    connect(checker, &ThreadedModFileCheck::fileCheckComplete, [=](ThreadedModFileCheckResults *results) {
+       qDebug() << "Total good files " << results->goodFileCount();
+       qDebug() << "Total bad files " << results->badFileCount();
+    });
+
+    thread->start();
+
+
 }
 
 

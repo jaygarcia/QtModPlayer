@@ -1,83 +1,99 @@
 #include "ThreadedModFileCheck.h"
 
+ThreadedModFileCheck::ThreadedModFileCheck(QVector<QString> droppedFiles) {
+    this->m_droppedFiles = droppedFiles;
+}
 
 void ThreadedModFileCheck::run() {
-    qDebug() << "m_dirName == " << m_dirName << "\n";
-    QDirIterator *iterator = new QDirIterator(m_dirName, QDirIterator::Subdirectories);
 
-//    ThreadedModFileCheckResults finalResults = new ThreadedModFileCheckResults();
-    QObject *finalResults = new QObject();
+    this->queryAllDroppedItems();
 
-    int64_t totalFiles = this->countFiles(),
+    int64_t totalFiles = this->allFiles.size(),
             totalFilesChecked = 0;
-
-    printf("Total files :: %lli\n", totalFiles); fflush(stdout);
 
     float percentDone;
 
-//    finalResults.setTotalFiles(totalFiles);
-//    emit filesCounted(totalFiles);
+    emit filesCounted(totalFiles);
 
     QVector<QString> badFiles;
     QVector<QString> goodFiles;
 
-    while (iterator->hasNext()) {
+    int8_t lastPctDone = 0;
 
-        QFileInfo *fileInfo = new QFileInfo(iterator->next());
+    for (int64_t i = 0; i < totalFiles; ++i) {
+
+        QFileInfo *fileInfo = new QFileInfo(this->allFiles.at(i));
 
         if (fileInfo->isFile()) {
 
             QString filePath = fileInfo->absoluteFilePath();
             const char *fileString = filePath.toUtf8();
 
-//            printf("%s\n", fileString); fflush(stdout);
-
             std::ifstream file(fileString, std::ios::binary);
 
             int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
-            if (goodLoad == openmpt::probe_file_header_result_failure) {
-                badFiles.push_back(filePath);
-            }
 
             if (goodLoad == openmpt::probe_file_header_result_success) {
                 goodFiles.push_back(filePath);
+            }
+            else {
+                badFiles.push_back(filePath);
             }
         }
         totalFilesChecked++;
         percentDone = (float)totalFilesChecked / (float)totalFiles;
 
-
-        //TODO: Get PCT Complete done
         int8_t pctDone = (int8_t) (percentDone * 100.0);
-        emit fileCheckPercentUpdate(pctDone);
-        printf("Percent Done :: %i | %f", pctDone, percentDone);
-        fflush(stdout);
-        // Todo: Connect w/ testing audio
+        if (pctDone > lastPctDone) {
+            emit fileCheckPercentUpdate(pctDone);
+            lastPctDone = pctDone;
+        }
     }
 
-//    finalResults.setGoodFiles(goodFiles);
-//    finalResults.setGoodFileCount((int64_t) goodFiles.size());
 
-//    finalResults.setBadFiles(badFiles);
-//    finalResults.setBadFileCount((int64_t) badFiles.size());
+    ThreadedModFileCheckResults *finalResults = new ThreadedModFileCheckResults();
 
-    // Emit event w/ the final results
-    qDebug() << "Done checking!";
+    finalResults->setTotalFiles(totalFiles);
+
+    finalResults->setGoodFiles(goodFiles);
+    finalResults->setGoodFileCount((int64_t) goodFiles.size());
+
+    finalResults->setBadFiles(badFiles);
+    finalResults->setBadFileCount((int64_t) badFiles.size());
+
     emit fileCheckComplete(finalResults);
 }
 
-int64_t ThreadedModFileCheck::countFiles() {
-    QDirIterator *iterator = new QDirIterator(m_dirName, QDirIterator::Subdirectories);
 
-    int64_t totalFiles = 0;
+// Todo: Loop through all dropped items
+// -- Put them in allFiles QVector<QString> member
+
+void ThreadedModFileCheck::queryAllDroppedItems() {
+    for (int64_t i = 0; i < this->m_droppedFiles.size(); ++i) {
+        QString droppedFileName = this->m_droppedFiles.at(i);
+
+        QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
+        qDebug() << "\n*********************************\n";
+
+        if (droppedFileInfo->isDir()) {
+            qDebug() << "Dropped dir :: " << droppedFileName;
+            this->searchDirectoryForFiles(droppedFileName);
+        }
+
+        if (droppedFileInfo->isFile()) {
+            qDebug() << "Dropped file:" << droppedFileName;
+            this->allFiles.push_back(droppedFileName);
+        }
+    }
+}
+
+
+void ThreadedModFileCheck::searchDirectoryForFiles(QString dirName) {
+    QDirIterator *iterator = new QDirIterator(dirName, QDirIterator::Subdirectories);
 
     while (iterator->hasNext()) {
-        iterator->next(); // pop off the stack
-        totalFiles++;
-
+        this->allFiles.push_back(iterator->next()); // pop off the stack
     }
-
-    return totalFiles;
 }
 
 
