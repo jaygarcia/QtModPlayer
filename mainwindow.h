@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "Workers/ThreadedModFileCheck.h"
+
 
 class MainWindow : public QMainWindow
 {
@@ -16,6 +18,9 @@ public:
     void dropEvent(QDropEvent *e);
 
     ~MainWindow();
+
+public slots:
+//    void onFileCountComplete(ThreadedModFileCheckResults);
 };
 
 #endif // MAINWINDOW_H

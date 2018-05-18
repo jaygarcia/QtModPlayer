@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "playerwidget.h"
-#include "utilities.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -16,6 +15,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setAcceptDrops(true);
 
+//    ThreadedModFileCheck *checker = new ThreadedModFileCheck();
+//    checker->m_dirName = "/Users/jgarcia/Music/KEYGENMUSiC MusicPack/";
+//    checker->start();
+
+//    checker->wait();
 }
 
 // Todo: Move to playlist?
@@ -35,7 +39,20 @@ void MainWindow::dropEvent(QDropEvent *e) {
 
         if (droppedFileInfo->isDir()) {
             qDebug() << "Dropped dir :: " << droppedFileName;
-            Utilities::traverseDirectoriesAndTestFiles(droppedFileName);
+
+            QThread *thread = new QThread();
+            ThreadedModFileCheck *checker = new ThreadedModFileCheck();
+            connect(thread, &QThread::finished, checker, &QObject::deleteLater);
+
+            checker->m_dirName = droppedFileName;
+            checker->moveToThread(thread);
+
+            connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
+
+            connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, [=](int8_t &pctComplete) {
+                qDebug() << "pct complete" << pctComplete;
+            });
+            thread->start();
         }
 
         if (droppedFileInfo->isFile()) {
