@@ -39,7 +39,7 @@ void MainWindow::dropEvent(QDropEvent *e) {
     ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
 
 
-    progressDialog.setLabelText("Checking Files");
+    progressDialog.setLabelText("Counting files...");
     progressDialog.setMinimum(0);
     progressDialog.setMaximum(100);
     progressDialog.setWindowModality(Qt::WindowModal);
@@ -59,6 +59,10 @@ void MainWindow::dropEvent(QDropEvent *e) {
     // TODO Wire in Cancel with thread quitting https://doc.qt.io/qt-5.10/qthread.html
     connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
         this->progressDialog.setValue(pctComplete);
+    });
+
+    connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
+        this->progressDialog.setLabelText(QString("Testing total files: %1").arg(filesCounted));
     });
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {

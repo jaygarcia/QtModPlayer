@@ -54,7 +54,7 @@ private:
 
 
 signals:
-    void filesCounted(const int64_t &filesCounted);
+    void filesCounted(unsigned int filesCounted);
     void fileCheckPercentUpdate(int pctComplete);
     void fileCheckComplete(ThreadedModFileCheckResults* = 0); // <-- To do, find out how to pass a signal
 };

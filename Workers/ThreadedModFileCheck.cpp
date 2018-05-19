@@ -7,7 +7,7 @@ ThreadedModFileCheck::ThreadedModFileCheck(QVector<QString> droppedFiles) {
 void ThreadedModFileCheck::run() {
     this->queryAllDroppedItems();
 
-    int64_t totalFiles = this->allFiles.size(),
+    unsigned int totalFiles = this->allFiles.size(),
             totalFilesChecked = 0;
 
     float percentDone;
