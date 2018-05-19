@@ -5,7 +5,6 @@ ThreadedModFileCheck::ThreadedModFileCheck(QVector<QString> droppedFiles) {
 }
 
 void ThreadedModFileCheck::run() {
-
     this->queryAllDroppedItems();
 
     int64_t totalFiles = this->allFiles.size(),
@@ -18,9 +17,13 @@ void ThreadedModFileCheck::run() {
     QVector<QString> badFiles;
     QVector<QString> goodFiles;
 
-    int8_t lastPctDone = 0;
+    int lastPctDone = 0;
 
-    for (int64_t i = 0; i < totalFiles; ++i) {
+    for (uint32_t i = 0; i < totalFiles; ++i) {
+
+        if (QThread::currentThread()->isInterruptionRequested()) {
+            return;
+        }
 
         QFileInfo *fileInfo = new QFileInfo(this->allFiles.at(i));
 
@@ -40,11 +43,13 @@ void ThreadedModFileCheck::run() {
                 badFiles.push_back(filePath);
             }
         }
+
         totalFilesChecked++;
         percentDone = (float)totalFilesChecked / (float)totalFiles;
 
-        int8_t pctDone = (int8_t) (percentDone * 100.0);
-        if (pctDone > lastPctDone) {
+        int pctDone = (int) (percentDone * 100.0);
+
+        if (pctDone > lastPctDone && pctDone % 2 == 0) {
             emit fileCheckPercentUpdate(pctDone);
             lastPctDone = pctDone;
         }
@@ -91,7 +96,7 @@ void ThreadedModFileCheck::queryAllDroppedItems() {
 void ThreadedModFileCheck::searchDirectoryForFiles(QString dirName) {
     QDirIterator *iterator = new QDirIterator(dirName, QDirIterator::Subdirectories);
 
-    while (iterator->hasNext()) {
+    while (iterator->hasNext() && ! QThread::currentThread()->isInterruptionRequested()) {
         this->allFiles.push_back(iterator->next()); // pop off the stack
     }
 }

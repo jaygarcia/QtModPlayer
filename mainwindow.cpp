@@ -14,12 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("QtModPlayer");
 
     this->setAcceptDrops(true);
-
-//    ThreadedModFileCheck *checker = new ThreadedModFileCheck();
-//    checker->m_dirName = "/Users/jgarcia/Music/KEYGENMUSiC MusicPack/";
-//    checker->start();
-
-//    checker->wait();
+    progressDialog.hide();
 }
 
 // Todo: Move to playlist?
@@ -39,23 +34,50 @@ void MainWindow::dropEvent(QDropEvent *e) {
         droppedFiles.push_back(url.toLocalFile());
     }
 
+    qDebug() << "Total items dropped" << droppedFiles.size();
+
+    ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
+
+
+    progressDialog.setLabelText("Checking Files");
+    progressDialog.setMinimum(0);
+    progressDialog.setMaximum(100);
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setAutoClose(false);
+//    progressDialog.setCancelButton(0); // Verify that this is the best thing!
+    progressDialog.setFixedSize(progressDialog.geometry().width(), progressDialog.geometry().height());
+    this->progressDialog.show();
+
 
     QThread *thread = new QThread();
-    ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
     connect(thread, &QThread::finished, checker, &QObject::deleteLater);
 
     checker->moveToThread(thread);
 
     connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
 
-    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, [=](int8_t &pctComplete) {
-        qDebug() << "pct complete" << pctComplete;
+    // TODO Wire in Cancel with thread quitting https://doc.qt.io/qt-5.10/qthread.html
+    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
+        this->progressDialog.setValue(pctComplete);
     });
 
-    connect(checker, &ThreadedModFileCheck::fileCheckComplete, [=](ThreadedModFileCheckResults *results) {
+    connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
        qDebug() << "Total good files " << results->goodFileCount();
-       qDebug() << "Total bad files " << results->badFileCount();
+       qDebug() << "Total bad files "  << results->badFileCount();
+       this->progressDialog.hide();
+       thread->quit();
+       thread->wait();
+
     });
+
+    connect(&progressDialog, &QProgressDialog::canceled, this, [=]() {
+        thread->requestInterruption();
+//        thread->wait();
+        thread->quit();
+        thread->wait();
+        progressDialog.hide();
+    });
+
 
     thread->start();
 

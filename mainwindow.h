@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QProgressDialog>
+
 #include "Workers/ThreadedModFileCheck.h"
 
 
@@ -10,7 +12,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-
+    QProgressDialog progressDialog;
 
 public:
     MainWindow(QWidget *parent = 0);

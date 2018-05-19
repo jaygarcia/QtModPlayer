@@ -34,13 +34,15 @@ SOURCES += \
         mainwindow.cpp \
         QtDarkStyle/DarkStyle.cpp \
     playerwidget.cpp \
-    Workers/ThreadedModFileCheck.cpp
+    Workers/ThreadedModFileCheck.cpp \
+    playlistwidget.cpp
 
 HEADERS += \
         mainwindow.h \
     QtDarkStyle/DarkStyle.h \
     playerwidget.h \
-    Workers/ThreadedModFileCheck.h
+    Workers/ThreadedModFileCheck.h \
+    playlistwidget.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc
