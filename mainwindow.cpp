@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("QtModPlayer");
 
     this->setAcceptDrops(true);
-    progressDialog.hide();
+
+    this->progressDialog.cancel();
 }
 
 // Todo: Move to playlist?
@@ -26,7 +27,6 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
 
 
 void MainWindow::dropEvent(QDropEvent *e) {
-
     // Todo: refactor so we can use a mixture of folders and files!
 
     QVector<QString> droppedFiles;
@@ -38,15 +38,13 @@ void MainWindow::dropEvent(QDropEvent *e) {
 
     ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
 
-
     progressDialog.setLabelText("Counting files...");
     progressDialog.setMinimum(0);
     progressDialog.setMaximum(100);
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
-//    progressDialog.setCancelButton(0); // Verify that this is the best thing!
-    progressDialog.setFixedSize(progressDialog.geometry().width(), progressDialog.geometry().height());
-    this->progressDialog.show();
+    progressDialog.setFixedSize(this->geometry().width(), progressDialog.geometry().height());
+    progressDialog.show();
 
 
     QThread *thread = new QThread();
@@ -62,7 +60,8 @@ void MainWindow::dropEvent(QDropEvent *e) {
     });
 
     connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
-        this->progressDialog.setLabelText(QString("Testing total files: %1").arg(filesCounted));
+        QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
+        this->progressDialog.setLabelText(QString("Testing total files: %1").arg(friendlyNumber));
     });
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
@@ -71,7 +70,12 @@ void MainWindow::dropEvent(QDropEvent *e) {
        this->progressDialog.hide();
        thread->quit();
        thread->wait();
+    });
 
+    connect(checker, &ThreadedModFileCheck::countingFiles, this, [=](unsigned int filesCounted) {
+
+        QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
+        this->progressDialog.setLabelText(QString("Files found: %1").arg(friendlyNumber));
     });
 
     connect(&progressDialog, &QProgressDialog::canceled, this, [=]() {

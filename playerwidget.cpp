@@ -112,8 +112,6 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     QPushButton *shuffleButton = this->buildButton("random");
     layout->addWidget(shuffleButton);
 
-
-//    widget->setStyleSheet("background-color: #AAF");
     return widget;
 }
 

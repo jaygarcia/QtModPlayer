@@ -98,6 +98,10 @@ void ThreadedModFileCheck::searchDirectoryForFiles(QString dirName) {
 
     while (iterator->hasNext() && ! QThread::currentThread()->isInterruptionRequested()) {
         this->allFiles.push_back(iterator->next()); // pop off the stack
+
+        if (this->allFiles.size() % 15 == 0) {
+            emit countingFiles(this->allFiles.size());
+        }
     }
 }
 
