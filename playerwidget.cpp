@@ -15,10 +15,7 @@ void PlayerWidget::configure() {
 }
 
 
-//https://github.com/gamecreature/QtAwesome
 void PlayerWidget::addChildren() {
-//    QWidget *centralWidget = new QWidget(this);
-
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setGeometry(this->geometry());
     mainLayout->setSpacing(0);
@@ -136,6 +133,10 @@ QWidget *PlayerWidget::buildBottomControlUI() {
 
     QPushButton *playlistButton = this->buildButton("reorder");
     widget->layout()->addWidget(playlistButton);
+
+    connect(playlistButton, &QPushButton::clicked, this, [this]() {
+        emit this->showPlaylist();
+    });
 
     QVariantMap options;
     options.insert("color" , QColor(200,200,200));

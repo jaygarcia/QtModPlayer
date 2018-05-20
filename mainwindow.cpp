@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 #include "playerwidget.h"
-
+#include "playlistwidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     PlayerWidget *playerWidget = new PlayerWidget(this);
     this->setCentralWidget(playerWidget);
+
+    connect(playerWidget, &PlayerWidget::showPlaylist, this, &MainWindow::onPlayerWidgetShowPlayList);
 
     this->setAnimated(true);
     this->setFixedSize(300, 150);
@@ -16,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setAcceptDrops(true);
 
     this->progressDialog.cancel();
+    this->playlistWidgetShowing = false;
 }
 
 // Todo: Move to playlist?
@@ -89,10 +92,40 @@ void MainWindow::dropEvent(QDropEvent *e) {
 
     thread->start();
 
-
 }
 
 
+void MainWindow::onPlayerWidgetShowPlayList() {
+    if (this->playlistWidgetShowing == false) {
+        PlayListWidget *playlist = new PlayListWidget();
+        playlist->setObjectName("playlist");
+        playlist->setAttribute(Qt::WA_DeleteOnClose);
+        playlist->setFixedSize(this->geometry().width(), 300);
+        playlist->move(this->pos().x(), this->pos().y() + this->geometry().height() + 23);
+        playlist->show();
+
+
+        this->playlistWidgetShowing = true;
+
+        connect(playlist, &PlayListWidget::destroyed, this, [this](QObject *) {
+            qDebug() << "Destroyed";
+            this->playlistWidgetShowing = false;
+        });
+
+    }
+    else if (this->playlistWidgetShowing == true) {
+
+        QWindowList allWindows = QGuiApplication::allWindows();
+
+        for (int i = 0; i < allWindows.size(); ++i) {
+            if (allWindows.at(i)->objectName().toStdString() == "playlistWindow") {
+                allWindows.at(i)->close();
+                this->playlistWidgetShowing = false;
+            }
+        }
+
+    }
+}
 // Destructor
 MainWindow::~MainWindow()
 {

@@ -24,6 +24,13 @@ public:
     QWidget *buildBottomControlUI();
 
 signals:
+    void play();
+    void pause();
+    void next();
+    void previous();
+    void shuffle();
+    void repeat();
+    void showPlaylist();
 
 public slots:
 };

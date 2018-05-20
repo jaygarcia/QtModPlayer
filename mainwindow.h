@@ -13,11 +13,13 @@ class MainWindow : public QMainWindow
 
 private:
     QProgressDialog progressDialog;
+    bool playlistWidgetShowing;
 
 public:
     MainWindow(QWidget *parent = 0);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
+    void onPlayerWidgetShowPlayList();
 
     ~MainWindow();
 
