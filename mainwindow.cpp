@@ -1,6 +1,15 @@
 #include "mainwindow.h"
-#include "playerwidget.h"
-#include "playlistwidget.h"
+
+
+PlaylistWidget *MainWindow::getPlaylist() const
+{
+    return m_playlistWindow;
+}
+
+void MainWindow::setPlaylist(PlaylistWidget *playlist)
+{
+    m_playlistWindow = playlist;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setAcceptDrops(true);
 
-    this->progressDialog.cancel();
-    this->playlistWidgetShowing = false;
+    this->m_playlistWidgetShowing = false;
+//    this->m_playlistWindow->close();
 }
 
 // Todo: Move to playlist?
@@ -32,99 +41,59 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
 void MainWindow::dropEvent(QDropEvent *e) {
     // Todo: refactor so we can use a mixture of folders and files!
 
-    QVector<QString> droppedFiles;
-    foreach (const QUrl &url, e->mimeData()->urls()) {
-        droppedFiles.push_back(url.toLocalFile());
+    if (e->mimeData()->hasUrls()) {
+        this->showPlaylistWindow();
+
+        if (this->m_playlistWidgetShowing == true) {
+            this->getPlaylist()->dropEvent(e);
+        }
+        else {
+            qDebug() << "NO PLAYLIST!";
+        }
     }
-
-    qDebug() << "Total items dropped" << droppedFiles.size();
-
-    ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
-
-    progressDialog.setLabelText("Counting files...");
-    progressDialog.setMinimum(0);
-    progressDialog.setMaximum(100);
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setAutoClose(false);
-    progressDialog.setFixedSize(this->geometry().width(), progressDialog.geometry().height());
-    progressDialog.show();
-
-
-    QThread *thread = new QThread();
-    connect(thread, &QThread::finished, checker, &QObject::deleteLater);
-
-    checker->moveToThread(thread);
-
-    connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
-
-    // TODO Wire in Cancel with thread quitting https://doc.qt.io/qt-5.10/qthread.html
-    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
-        this->progressDialog.setValue(pctComplete);
-    });
-
-    connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
-        QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
-        this->progressDialog.setLabelText(QString("Testing total files: %1").arg(friendlyNumber));
-    });
-
-    connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
-       qDebug() << "Total good files " << results->goodFileCount();
-       qDebug() << "Total bad files "  << results->badFileCount();
-       this->progressDialog.hide();
-       thread->quit();
-       thread->wait();
-    });
-
-    connect(checker, &ThreadedModFileCheck::countingFiles, this, [=](unsigned int filesCounted) {
-
-        QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
-        this->progressDialog.setLabelText(QString("Files found: %1").arg(friendlyNumber));
-    });
-
-    connect(&progressDialog, &QProgressDialog::canceled, this, [=]() {
-        thread->requestInterruption();
-//        thread->wait();
-        thread->quit();
-        thread->wait();
-        progressDialog.hide();
-    });
-
-
-    thread->start();
-
+}
+void MainWindow::onPlayerWidgetShowPlayList() {
+    this->togglePlaylistWindow();
 }
 
+void MainWindow::togglePlaylistWindow() {
+    if (this->m_playlistWidgetShowing == false) {
+        this->showPlaylistWindow();
+    }
+    else if (this->m_playlistWidgetShowing == true) {
+        this->hidePlaylistWindow();
+    }
+}
 
-void MainWindow::onPlayerWidgetShowPlayList() {
-    if (this->playlistWidgetShowing == false) {
-        PlayListWidget *playlist = new PlayListWidget();
+void MainWindow::showPlaylistWindow() {
+    if (this->m_playlistWidgetShowing == false) {
+
+        PlaylistWidget *playlist = new PlaylistWidget();
         playlist->setObjectName("playlist");
         playlist->setAttribute(Qt::WA_DeleteOnClose);
         playlist->setFixedSize(this->geometry().width(), 300);
         playlist->move(this->pos().x(), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
 
+        this->m_playlistWidgetShowing = true;
+        this->m_playlistWindow = playlist;
 
-        this->playlistWidgetShowing = true;
-
-        connect(playlist, &PlayListWidget::destroyed, this, [this](QObject *) {
-            this->playlistWidgetShowing = false;
+        connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *) {
+            qDebug() << "playlist destroyed";
+            this->m_playlistWidgetShowing = false;
         });
-
     }
-    else if (this->playlistWidgetShowing == true) {
+}
 
-        QWindowList allWindows = QGuiApplication::allWindows();
-
-        for (int i = 0; i < allWindows.size(); ++i) {
-            if (allWindows.at(i)->objectName().toStdString() == "playlistWindow") {
-                allWindows.at(i)->close();
-                this->playlistWidgetShowing = false;
-            }
-        }
+void MainWindow::hidePlaylistWindow() {
+    if (this->m_playlistWidgetShowing == true) {
+        this->getPlaylist()->close();
+        this->m_playlistWidgetShowing = false;
 
     }
 }
+
+
 // Destructor
 MainWindow::~MainWindow()
 {

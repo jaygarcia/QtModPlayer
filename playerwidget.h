@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QtWidgets>
 #include <QtAwesome.h>
+#include <QProgressDialog>
 
 class PlayerWidget : public QWidget
 {

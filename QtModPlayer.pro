@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 include(resources/QtAwesome/QtAwesome.pri)
 
+ICON = Resources/experience_speakers_twin.icns
 
 INCLUDEPATH += QtDarkStyle
 
@@ -35,14 +36,18 @@ SOURCES += \
         QtDarkStyle/DarkStyle.cpp \
     playerwidget.cpp \
     Workers/ThreadedModFileCheck.cpp \
-    playlistwidget.cpp
+    DBManager/dbmanager.cpp \
+    DBManager/ThreadedModFileInserter.cpp \
+    PlaylistWidget/playlistwidget.cpp
 
 HEADERS += \
         mainwindow.h \
     QtDarkStyle/DarkStyle.h \
     playerwidget.h \
     Workers/ThreadedModFileCheck.h \
-    playlistwidget.h
+    DBManager/dbmanager.h \
+    DBManager/ThreadedModFileInserter.h \
+    PlaylistWidget/playlistwidget.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc
@@ -54,3 +59,10 @@ INCLUDEPATH += $$PWD/libraries/libopenmpt/include
 DEPENDPATH += $$PWD/libraries/libopenmpt/include
 
 macx: PRE_TARGETDEPS += $$PWD/libraries/libopenmpt/lib/libopenmpt.a
+
+## Include Database file
+macx {
+    db_files.path = Contents/Resources/db
+    db_files.files = $$PWD/db/modmusic.db
+    QMAKE_BUNDLE_DATA += db_files
+}
