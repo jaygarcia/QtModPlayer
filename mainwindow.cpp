@@ -108,7 +108,6 @@ void MainWindow::onPlayerWidgetShowPlayList() {
         this->playlistWidgetShowing = true;
 
         connect(playlist, &PlayListWidget::destroyed, this, [this](QObject *) {
-            qDebug() << "Destroyed";
             this->playlistWidgetShowing = false;
         });
 
