@@ -2,8 +2,6 @@
 
 DBManager::DBManager(QObject *parent) : QObject(parent)
 {
-
-
     this->purgeCurrentPlaylist();
 }
 

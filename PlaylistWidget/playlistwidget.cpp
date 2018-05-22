@@ -14,7 +14,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     m_tableView = new QTableView(this);
     this->layout()->addWidget(m_tableView);
-
+    this->m_dbManager.purgeCurrentPlaylist();
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
