@@ -6,15 +6,14 @@
 
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
+#include "../modfile.h"
+
 
 class ThreadedModFileCheckResults : public QObject {
     Q_OBJECT
 
 
 public :
-
-    QVector<QString> goodFiles() const;
-    void setGoodFiles(const QVector<QString> &goodFiles);
 
     QVector<QString>badFiles() const;
     void setBadFiles(const QVector<QString> &badFiles);
@@ -29,8 +28,11 @@ public :
     void setBadFileCount(const int64_t &badFileCount);
 
 
+    QVector<ModFile *> goodFiles() const;
+    void setGoodFiles(const QVector<ModFile *> &goodFiles);
+
 private :
-    QVector<QString> m_goodFiles;
+    QVector<ModFile *> m_goodFiles;
     QVector<QString> m_badFiles;
     int64_t m_totalFiles;
     int64_t m_goodFileCount;

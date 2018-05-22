@@ -1,13 +1,19 @@
 #include "playlistwidget.h"
 
+
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
-    this->setStyleSheet("background-color: blue");
+//    this->setStyleSheet("background-color: blue");
     this->setAcceptDrops(true);
 
     this->m_progressDialog.cancel();
+
+    this->setLayout(new QVBoxLayout());
+
+    m_tableView = new QTableView(this);
+    this->layout()->addWidget(m_tableView);
 
 }
 

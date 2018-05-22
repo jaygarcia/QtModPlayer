@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 
-
 PlaylistWidget *MainWindow::getPlaylist() const
 {
     return m_playlistWindow;
@@ -39,8 +38,6 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
 
 
 void MainWindow::dropEvent(QDropEvent *e) {
-    // Todo: refactor so we can use a mixture of folders and files!
-
     if (e->mimeData()->hasUrls()) {
         this->showPlaylistWindow();
 
@@ -52,6 +49,7 @@ void MainWindow::dropEvent(QDropEvent *e) {
         }
     }
 }
+
 void MainWindow::onPlayerWidgetShowPlayList() {
     this->togglePlaylistWindow();
 }

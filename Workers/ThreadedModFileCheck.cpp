@@ -15,7 +15,7 @@ void ThreadedModFileCheck::run() {
     emit filesCounted(totalFiles);
 
     QVector<QString> badFiles;
-    QVector<QString> goodFiles;
+    QVector<ModFile *> goodFiles;
 
     int lastPctDone = 0;
 
@@ -37,7 +37,21 @@ void ThreadedModFileCheck::run() {
             int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
 
             if (goodLoad == openmpt::probe_file_header_result_success) {
-                goodFiles.push_back(filePath);
+                ModFile *goodFile = new ModFile();
+
+//                openmpt::module mod(file);
+
+//                printf("Song title:: %s\n", mod.get_metadata("title").c_str());
+//                fflush(stdout);
+
+//                goodFile->song_name = QString::fromUtf8(mod.get_metadata("title").c_str());
+                goodFile->file_name = fileInfo->fileName();
+                goodFile->file_name_short = fileInfo->baseName();
+                goodFile->parent_directory = fileInfo->absolutePath();
+
+
+                goodFiles.push_back(goodFile);
+
             }
             else {
                 badFiles.push_back(filePath);
@@ -149,12 +163,16 @@ void ThreadedModFileCheckResults::setBadFileCount(const int64_t &badFileCount)
     m_badFileCount = badFileCount;
 }
 
-QVector<QString> ThreadedModFileCheckResults::goodFiles() const
+QVector<ModFile *> ThreadedModFileCheckResults::goodFiles() const
 {
     return m_goodFiles;
 }
 
-void ThreadedModFileCheckResults::setGoodFiles(const QVector<QString> &goodFiles)
+void ThreadedModFileCheckResults::setGoodFiles(const QVector<ModFile *> &goodFiles)
 {
     m_goodFiles = goodFiles;
 }
+
+
+
+

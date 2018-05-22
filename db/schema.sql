@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS directories;
 DROP INDEX IF EXISTS song_index;
 DROP TABLE IF EXISTS eqSettings;
 DROP TABLE IF EXISTS playlists;
-DROP TABLE IF EXISTS playlistSongs;
+DROP TABLE IF EXISTS playlist_songs;
 
 -- CREATE TABLE songs (
 --     id_md5     TEXT,
@@ -23,22 +23,21 @@ CREATE TABLE directories (
 
 CREATE TABLE plays (id_md5 TEXT, number_plays INT);
 
-
-
 CREATE TABLE playlists (
     id           INTEGER PRIMARY KEY   AUTOINCREMENT,
-    dateModified timestamp default (strftime('%s', 'now')),
-    playlistName TEXT
+    dated_modified timestamp default (strftime('%s', 'now')),
+    playlist_name TEXT
 );
 
-CREATE TABLE playlistSongs (
-    playlistId INT,
-    id_md5     TEXT,
+INSERT INTO playlists VALUES(0, "2007-01-01 10:00:00", "default");
+
+CREATE TABLE playlist_songs (
+    playlist_id INT,
     song_name  TEXT,
-    name       TEXT, 
-    file_name_short  TEXT, 
-    directory  TEXT, 
+    file_name  TEXT, 
+    parent_directory  TEXT, 
     like_value INT,
+    has_been_processed INT default (0),
     in_queue   INT
 );
 
@@ -46,7 +45,7 @@ CREATE
     INDEX 
         song_index 
     ON 
-        playlistSongs(song_name, name) 
+        playlist_songs(song_name, file_name) 
     WHERE 
         song_name 
     IS 

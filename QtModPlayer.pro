@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,7 +38,8 @@ SOURCES += \
     Workers/ThreadedModFileCheck.cpp \
     DBManager/dbmanager.cpp \
     DBManager/ThreadedModFileInserter.cpp \
-    PlaylistWidget/playlistwidget.cpp
+    PlaylistWidget/playlistwidget.cpp \
+    modfile.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     Workers/ThreadedModFileCheck.h \
     DBManager/dbmanager.h \
     DBManager/ThreadedModFileInserter.h \
-    PlaylistWidget/playlistwidget.h
+    PlaylistWidget/playlistwidget.h \
+    modfile.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

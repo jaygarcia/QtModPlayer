@@ -2,11 +2,14 @@
 #define PLAYLISTWIDGET_H
 
 #include <QWidget>
+#include <QLayout>
 #include <QProgressDialog>
+#include <QTableView>
 
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QDropEvent>
+#include <QTableView>
 
 #include "../Workers/ThreadedModFileCheck.h"
 #include "../DBManager/dbmanager.h"
@@ -18,6 +21,7 @@ class PlaylistWidget : public QWidget
 private:
     QProgressDialog m_progressDialog;
     DBManager m_dbManager;
+    QTableView *m_tableView;
 
 public:
     PlaylistWidget(QWidget *parent = nullptr);
