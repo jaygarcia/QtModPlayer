@@ -66,9 +66,9 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        qDebug() << "Total good files " << results->goodFileCount();
        qDebug() << "Total bad files "  << results->badFileCount();
 
-       this->m_progressDialog.hide();
        thread->quit();
        thread->wait();
+       this->m_progressDialog.hide();
 
        qDebug() << " results.size() == " << results->goodFiles().size();
        this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
