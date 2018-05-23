@@ -14,7 +14,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     m_tableView = new QTableView(this);
     this->layout()->addWidget(m_tableView);
-    this->m_dbManager.purgeCurrentPlaylist();
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
@@ -60,7 +59,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
         QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
-        this->m_progressDialog.setLabelText(QString("Testing total files: %1").arg(friendlyNumber));
+        this->m_progressDialog.setLabelText(QString("Validating total files: %1").arg(friendlyNumber));
     });
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
@@ -72,7 +71,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        thread->wait();
 
        qDebug() << " results.size() == " << results->goodFiles().size();
-       this->m_dbManager.addToPlaylist("default", results->goodFiles());
+       this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
     });
 
     connect(checker, &ThreadedModFileCheck::countingFiles, this, [=](unsigned int filesCounted) {

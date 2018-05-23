@@ -11,7 +11,9 @@ public:
     QString song_name;
     QString file_name;
     QString file_name_short;
+    QString full_path;
     QString parent_directory;
+    QString md5;
 signals:
 
 public slots:

@@ -13,6 +13,7 @@
 
 #include "../Workers/ThreadedModFileCheck.h"
 #include "../DBManager/dbmanager.h"
+#include "../DBManager/ThreadedModFileInserter.h"
 
 class PlaylistWidget : public QWidget
 {
@@ -21,6 +22,7 @@ class PlaylistWidget : public QWidget
 private:
     QProgressDialog m_progressDialog;
     DBManager m_dbManager;
+    ThreadedModFileInserter m_modFileInserter;
     QTableView *m_tableView;
 
 public:

@@ -6,6 +6,10 @@
 
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
+#include <QThread>
+
+#include "../modfile.h"
+#include "dbmanager.h"
 
 class ThreadedModFileInserterResults : public QObject {
     Q_OBJECT
@@ -27,17 +31,16 @@ class ThreadedModFileInserter : public QObject
 public:
     ThreadedModFileInserter();
     void run();
+    void addToPlaylist(int playlistId, QVector<ModFile *> modFiles);
 
 private:
-    void searchDirectoryForFiles(QString dirName);
-    void queryAllDroppedItems();
-
 
 signals:
-    void filesCounted(unsigned int filesCounted);
-    void countingFiles(unsigned int filesCounted);
-    void fileCheckPercentUpdate(int pctComplete);
-    void fileCheckComplete(ThreadedModFileInserterResults* = 0); // <-- To do, find out how to pass a signal
+    void insertPercentUpdate(int pctComplete);
+    void insertComplete(int totalDone);
+
+public slots:
+    void onFileInsert();
 };
 
 

@@ -1,14 +1,5 @@
 #include "mainwindow.h"
-
-PlaylistWidget *MainWindow::getPlaylist() const
-{
-    return m_playlistWindow;
-}
-
-void MainWindow::setPlaylist(PlaylistWidget *playlist)
-{
-    m_playlistWindow = playlist;
-}
+#include "DBManager/dbmanager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -26,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->setAcceptDrops(true);
 
     this->m_playlistWidgetShowing = false;
+    DBManager *dbManager = new DBManager();
+    dbManager->purgeCurrentPlaylist();
+
 //    this->m_playlistWindow->close();
 }
 
@@ -89,6 +83,15 @@ void MainWindow::hidePlaylistWindow() {
         this->m_playlistWidgetShowing = false;
 
     }
+}
+PlaylistWidget *MainWindow::getPlaylist() const
+{
+    return m_playlistWindow;
+}
+
+void MainWindow::setPlaylist(PlaylistWidget *playlist)
+{
+    m_playlistWindow = playlist;
 }
 
 

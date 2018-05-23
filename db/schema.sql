@@ -1,6 +1,5 @@
 -- DROP TABLE IF EXISTS songs;
 DROP TABLE IF EXISTS plays;
-DROP TABLE IF EXISTS directories;
 DROP INDEX IF EXISTS song_index;
 DROP TABLE IF EXISTS eqSettings;
 DROP TABLE IF EXISTS playlists;
@@ -16,11 +15,6 @@ DROP TABLE IF EXISTS playlist_songs;
 --     in_queue   INT
 -- );
 
-CREATE TABLE directories (
-    name         TEXT,
-    number_files INT
-);
-
 CREATE TABLE plays (id_md5 TEXT, number_plays INT);
 
 CREATE TABLE playlists (
@@ -35,10 +29,12 @@ CREATE TABLE playlist_songs (
     playlist_id INT,
     song_name  TEXT,
     file_name  TEXT, 
-    parent_directory  TEXT, 
+    full_path  TEXT, 
     like_value INT,
-    has_been_processed INT default (0),
-    in_queue   INT
+    was_processed INT default (0),
+    md5        TEXT,
+    in_queue   INT,
+    unique(full_path)
 );
 
 CREATE 

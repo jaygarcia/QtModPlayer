@@ -1,5 +1,20 @@
 #include "ThreadedModFileCheck.h"
 
+// Based on: https://stackoverflow.com/a/16383433
+QString fileChecksum(const QString &fileName) {
+    QFile f(fileName);
+
+    QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
+
+    if (f.open(QFile::ReadOnly)) {
+        if (hash.addData(&f)) {
+            return QString::fromUtf8(hash.result().toHex());
+        }
+    }
+
+    return QString::fromUtf8(hash.result().toHex());
+}
+
 ThreadedModFileCheck::ThreadedModFileCheck(QVector<QString> droppedFiles) {
     this->m_droppedFiles = droppedFiles;
 }
@@ -39,17 +54,22 @@ void ThreadedModFileCheck::run() {
             if (goodLoad == openmpt::probe_file_header_result_success) {
                 ModFile *goodFile = new ModFile();
 
+                // TODO:: Move to a separate background processor thread
 //                openmpt::module mod(file);
 
-//                printf("Song title:: %s\n", mod.get_metadata("title").c_str());
+//                printf("%i -- Song title:: %s\n", i, mod.get_metadata("title").c_str());
 //                fflush(stdout);
 
-//                goodFile->song_name = QString::fromUtf8(mod.get_metadata("title").c_str());
+//                QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
+
                 goodFile->file_name = fileInfo->fileName();
                 goodFile->file_name_short = fileInfo->baseName();
                 goodFile->parent_directory = fileInfo->absolutePath();
+                goodFile->full_path = filePath;
 
-
+// TODO:: Move to a separate background processor thread
+//                goodFile->song_name = songName;
+//                goodFile->md5 = fileChecksum(filePath);
                 goodFiles.push_back(goodFile);
 
             }

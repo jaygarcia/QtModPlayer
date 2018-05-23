@@ -4,70 +4,39 @@ ThreadedModFileInserter::ThreadedModFileInserter() {
 }
 
 void ThreadedModFileInserter::run() {
-    this->queryAllDroppedItems();
 
-//    unsigned int totalFiles = this->allFiles.size(),
-//            totalFilesChecked = 0;
-
-//    float percentDone;
-
-//    emit filesCounted(totalFiles);
-
-//    QVector<QString> badFiles;
-//    QVector<QString> goodFiles;
-
-//    int lastPctDone = 0;
-
-//    for (uint32_t i = 0; i < totalFiles; ++i) {
-
-////        if (pctDone > lastPctDone && pctDone % 2 == 0) {
-////            emit fileCheckPercentUpdate(pctDone);
-////            lastPctDone = pctDone;
-////        }
-//    }
-
-
-    ThreadedModFileInserterResults *finalResults = new ThreadedModFileInserterResults();
-
-
-
-    emit fileCheckComplete(finalResults);
 }
 
 
-// Todo: Loop through all dropped items
-// -- Put them in allFiles QVector<QString> member
+void ThreadedModFileInserter::addToPlaylist(int playlistId, QVector<ModFile *> modFiles) {
 
-void ThreadedModFileInserter::queryAllDroppedItems() {
-//    for (int64_t i = 0; i < this->m_droppedFiles.size(); ++i) {
-//        QString droppedFileName = this->m_droppedFiles.at(i);
+    DBManager *dbManager = new DBManager();
+    dbManager->setPlaylistId(playlistId);
+    dbManager->setFilesToInsert(modFiles);
 
-//        QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
-//        qDebug() << "\n*********************************\n";
+    QThread *thread = new QThread();
+    connect(thread, &QThread::finished, dbManager, &QObject::deleteLater);
 
-//        if (droppedFileInfo->isDir()) {
-//            qDebug() << "Dropped dir :: " << droppedFileName;
-//            this->searchDirectoryForFiles(droppedFileName);
-//        }
+    dbManager->moveToThread(thread);
 
-//        if (droppedFileInfo->isFile()) {
-//            qDebug() << "Dropped file:" << droppedFileName;
-//            this->allFiles.push_back(droppedFileName);
-//        }
-//    }
+    connect(thread, &QThread::started, dbManager, &DBManager::run);
+
+    connect(dbManager, &DBManager::insertPercentUpdate, this, [this](int pctComplete) {
+       qDebug() << "Insert % complete ::" << pctComplete;
+       // Todo : Emit file insert percentage so we can update the Playlist progress bar
+    });
+
+
+    connect(dbManager, &DBManager::insertComplete, this, [this](int totalDone) {
+        qDebug() << "Insert DONE ::" << totalDone;
+        // todo : Emit done
+    });
+
+    thread->start();
+
 }
 
 
-void ThreadedModFileInserter::searchDirectoryForFiles(QString dirName) {
-//    QDirIterator *iterator = new QDirIterator(dirName, QDirIterator::Subdirectories);
+void ThreadedModFileInserter::onFileInsert() {
 
-//    while (iterator->hasNext() && ! QThread::currentThread()->isInterruptionRequested()) {
-//        this->allFiles.push_back(iterator->next()); // pop off the stack
-
-//        if (this->allFiles.size() % 15 == 0) {
-//            emit countingFiles(this->allFiles.size());
-//        }
-//    }
 }
-
-
