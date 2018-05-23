@@ -1,5 +1,6 @@
 #include "playlistwidget.h"
 
+#include <QTableWidget>
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 {
@@ -12,7 +13,13 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->setLayout(new QVBoxLayout());
 
-    m_tableView = new QTableView(this);
+    AsyncTableModel model(this);
+
+    m_tableView = new QTableWidget(this);
+    m_tableView->setRowCount(100);
+    m_tableView->setColumnCount(3);
+//    m_tableView->setModel(&model);
+
     this->layout()->addWidget(m_tableView);
 }
 
@@ -54,7 +61,9 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     // TODO Wire in Cancel with thread quitting https://doc.qt.io/qt-5.10/qthread.html
     connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
-        this->m_progressDialog.setValue(pctComplete);
+        if (! this->m_progressDialog.isHidden()) {
+            this->m_progressDialog.setValue(pctComplete);
+        }
     });
 
     connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
@@ -83,6 +92,8 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         thread->requestInterruption();
         thread->quit();
         thread->wait();
+        this->thread()->msleep(10);
+        m_progressDialog.hide();
         m_progressDialog.hide();
     });
 

@@ -83,10 +83,17 @@ void ThreadedModFileCheck::run() {
 
         int pctDone = (int) (percentDone * 100.0);
 
-        if (pctDone > lastPctDone && pctDone % 2 == 0) {
-            emit fileCheckPercentUpdate(pctDone);
+
+
+        if (pctDone > lastPctDone) {
+            if (! QThread::currentThread()->isInterruptionRequested()) {
+                emit fileCheckPercentUpdate(pctDone);
+            }
             lastPctDone = pctDone;
         }
+
+        // Give us a little time to press cancel
+        this->thread()->msleep(1);
     }
 
 
@@ -112,7 +119,7 @@ void ThreadedModFileCheck::queryAllDroppedItems() {
         QString droppedFileName = this->m_droppedFiles.at(i);
 
         QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
-        qDebug() << "\n*********************************\n";
+//        qDebug() << "\n*********************************\n";
 
         if (droppedFileInfo->isDir()) {
             qDebug() << "Dropped dir :: " << droppedFileName;

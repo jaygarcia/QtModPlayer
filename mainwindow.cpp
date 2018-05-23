@@ -19,8 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->m_playlistWidgetShowing = false;
     DBManager *dbManager = new DBManager();
     dbManager->purgeCurrentPlaylist();
-
-//    this->m_playlistWindow->close();
 }
 
 // Todo: Move to playlist?

@@ -113,7 +113,7 @@ void DBManager::run() {
 
         pctDone = (int) (percentDone * 100.0);
 
-        if (pctDone > lastPctDone && pctDone % 2 == 0) {
+        if (pctDone > lastPctDone) {
             emit insertPercentUpdate(pctDone);
             lastPctDone = pctDone;
         }
