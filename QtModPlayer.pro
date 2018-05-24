@@ -39,7 +39,8 @@ SOURCES += \
     DBManager/dbmanager.cpp \
     DBManager/ThreadedModFileInserter.cpp \
     PlaylistWidget/playlistwidget.cpp \
-    modfile.cpp
+    modfile.cpp \
+    PlaylistWidget/asyncbufferedtablemodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,7 +50,8 @@ HEADERS += \
     DBManager/dbmanager.h \
     DBManager/ThreadedModFileInserter.h \
     PlaylistWidget/playlistwidget.h \
-    modfile.h
+    modfile.h \
+    PlaylistWidget/asyncbufferedtablemodel.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

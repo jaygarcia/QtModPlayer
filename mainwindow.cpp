@@ -61,7 +61,10 @@ void MainWindow::showPlaylistWindow() {
         PlaylistWidget *playlist = new PlaylistWidget();
         playlist->setObjectName("playlist");
         playlist->setAttribute(Qt::WA_DeleteOnClose);
-        playlist->setFixedSize(this->geometry().width(), 300);
+        playlist->setFixedWidth(this->geometry().width());
+        playlist->setMinimumHeight(300);
+        playlist->setMaximumHeight(500);
+
         playlist->move(this->pos().x(), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
 
@@ -77,7 +80,7 @@ void MainWindow::showPlaylistWindow() {
 
 void MainWindow::hidePlaylistWindow() {
     if (this->m_playlistWidgetShowing == true) {
-        this->getPlaylist()->close();
+        this->getPlaylist()->hide();
         this->m_playlistWidgetShowing = false;
 
     }

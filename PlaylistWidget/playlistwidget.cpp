@@ -1,6 +1,7 @@
 #include "playlistwidget.h"
 
 #include <QTableWidget>
+#include <QHeaderView>
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 {
@@ -11,16 +12,44 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->m_progressDialog.cancel();
 
-    this->setLayout(new QVBoxLayout());
+    QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::Down, this);
+    this->setLayout(boxLayout);
 
-    AsyncTableModel model(this);
 
-    m_tableView = new QTableWidget(this);
-    m_tableView->setRowCount(100);
-    m_tableView->setColumnCount(3);
-//    m_tableView->setModel(&model);
+
+    m_tableView = new QTableView(this);
+
+    QHeaderView *verticalHeader = m_tableView->verticalHeader();
+
+    verticalHeader->hide();
+    verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
+    verticalHeader->setDefaultSectionSize(24);
+
+
+    QFont font = QFont("Courier New", 12, QFont::Bold);
+    m_tableView->setFont(font);
+    m_tableView->setModel(&m_model);
+    m_tableView->horizontalHeader()->setStretchLastSection(true);
+
+
+
+
+//    model->setHeaderData(1, Qt::Horizontal, tr("Salary"));
+
+//    QWidget *y = new QWidget(this);
+//    y->setStyleSheet("background-color: #F0F");
+//    this->layout()->addWidget(y);
+//    boxLayout->setStretch(0,1);
 
     this->layout()->addWidget(m_tableView);
+    boxLayout->setStretch(0,1);
+
+//    QWidget *x = new QWidget(this);
+//    x->setStyleSheet("background-color: #00F");
+//    this->layout()->addWidget(x);
+//    this->layout()->setMargin(0);
+
+    this->layout()->setMargin(0);
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
