@@ -4,9 +4,11 @@
 
 RandomListModel::RandomListModel(QObject *parent)
     : QAbstractListModel(parent), m_rows(bufferSize), m_count(1000000) {
+    m_dbManager = new DBManager(this);
 }
 
 RandomListModel::~RandomListModel() {
+    this->m_dbManager->disconnect();
 }
 
 int RandomListModel::rowCount(const QModelIndex &) const {

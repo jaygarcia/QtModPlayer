@@ -5,6 +5,7 @@
 #include <QThread>
 #include <tuple>
 #include <QtConcurrent>
+#include "../DBManager/dbmanager.h"
 
 #include <QAbstractListModel>
 static const int bufferSize(500);
@@ -24,6 +25,7 @@ public:
     QVariant data(const QModelIndex &, int) const override;
 
 private:
+    DBManager *m_dbManager;
     void cacheRows(int, int) const;
     QString fetchRow(int) const;
 

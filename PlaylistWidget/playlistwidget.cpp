@@ -49,7 +49,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 //    this->layout()->addWidget(x);
 //    this->layout()->setMargin(0);
 
-    this->layout()->setMargin(0);
+//    this->layout()->setMargin(0);
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {

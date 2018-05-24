@@ -14,7 +14,7 @@ void DBManager::purgeCurrentPlaylist() {
     this->connect();
 
     QSqlQuery query(this->m_db);
-    query.prepare("delete from playlist_songs where playlist_id = 0");
+//    query.prepare("delete from playlist_songs where playlist_id = 0");
 
     if (!query.exec()) {
         qDebug() << "Could not purge current playlist";
@@ -68,7 +68,7 @@ QString getLastExecutedQuery(const QSqlQuery& query)
  return str;
 }
 
-void DBManager::run() {
+void DBManager::bulkInsertToPlaylist() {
     if (! this->connect()) {
         qDebug() << "Cannot connect to database! Cannot run()";
         return;
@@ -125,7 +125,7 @@ void DBManager::run() {
     this->disconnect();
 }
 
-void DBManager::addToPlaylist(int playlistId, QVector<ModFile *> filesToInsert) {
+void DBManager::queueAddToPlaylist(int playlistId, QVector<ModFile *> filesToInsert) {
     this->m_playlistId = playlistId;
     this->m_filesToInsert = filesToInsert;
 }
@@ -190,7 +190,29 @@ bool DBManager::disconnect() {
 }
 
 
+int DBManager::queryNumRowsForPlaylist(int playlistId) {
+    this->connect();
 
+//    QSqlQuery query;
+//    query.prepare("Select count (*) from playlist_songs where playlist_id = :playlist_id");
+//    query.addBindValue(":playlist_id", playlistId);
+//    if (! query.exec()) {
+//        qDebug() << "Something went wrong with counting songs from a playlist";
+//    }
+//    this->disconnect();
+
+//    QSqlRecord record = query.record();
+
+
+
+
+}
+
+int DBManager::queryRowFromPlaylist(int playlist) {
+
+}
+
+// Todo: Separate in a DBManager base class
 QSqlDatabase DBManager::db() const
 {
     return m_db;

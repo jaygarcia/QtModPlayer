@@ -22,12 +22,16 @@ private:
 
 public:
     explicit DBManager(QObject *parent = nullptr);
-    void addToPlaylist(int playlistId, QVector<ModFile *> filesToInsert);
-    void run(); // Executed by thread
+    void queueAddToPlaylist(int playlistId, QVector<ModFile *> filesToInsert);
+    void bulkInsertToPlaylist(); // Executed by thread
     bool checkForDeployedDatabase();
     bool connect();
     bool disconnect();
     void purgeCurrentPlaylist();
+
+    // Todo: Push into another class?
+    int queryNumRowsForPlaylist(int playlistId);
+    int queryRowFromPlaylist(int playlist);
 
     QSqlDatabase db() const;
     void setDb(const QSqlDatabase &db);
