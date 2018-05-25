@@ -2,10 +2,30 @@
 #include "../modfile.h"
 
 
+
+QString getLastExecutedQuery(const QSqlQuery& query)
+{
+ QString str = query.lastQuery();
+ QMapIterator<QString, QVariant> it(query.boundValues());
+ while (it.hasNext()) {
+  it.next();
+  str.replace(it.key(),it.value().toString());
+ }
+ return str;
+}
+
+
 int connectionCount = 0;
 
 DBManager::DBManager(QObject *parent) : QObject(parent)
 {
+    m_dbFileName  = "modmusic.db";
+
+    QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
+            destDbFile  = destDbDir + m_dbFileName;
+
+
+    this->m_dbPath = destDbFile;
 }
 
 void DBManager::purgeCurrentPlaylist() {
@@ -13,26 +33,24 @@ void DBManager::purgeCurrentPlaylist() {
 
     this->connect();
 
-    QSqlQuery query(this->m_db);
+//    QSqlQuery query(this->m_db);
 //    query.prepare("delete from playlist_songs where playlist_id = 0");
 
-    if (!query.exec()) {
-        qDebug() << "Could not purge current playlist";
-        qDebug() << query.lastError();
-    }
-    query.clear();
+//    if (!query.exec()) {
+//        qDebug() << "Could not purge current playlist";
+//        qDebug() << query.lastError();
+//    }
+//    query.clear();
 
     this->disconnect();
 }
 
 bool DBManager::checkForDeployedDatabase() {
-    QString dbFileName  = "modmusic.db",
-            sourceDbFile = QDir::currentPath() + "/../Resources/db/" + dbFileName;
+    QString sourceDbFile = QDir::currentPath() + "/../Resources/db/" + m_dbFileName;
+
 
     QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
-            destDbFile  = destDbDir + dbFileName;
-
-    this->m_dbPath = destDbFile;
+            destDbFile  = destDbDir + m_dbFileName;
 
 //    qDebug() << "this->m_dbPath =" << destDbFile;
 //    qDebug() << destDbFile;
@@ -57,20 +75,9 @@ bool DBManager::checkForDeployedDatabase() {
     return true;
 }
 
-QString getLastExecutedQuery(const QSqlQuery& query)
-{
- QString str = query.lastQuery();
- QMapIterator<QString, QVariant> it(query.boundValues());
- while (it.hasNext()) {
-  it.next();
-  str.replace(it.key(),it.value().toString());
- }
- return str;
-}
-
 void DBManager::bulkInsertToPlaylist() {
     if (! this->connect()) {
-        qDebug() << "Cannot connect to database! Cannot run()";
+        qDebug() << "Cannot connect to database! Cannot bulkInsertToPlaylist()";
         return;
     }
 
@@ -146,11 +153,14 @@ bool DBManager::connect() {
         m_db = QSqlDatabase::addDatabase("QSQLITE", dbId);
         m_db.setDatabaseName(this->m_dbPath);
         bool hasOpened = m_db.open();
+
         qDebug() << "m_db.databaseName =" << m_db.databaseName();
 
         qDebug() << "hasOpened" << hasOpened;
 
-        ++connectionCount;
+        if (hasOpened) {
+            connectionCount++;
+        }
 
         return hasOpened;
     }
@@ -190,25 +200,49 @@ bool DBManager::disconnect() {
 }
 
 
-int DBManager::queryNumRowsForPlaylist(int playlistId) {
+int DBManager::queryNumRowsForPlaylist(int playlistId)  {
     this->connect();
 
-//    QSqlQuery query;
-//    query.prepare("Select count (*) from playlist_songs where playlist_id = :playlist_id");
-//    query.addBindValue(":playlist_id", playlistId);
-//    if (! query.exec()) {
-//        qDebug() << "Something went wrong with counting songs from a playlist";
-//    }
-//    this->disconnect();
 
-//    QSqlRecord record = query.record();
+    QSqlQuery query(this->m_db);
+    query.prepare("select count(*) as num_rows from playlist_songs where playlist_id = 0");
+//    query.bindValue(":playlist_id", playlistId);
 
+    if (! query.exec()) {
+        qDebug() << "Something went wrong with counting songs from a playlist";
+    }
+    else {
+        query.seek(0);
 
+        return query.record().value(0).toInt();
+//        qDebug() << "num_records=" << value;
+//        qDebug() << getLastExecutedQuery(query);
+    }
 
+    this->disconnect();
 
+    return 0;
 }
 
-int DBManager::queryRowFromPlaylist(int playlist) {
+QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
+    QSqlQuery query(this->m_db);
+    query.prepare("select song_name, file_name from playlist_songs where playlist_id = :playlist_id and rowid = :row_id");
+    query.bindValue(":playlist_id", playlistId);
+    query.bindValue(":row_id", rowId);
+
+    if (! query.exec()) {
+        qDebug() << "Something went wrong with counting songs from a playlist";
+        qDebug() << getLastExecutedQuery(query);
+    }
+    else {
+        query.seek(0);
+
+    }
+    QSqlRecord record = query.record();
+
+    qDebug() << rowId << record.value("song_name").toString() << record.value(0).toString();
+
+    return query.record();
 
 }
 

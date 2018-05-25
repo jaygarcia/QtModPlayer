@@ -16,8 +16,10 @@ class DBManager : public QObject
 private:
     QSqlDatabase m_db;
     QString m_dbPath;
+    QString m_dbFileName;
     QVector<ModFile *> m_filesToInsert;
     int m_playlistId;
+
 
 
 public:
@@ -31,7 +33,7 @@ public:
 
     // Todo: Push into another class?
     int queryNumRowsForPlaylist(int playlistId);
-    int queryRowFromPlaylist(int playlist);
+    QSqlRecord getRecordAt(int rowNumber, int playlistId);
 
     QSqlDatabase db() const;
     void setDb(const QSqlDatabase &db);

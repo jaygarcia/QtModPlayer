@@ -13,26 +13,6 @@ static const int lookAhead(100);
 static const int halfLookAhead(lookAhead/2);
 
 
-
-class RandomListModel : public QAbstractListModel
-{
-    Q_OBJECT
-public:
-    RandomListModel(QObject *parent = 0);
-    ~RandomListModel();
-
-    int rowCount(const QModelIndex & = QModelIndex()) const override;
-    QVariant data(const QModelIndex &, int) const override;
-
-private:
-    DBManager *m_dbManager;
-    void cacheRows(int, int) const;
-    QString fetchRow(int) const;
-
-    mutable QContiguousCache<QString> m_rows;
-    const int m_count;
-};
-
 //class AsyncBufferedTableModel : public QAbstractTableModel{
 //    Q_OBJECT
 //    //type used to hold the model's internal data in the variable m_rows
@@ -138,10 +118,13 @@ class AsyncBufferedTableModel : public QAbstractTableModel {
 
 private:
     void cacheRows(int, int) const;
-    QString fetchRow(int) const;
+    QSqlRecord fetchRow(int rowNumber, int playlistId) const;
 
-    mutable QContiguousCache<QString> m_rows;
+    mutable QContiguousCache<QSqlRecord> m_rows;
     int m_count;
+    int m_playlistId;
+
+    DBManager *m_dbManager;
 
 public:
     AsyncBufferedTableModel(QObject *parent = 0);
@@ -163,10 +146,10 @@ public:
         if (orientation == Qt::Horizontal) {
             switch (section) {
                 case 0:
-                    return "File Name";
+                    return "Song Name";
 
                 case 1:
-                    return "Song Name";
+                    return "File Name";
 
                 default:
                     return QVariant();
