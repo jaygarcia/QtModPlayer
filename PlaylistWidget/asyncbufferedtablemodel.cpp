@@ -7,7 +7,7 @@
 AsyncBufferedTableModel::AsyncBufferedTableModel(QObject *parent)
     : QAbstractTableModel(parent), m_rows(bufferSize) {
     m_dbManager = new DBManager(this);
-    m_dbManager->queryNumRowsForPlaylist(0);
+//    m_dbManager->queryNumRowsForPlaylist(0);
     m_count = m_dbManager->queryNumRowsForPlaylist(0);
     m_dbManager->connect();
 }
@@ -19,6 +19,13 @@ AsyncBufferedTableModel::~AsyncBufferedTableModel() {
 
 int AsyncBufferedTableModel::rowCount(const QModelIndex &) const {
     return m_count;
+}
+
+void AsyncBufferedTableModel::refresh() {
+    this->beginResetModel();
+    m_rows.clear();
+    m_count = m_dbManager->queryNumRowsForPlaylist(0);
+    this->endResetModel();
 }
 
 //! [0]
@@ -70,7 +77,7 @@ void AsyncBufferedTableModel::cacheRows(int from, int to) const {
 QSqlRecord AsyncBufferedTableModel::fetchRow(int rowNumber, int playlistId) const {
 //    QString rowData =  QString::number(position) + " | row";
 
-    QSqlRecord rowRecord = m_dbManager->getRecordAt(rowNumber, playlistId);
+    QSqlRecord rowRecord = m_dbManager->getRecordAt(rowNumber + 1, playlistId);
 
     return rowRecord;
 }

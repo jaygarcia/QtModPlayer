@@ -23,13 +23,13 @@ void ThreadedModFileInserter::addToPlaylist(int playlistId, QVector<ModFile *> m
 
     connect(dbManager, &DBManager::insertPercentUpdate, this, [this](int pctComplete) {
        qDebug() << "Insert % complete ::" << pctComplete;
-       // Todo : Emit file insert percentage so we can update the Playlist progress bar
+       emit insertPercentUpdate(pctComplete);
     });
 
 
     connect(dbManager, &DBManager::insertComplete, this, [this](int totalDone) {
-        qDebug() << "Insert DONE ::" << totalDone;
-        // todo : Emit done
+//        qDebug() << "Insert DONE ::" << totalDone;
+        emit insertComplete(totalDone);
     });
 
     thread->start();

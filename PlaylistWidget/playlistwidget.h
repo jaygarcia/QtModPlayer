@@ -31,11 +31,13 @@ private:
     ThreadedModFileInserter m_modFileInserter;
     QTableView *m_tableView;
     AsyncBufferedTableModel m_model;
+
 public:
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dropEvent(QDropEvent *e) override;
-
+    void startFileInsertion(ThreadedModFileCheckResults *results);
+    void refreshTableView();
 signals:
 
 public slots:

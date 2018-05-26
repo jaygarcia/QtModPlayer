@@ -133,6 +133,8 @@ public:
     int rowCount(const QModelIndex & = QModelIndex()) const override;
     QVariant data(const QModelIndex &, int) const override;
 
+    void refresh();
+
     int columnCount(const QModelIndex &parent) const override {
         Q_UNUSED(parent);
         return 2;

@@ -33,14 +33,14 @@ void DBManager::purgeCurrentPlaylist() {
 
     this->connect();
 
-//    QSqlQuery query(this->m_db);
-//    query.prepare("delete from playlist_songs where playlist_id = 0");
+    QSqlQuery query(this->m_db);
+    query.prepare("delete from playlist_songs where playlist_id = 0");
 
-//    if (!query.exec()) {
-//        qDebug() << "Could not purge current playlist";
-//        qDebug() << query.lastError();
-//    }
-//    query.clear();
+    if (!query.exec()) {
+        qDebug() << "Could not purge current playlist";
+        qDebug() << query.lastError();
+    }
+    query.clear();
 
     this->disconnect();
 }
@@ -91,8 +91,8 @@ void DBManager::bulkInsertToPlaylist() {
     QSqlQuery query(this->m_db);
 
     query.prepare(
-        "INSERT OR IGNORE INTO playlist_songs (playlist_id, song_name, file_name, full_path)"
-        " VALUES (:playlist_id, :song_name, :file_name, :full_path) "
+        "INSERT OR IGNORE INTO playlist_songs (playlist_id, song_name, file_name, full_path, was_processed)"
+        " VALUES (:playlist_id, :song_name, :file_name, :full_path, :was_processed) "
     );
 
     for (int i = 0; i < m_filesToInsert.size(); ++i) {
@@ -102,13 +102,26 @@ void DBManager::bulkInsertToPlaylist() {
         query.bindValue(":playlist_id", 0);
         query.bindValue(":file_name", modFile->file_name);
         query.bindValue(":full_path", modFile->full_path);
-//        query.bindValue(":song_name", modFile->song_name);
+
+        // Lets grab song info for the first thirty just so it looks prettier
+//        if (i < 30) {
+            std::ifstream file(modFile->full_path.toUtf8(), std::ios::binary);
+
+            openmpt::module mod(file);
+
+//            printf("%i -- Song title:: %s\n", i, mod.get_metadata("title").c_str());
+//            fflush(stdout);
+
+            QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
+            query.bindValue(":was_processed", 1);
+            query.bindValue(":song_name", modFile->song_name);
+//        }
 
         if (query.exec()) {
             totalDone++;
             query.finish();
             // Sleep for a tad
-            this->thread()->msleep(5);
+            this->thread()->msleep(1);
         }
         else {
             qDebug() << m_filesToInsert.at(i)->file_name << "FAILURE!";
@@ -226,7 +239,7 @@ int DBManager::queryNumRowsForPlaylist(int playlistId)  {
 
 QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
     QSqlQuery query(this->m_db);
-    query.prepare("select song_name, file_name from playlist_songs where playlist_id = :playlist_id and rowid = :row_id");
+    query.prepare("select * from playlist_songs where playlist_id = :playlist_id and rowid = :row_id");
     query.bindValue(":playlist_id", playlistId);
     query.bindValue(":row_id", rowId);
 
