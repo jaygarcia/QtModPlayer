@@ -4,6 +4,7 @@ DROP INDEX IF EXISTS song_index;
 DROP TABLE IF EXISTS eqSettings;
 DROP TABLE IF EXISTS playlists;
 DROP TABLE IF EXISTS playlist_songs;
+DROP TABLE IF EXISTS playlist_songs_tmp;
 
 -- CREATE TABLE songs (
 --     id_md5     TEXT,
@@ -26,14 +27,14 @@ CREATE TABLE playlists (
 INSERT INTO playlists VALUES(0, "2007-01-01 10:00:00", "default");
 
 CREATE TABLE playlist_songs (
+    song_id     INTEGER PRIMARY KEY AUTOINCREMENT,
     playlist_id INT,
     song_name  TEXT,
     file_name  TEXT, 
     full_path  TEXT, 
     like_value INT,
-    was_processed INT default (0),
     md5        TEXT,
-    in_queue   INT,
+    in_queue   INT default(0),
     unique(full_path)
 );
 

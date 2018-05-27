@@ -30,18 +30,40 @@ DBManager::DBManager(QObject *parent) : QObject(parent)
 }
 
 void DBManager::purgeCurrentPlaylist() {
-//    qDebug() << "purgeCurrentPlaylist()";
-
     this->connect();
 
-    QSqlQuery query(this->m_db);
-    query.prepare("delete from playlist_songs where playlist_id = 0");
+    this->m_db.commit();
 
-    if (!query.exec()) {
-        qWarning() << "Could not purge current playlist";
-        qWarning() << query.lastError();
-    }
-    query.clear();
+    QSqlQuery query(this->m_db);
+
+    query.exec("drop table if exists playlist_songs_tmp; ");
+
+    query.exec("delete from playlist_songs where playlist_id = 0; ");
+
+    query.exec("create table playlist_songs_tmp as "
+        "SELECT playlist_id, song_name, file_name, full_path, like_value, md5, in_queue "
+        "FROM playlist_songs; ");
+
+    query.exec("delete from sqlite_sequence where name = 'playlist_songs'; ");
+
+    query.exec("insert into "
+        "playlist_songs (playlist_id, song_name, file_name, full_path, like_value, md5, in_queue) "
+        "SELECT playlist_id, song_name, file_name, full_path, like_value, md5, in_queue "
+        "FROM playlist_songs_tmp; ");
+
+    query.exec("drop table playlist_songs_tmp; ");
+
+    query.exec("vacuum;");
+
+    query.finish();
+
+//    if (!query.exec()) {
+//        qWarning() << "Could not purge current playlist";
+//        qWarning() << query.lastError();
+//        qWarning() << getLastExecutedQuery(query);
+//    }
+
+    this->m_db.commit();
 
     this->disconnect();
 }
@@ -92,8 +114,8 @@ void DBManager::bulkInsertToPlaylist() {
     QSqlQuery query(this->m_db);
 
     query.prepare(
-        "INSERT OR IGNORE INTO playlist_songs (playlist_id, song_name, file_name, full_path, was_processed)"
-        " VALUES (:playlist_id, :song_name, :file_name, :full_path, :was_processed) "
+        "INSERT OR IGNORE INTO playlist_songs (playlist_id, song_name, file_name, full_path)"
+        " VALUES (:playlist_id, :song_name, :file_name, :full_path) "
     );
 
     for (int i = 0; i < m_filesToInsert.size(); ++i) {
@@ -104,25 +126,18 @@ void DBManager::bulkInsertToPlaylist() {
         query.bindValue(":file_name", modFile->file_name);
         query.bindValue(":full_path", modFile->full_path);
 
-        // Lets grab song info for the first thirty just so it looks prettier
-//        if (i < 30) {
-            std::ifstream file(modFile->full_path.toUtf8(), std::ios::binary);
+        std::ifstream file(modFile->full_path.toUtf8(), std::ios::binary);
 
-            openmpt::module mod(file);
+        openmpt::module mod(file);
 
-//            printf("%i -- Song title:: %s\n", i, mod.get_metadata("title").c_str());
-//            fflush(stdout);
-
-            QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
-//            qDebug() << songName;
-            query.bindValue(":was_processed", 1);
-            query.bindValue(":song_name", songName);
-//        }
+        QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
+        query.bindValue(":song_name", songName);
 
         if (query.exec()) {
             totalDone++;
             query.finish();
             // Sleep for a tad
+            this->m_db.commit();
             this->thread()->msleep(1);
         }
         else {
@@ -135,17 +150,7 @@ void DBManager::bulkInsertToPlaylist() {
 
         pctDone = (int) (percentDone * 100.0);
 
-//        int modNumber = 0;
-
-//        if (pctDone < 20) {
-//            modNumber = pctDone % 1;
-//        }
-//        else {
-//            modNumber = pctDone % 5;
-//        }
-
-
-        if (pctDone > lastPctDone && pctDone % 1 == 0) {
+        if (pctDone > lastPctDone) {
             emit insertPercentUpdate(pctDone);
             lastPctDone = pctDone;
         }
@@ -179,9 +184,6 @@ bool DBManager::connect() {
         m_db.setDatabaseName(this->m_dbPath);
         bool hasOpened = m_db.open();
 
-//        qDebug() << "m_db.databaseName =" << m_db.databaseName();
-
-//        qDebug() << "hasOpened" << hasOpened;
 
         if (hasOpened) {
             connectionCount++;
@@ -250,7 +252,7 @@ int DBManager::queryNumRowsForPlaylist(int playlistId)  {
 
 QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
     QSqlQuery query(this->m_db);
-    query.prepare("select * from playlist_songs where playlist_id = :playlist_id and rowid = :row_id");
+    query.prepare("select * from playlist_songs where playlist_id = :playlist_id and song_id = :row_id    ");
     query.bindValue(":playlist_id", playlistId);
     query.bindValue(":row_id", rowId);
 
@@ -264,15 +266,42 @@ QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
     }
     QSqlRecord record = query.record();
 
+//    qWarning() << getLastExecutedQuery(query);
+
 //    qDebug() << rowId << record.value("song_name").toString() << record.value(0).toString();
 
     return query.record();
 
 }
 
+/*  --- To be used on row removal
+
+drop table if exists playlist_songs_tmp;
+
+create table playlist_songs_tmp as
+    SELECT
+        playlist_id, song_name, file_name, full_path, like_value, md5, in_queue
+    FROM
+        playlist_songs;
+
+delete from playlist_songs;
+delete from sqlite_sequence where name = 'playlist_songs';
+
+insert into
+    playlist_songs
+     (playlist_id, song_name, file_name, full_path, like_value, md5, in_queue)
+    SELECT
+        playlist_id, song_name, file_name, full_path, like_value, md5, in_queue
+    FROM
+        playlist_songs_tmp;
+
+drop table playlist_songs_tmp;
+
+vacuum;
+ */
+
 // Todo: Separate in a DBManager base class
-QSqlDatabase DBManager::db() const
-{
+QSqlDatabase DBManager::db() const {
     return m_db;
 }
 

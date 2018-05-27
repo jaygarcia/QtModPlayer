@@ -84,7 +84,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
         QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
-        this->m_progressDialog.setLabelText(QString("Validating total files: %1").arg(friendlyNumber));
+        this->m_progressDialog.setLabelText(QString("Validating %1 files").arg(friendlyNumber));
     });
 
 
