@@ -7,7 +7,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
-//    this->setStyleSheet("background-color: blue");
     this->setAcceptDrops(true);
 
     this->m_progressDialog.cancel();
@@ -34,29 +33,14 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     boxLayout->setStretch(0,1);
 
 
-    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, &PlaylistWidget::onInsertPercentUpdate);
-
-    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, &PlaylistWidget::onInsertComplete);
-
-
-//    model->setHeaderData(1, Qt::Horizontal, tr("Salary"));
-
-//    QWidget *y = new QWidget(this);
-//    y->setStyleSheet("background-color: #F0F");
-//    this->layout()->addWidget(y);
-//    boxLayout->setStretch(0,1);
-
-
-//    QWidget *x = new QWidget(this);
-//    x->setStyleSheet("background-color: #00F");
-//    this->layout()->addWidget(x);
-//    this->layout()->setMargin(0);
-
-//    this->layout()->setMargin(0);
 }
 
-void PlaylistWidget::refreshTableView() {
-    m_tableView->repaint();
+//void PlaylistWidget::refreshTableView() {
+//    m_tableView->repaint();
+//}
+
+void PlaylistWidget::setModFileInserter(ThreadedModFileInserter *modFileInserter) {
+    m_modFileInserter = modFileInserter;
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
@@ -134,17 +118,18 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
 
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-    this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
+    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
 }
 
-void PlaylistWidget::onInsertPercentUpdate(int pctComplete) {
-    AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
-    model->refresh();
-}
+//void PlaylistWidget::onInserterPercentUpdate(int pctDone) {
+//    this->refreshTableView();
+//}
 
-void PlaylistWidget::onInsertComplete(int totalDone) {
-    qDebug() << "Total files inserted" << totalDone;
+//void PlaylistWidget::onInserterComplete(int totalFiles) {
+//    this->refreshTableView();
+//}
 
+void PlaylistWidget::refreshTableView() {
     AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
     model->refresh();
 }

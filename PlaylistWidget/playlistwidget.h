@@ -28,21 +28,23 @@ class PlaylistWidget : public QWidget
 private:
     QProgressDialog m_progressDialog;
     DBManager m_dbManager;
-    ThreadedModFileInserter m_modFileInserter;
     QTableView *m_tableView;
     AsyncBufferedTableModel m_model;
 
 public:
+    ThreadedModFileInserter *m_modFileInserter;
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void startFileInsertion(ThreadedModFileCheckResults *results);
     void refreshTableView();
+    void setModFileInserter(ThreadedModFileInserter *modFileInserter);
+
 signals:
 
 public slots:
-    void onInsertPercentUpdate(int pctComplete);
-    void onInsertComplete(int totalDone);
+//    void onInserterPercentUpdate(int pctDone);
+//    void onInserterComplete(int totalFiles);
 };
 
 #endif // PLAYLISTWIDGET_H

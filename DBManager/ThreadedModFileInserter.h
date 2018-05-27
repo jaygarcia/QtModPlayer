@@ -28,19 +28,21 @@ class ThreadedModFileInserter : public QObject
 {
     Q_OBJECT
 
+private:
+
 public:
     ThreadedModFileInserter();
     void run();
     void addToPlaylist(int playlistId, QVector<ModFile *> modFiles);
 
-private:
 
 signals:
-    void insertPercentUpdate(int pctComplete);
-    void insertComplete(int totalDone);
+    void insertPercentUpdate(int pctDone);
+    void insertComplete(int totalFiles);
 
 public slots:
-    void onFileInsert();
+    void onDbManagerInsertPercentUpdate(int pctDone);
+    void onDbManagerInsertComplete(int totalFiles);
 };
 
 

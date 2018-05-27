@@ -54,11 +54,6 @@ QVariant AsyncBufferedTableModel::data(const QModelIndex &index, int role) const
         }
     }
 
-//    QSqlRecord record = query.record();
-
-//    qDebug() << rowId << record.value("file_name").toString() << record.value(0).toString();
-
-
     if (index.column() == 0) {
         return  m_rows.at(row).value("song_name").toString();
     }

@@ -145,7 +145,7 @@ void DBManager::bulkInsertToPlaylist() {
 //        }
 
 
-        if (pctDone > lastPctDone && pctDone % 2 == 0) {
+        if (pctDone > lastPctDone && pctDone % 1 == 0) {
             emit insertPercentUpdate(pctDone);
             lastPctDone = pctDone;
         }

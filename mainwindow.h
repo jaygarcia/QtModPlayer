@@ -5,6 +5,7 @@
 #include <QProgressDialog>
 
 #include "Workers/ThreadedModFileCheck.h"
+#include "DBManager/ThreadedModFileInserter.h"
 #include "DBManager/dbmanager.h"
 
 #include "playerwidget.h"
@@ -17,7 +18,6 @@ class MainWindow : public QMainWindow
 
 private:
     PlaylistWidget *m_playlistWindow;
-
     bool m_playlistWidgetShowing;
 
 public:
@@ -25,6 +25,8 @@ public:
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
     void onPlayerWidgetShowPlayList();
+
+    ThreadedModFileInserter *m_modFileInserter;
 
     void togglePlaylistWindow();
     void showPlaylistWindow();
@@ -35,8 +37,14 @@ public:
     PlaylistWidget *getPlaylist() const;
     void setPlaylist(PlaylistWidget *playlist);
 
+signals :
+
+
 public slots:
     //    void onFileCountComplete(ThreadedModFileCheckResults);
+    void onInserterPercentUpdate(int pctComplete);
+    void onInserterComplete(int totalFiles);
+
 };
 
 #endif // MAINWINDOW_H
