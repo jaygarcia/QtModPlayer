@@ -41,6 +41,8 @@ public:
 signals:
 
 public slots:
+    void onInsertPercentUpdate(int pctComplete);
+    void onInsertComplete(int totalDone);
 };
 
 #endif // PLAYLISTWIDGET_H

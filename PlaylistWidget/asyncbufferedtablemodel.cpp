@@ -15,6 +15,7 @@ AsyncBufferedTableModel::AsyncBufferedTableModel(QObject *parent)
 AsyncBufferedTableModel::~AsyncBufferedTableModel() {
     // Disconnect from DB
     m_dbManager->disconnect();
+    m_dbManager->deleteLater();
 }
 
 int AsyncBufferedTableModel::rowCount(const QModelIndex &) const {

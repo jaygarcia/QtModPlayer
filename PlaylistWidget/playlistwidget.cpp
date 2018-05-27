@@ -15,8 +15,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::Down, this);
     this->setLayout(boxLayout);
 
-
-
     m_tableView = new QTableView(this);
     m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -34,6 +32,11 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->layout()->addWidget(m_tableView);
     boxLayout->setStretch(0,1);
+
+
+    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, &PlaylistWidget::onInsertPercentUpdate);
+
+    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, &PlaylistWidget::onInsertComplete);
 
 
 //    model->setHeaderData(1, Qt::Horizontal, tr("Salary"));
@@ -74,7 +77,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
 
-    m_progressDialog.setLabelText("Counting files...");
+//    m_progressDialog.setLabelText("Counting files...");
     m_progressDialog.setParent(this);
     m_progressDialog.setMinimum(0);
     m_progressDialog.setMaximum(100);
@@ -119,8 +122,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
        qDebug() << " results.size() == " << results->goodFiles().size();
        this->startFileInsertion(results);
-
-       this->m_progressDialog.hide();
        this->m_progressDialog.hide();
     });
 
@@ -129,7 +130,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         thread->quit();
         thread->wait();
         this->thread()->msleep(10);
-        m_progressDialog.hide();
         m_progressDialog.hide();
     });
 
@@ -142,23 +142,30 @@ void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
 
 
     // C++ with Lambdas seems to be very much like JavaScript!
-    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, [this](int pctComplete) {
+
+
+    this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
+}
+
+void PlaylistWidget::onInsertPercentUpdate(int pctComplete) {
 //        QString friendlyNumber = QLocale(QLocale::English).toString((float)pctComplete, 'i', 0);
 //        this->m_progressDialog.setLabelText(QString("Inserting total files: %1").arg(friendlyNumber));
 //        this->m_progressDialog.setLabelText
 //        this->m_progressDialog.setValue(pctComplete);
 
-        AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
-        model->refresh();
-    });
+    AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
+    model->refresh();
+}
 
-    connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, [this](int totalDone) {
-        qDebug() << "Total files inserted" << totalDone;
+void PlaylistWidget::onInsertComplete(int totalDone) {
+    qDebug() << "Total files inserted" << totalDone;
 
-        AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
-        model->refresh();
-    });
+    AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
+    model->refresh();
 
 
-    this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
+    //
+//    disconnect(&this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, &PlaylistWidget::onInsertPercentUpdate);
+//    disconnect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, &PlaylistWidget::onInsertComplete);
+
 }
