@@ -77,7 +77,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
 
-//    m_progressDialog.setLabelText("Counting files...");
     m_progressDialog.setParent(this);
     m_progressDialog.setMinimum(0);
     m_progressDialog.setMaximum(100);
@@ -95,7 +94,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
 
-    // TODO Wire in Cancel with thread quitting https://doc.qt.io/qt-5.10/qthread.html
     connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
         if (! this->m_progressDialog.isHidden()) {
             this->m_progressDialog.setValue(pctComplete);
@@ -133,26 +131,15 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         m_progressDialog.hide();
     });
 
-
     thread->start();
 }
 
 
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-
-
-    // C++ with Lambdas seems to be very much like JavaScript!
-
-
     this->m_modFileInserter.addToPlaylist(0, results->goodFiles());
 }
 
 void PlaylistWidget::onInsertPercentUpdate(int pctComplete) {
-//        QString friendlyNumber = QLocale(QLocale::English).toString((float)pctComplete, 'i', 0);
-//        this->m_progressDialog.setLabelText(QString("Inserting total files: %1").arg(friendlyNumber));
-//        this->m_progressDialog.setLabelText
-//        this->m_progressDialog.setValue(pctComplete);
-
     AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
     model->refresh();
 }
@@ -162,10 +149,4 @@ void PlaylistWidget::onInsertComplete(int totalDone) {
 
     AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
     model->refresh();
-
-
-    //
-//    disconnect(&this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, &PlaylistWidget::onInsertPercentUpdate);
-//    disconnect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, &PlaylistWidget::onInsertComplete);
-
 }
