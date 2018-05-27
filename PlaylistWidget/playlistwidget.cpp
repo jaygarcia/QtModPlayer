@@ -18,6 +18,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
 
     m_tableView = new QTableView(this);
+    m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QHeaderView *verticalHeader = m_tableView->verticalHeader();
 
@@ -33,8 +34,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->layout()->addWidget(m_tableView);
     boxLayout->setStretch(0,1);
-
-
 
 
 //    model->setHeaderData(1, Qt::Horizontal, tr("Salary"));
@@ -120,6 +119,9 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
        qDebug() << " results.size() == " << results->goodFiles().size();
        this->startFileInsertion(results);
+
+       this->m_progressDialog.hide();
+       this->m_progressDialog.hide();
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
@@ -137,8 +139,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
 
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-    this->m_progressDialog.setLabelText("Inserting...");
-    this->m_progressDialog.setValue(0);
 
 
     // C++ with Lambdas seems to be very much like JavaScript!
@@ -146,14 +146,15 @@ void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
 //        QString friendlyNumber = QLocale(QLocale::English).toString((float)pctComplete, 'i', 0);
 //        this->m_progressDialog.setLabelText(QString("Inserting total files: %1").arg(friendlyNumber));
 //        this->m_progressDialog.setLabelText
-        this->m_progressDialog.setValue(pctComplete);
+//        this->m_progressDialog.setValue(pctComplete);
+
+        AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
+        model->refresh();
     });
 
     connect(&this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, [this](int totalDone) {
         qDebug() << "Total files inserted" << totalDone;
-        this->m_progressDialog.hide();
-        this->m_progressDialog.hide();
-        this->m_progressDialog.hide();
+
         AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
         model->refresh();
     });
