@@ -54,22 +54,11 @@ void ThreadedModFileCheck::run() {
             if (goodLoad == openmpt::probe_file_header_result_success) {
                 ModFile *goodFile = new ModFile();
 
-                // TODO:: Move to a separate background processor thread
-//                openmpt::module mod(file);
-
-//                printf("%i -- Song title:: %s\n", i, mod.get_metadata("title").c_str());
-//                fflush(stdout);
-
-//                QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
-
                 goodFile->file_name = fileInfo->fileName();
                 goodFile->file_name_short = fileInfo->baseName();
                 goodFile->parent_directory = fileInfo->absolutePath();
                 goodFile->full_path = filePath;
 
-// TODO:: Move to a separate background processor thread
-//                goodFile->song_name = songName;
-//                goodFile->md5 = fileChecksum(filePath);
                 goodFiles.push_back(goodFile);
 
             }
@@ -82,8 +71,6 @@ void ThreadedModFileCheck::run() {
         percentDone = (float)totalFilesChecked / (float)totalFiles;
 
         int pctDone = (int) (percentDone * 100.0);
-
-
 
         if (pctDone > lastPctDone) {
             if (! QThread::currentThread()->isInterruptionRequested()) {
@@ -111,23 +98,18 @@ void ThreadedModFileCheck::run() {
 }
 
 
-// Todo: Loop through all dropped items
-// -- Put them in allFiles QVector<QString> member
 
 void ThreadedModFileCheck::queryAllDroppedItems() {
     for (int64_t i = 0; i < this->m_droppedFiles.size(); ++i) {
         QString droppedFileName = this->m_droppedFiles.at(i);
 
         QFileInfo *droppedFileInfo = new QFileInfo(droppedFileName);
-//        qDebug() << "\n*********************************\n";
 
         if (droppedFileInfo->isDir()) {
-            qDebug() << "Dropped dir :: " << droppedFileName;
             this->searchDirectoryForFiles(droppedFileName);
         }
 
         if (droppedFileInfo->isFile()) {
-            qDebug() << "Dropped file:" << droppedFileName;
             this->allFiles.push_back(droppedFileName);
         }
     }

@@ -73,8 +73,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         droppedFiles.push_back(url.toLocalFile());
     }
 
-    qDebug() << "Total items dropped" << droppedFiles.size();
-
     ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
 
     m_progressDialog.setParent(this);
