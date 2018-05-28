@@ -6,7 +6,6 @@
 
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
-#include "../modfile.h"
 
 
 class ThreadedModFileCheckResults : public QObject {

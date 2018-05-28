@@ -11,9 +11,8 @@
 #include <QDropEvent>
 #include <QTableView>
 
-#include "../Workers/ThreadedModFileCheck.h"
-#include "../DBManager/dbmanager.h"
-#include "../DBManager/ThreadedModFileInserter.h"
+#include "ThreadedModFileCheck.h"
+
 
 
 #include "bufferedtablemodel.h"
