@@ -32,26 +32,24 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     this->layout()->addWidget(m_tableView);
     boxLayout->setStretch(0,1);
 
-
+    this->m_countingFiles = false;
 }
 
-//void PlaylistWidget::refreshTableView() {
-//    m_tableView->repaint();
-//}
 
 void PlaylistWidget::setModFileInserter(ThreadedModFileInserter *modFileInserter) {
     m_modFileInserter = modFileInserter;
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
-    if (e->mimeData()->hasUrls()) {
+    if (e->mimeData()->hasUrls() && ! this->m_countingFiles) {
         e->acceptProposedAction();
     }
 }
 
-
 void PlaylistWidget::dropEvent(QDropEvent *e) {
     QVector<QString> droppedFiles;
+
+    this->m_countingFiles = true;
 
     foreach (const QUrl &url, e->mimeData()->urls()) {
         droppedFiles.push_back(url.toLocalFile());
@@ -103,6 +101,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        qDebug() << " results.size() == " << results->goodFiles().size();
        this->startFileInsertion(results);
        this->m_progressDialog.hide();
+       this->m_countingFiles = false;
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
@@ -111,6 +110,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         thread->wait();
         this->thread()->msleep(10);
         m_progressDialog.hide();
+        this->m_countingFiles = false;
     });
 
     thread->start();

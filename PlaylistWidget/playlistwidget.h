@@ -32,6 +32,8 @@ private:
     AsyncBufferedTableModel m_model;
 
 public:
+    bool m_countingFiles;
+
     ThreadedModFileInserter *m_modFileInserter;
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;

@@ -118,7 +118,13 @@ void DBManager::bulkInsertToPlaylist() {
         " VALUES (:playlist_id, :song_name, :file_name, :full_path) "
     );
 
-    for (int i = 0; i < m_filesToInsert.size(); ++i) {
+
+    int totalSize = m_filesToInsert.size();
+
+    bool firstFlush = false;
+
+
+    for (int i = 0; i < totalSize; ++i) {
 
         ModFile *modFile = m_filesToInsert.at(i);
 
@@ -136,7 +142,7 @@ void DBManager::bulkInsertToPlaylist() {
         if (query.exec()) {
             totalDone++;
             query.finish();
-            // Sleep for a tad
+
             this->m_db.commit();
             this->thread()->msleep(1);
         }
@@ -150,11 +156,23 @@ void DBManager::bulkInsertToPlaylist() {
 
         pctDone = (int) (percentDone * 100.0);
 
-        if (pctDone > lastPctDone) {
+//        if (firstFlush == false && totalSize > 150 && i > 5) {
+//            emit insertPercentUpdate(pctDone);
+//            if (i > 50) {
+//                firstFlush = true;
+//            }
+//        }
+//        else {
+//            if (i > 10 && pctDone > lastPctDone) {
+//                emit insertPercentUpdate(pctDone);
+//            }
+//        }
+
+        if (i % 5 == 0) {
             emit insertPercentUpdate(pctDone);
-            lastPctDone = pctDone;
         }
 
+        lastPctDone = pctDone;
     }
 
     emit insertComplete(totalDone);

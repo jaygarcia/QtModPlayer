@@ -36,6 +36,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e) {
 
 
 void MainWindow::dropEvent(QDropEvent *e) {
+
     if (e->mimeData()->hasUrls()) {
         this->showPlaylistWindow();
 
@@ -82,6 +83,8 @@ void MainWindow::showPlaylistWindow() {
         connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *) {
 //            qDebug() << "playlist destroyed";
             this->m_playlistWidgetShowing = false;
+//            printf("m_playlistWindow %p\n", this->m_playlistWindow);
+//            fflush(stdout);
         });
     }
 }
@@ -90,7 +93,6 @@ void MainWindow::hidePlaylistWindow() {
     if (this->m_playlistWidgetShowing == true) {
         this->getPlaylist()->hide();
         this->m_playlistWidgetShowing = false;
-
     }
 }
 

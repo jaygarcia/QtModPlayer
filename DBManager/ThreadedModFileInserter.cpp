@@ -26,7 +26,6 @@ void ThreadedModFileInserter::addToPlaylist(int playlistId, QVector<ModFile *> m
     connect(dbManager, &DBManager::insertComplete, this, &ThreadedModFileInserter::onDbManagerInsertComplete);
 
     thread->start();
-
 }
 
 
