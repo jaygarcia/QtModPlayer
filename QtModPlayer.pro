@@ -32,22 +32,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
         QtDarkStyle/DarkStyle.cpp \
-    playerwidget.cpp \
     ThreadedModFileCheck.cpp \
-    PlaylistWidget/playlistwidget.cpp \
     PlaylistWidget/PlaylistControls.cpp \
-    PlaylistWidget/BufferedTableModel.cpp
+    PlaylistWidget/BufferedTableModel.cpp \
+    MainWindow_.cpp \
+    PlayerWidget_.cpp \
+    PlaylistWidget/PlaylistWidget_.cpp
 
 HEADERS += \
-        mainwindow.h \
     QtDarkStyle/DarkStyle.h \
-    playerwidget.h \
     ThreadedModFileCheck.h \
-    PlaylistWidget/playlistwidget.h \
     PlaylistWidget/PlaylistControls.h \
-    PlaylistWidget/BufferedTableModel.h
+    PlaylistWidget/BufferedTableModel.h \
+    MainWindow_.h \
+    PlayerWidget_.h \
+    PlaylistWidget/PlaylistWidget_.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

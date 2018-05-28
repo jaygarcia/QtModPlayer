@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "MainWindow_.h"
 #include <QApplication>
 
 // include <QFile> and <QTextStream>

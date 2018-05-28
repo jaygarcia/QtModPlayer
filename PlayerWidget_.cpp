@@ -1,4 +1,4 @@
-#include "playerwidget.h"
+#include "PlayerWidget_.h"
 
 PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 {
