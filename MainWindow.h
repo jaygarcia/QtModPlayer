@@ -6,7 +6,7 @@
 
 #include "ThreadedModFileCheck.h"
 
-#include "PlayerWidget_.h"
+#include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
 
 class MainWindow : public QMainWindow
