@@ -16,7 +16,7 @@
 #include "../DBManager/ThreadedModFileInserter.h"
 
 
-#include "asyncbufferedtablemodel.h"
+#include "bufferedtablemodel.h"
 
 
 
@@ -29,7 +29,7 @@ private:
     QProgressDialog m_progressDialog;
     DBManager m_dbManager;
     QTableView *m_tableView;
-    AsyncBufferedTableModel m_model;
+    BufferedTableModel m_model;
 
 public:
     bool m_countingFiles;

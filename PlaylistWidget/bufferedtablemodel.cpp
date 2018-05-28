@@ -1,7 +1,7 @@
-#include "asyncbufferedtablemodel.h"
+#include "bufferedtablemodel.h"
 
 
-AsyncBufferedTableModel::AsyncBufferedTableModel(QObject *parent)
+BufferedTableModel::BufferedTableModel(QObject *parent)
     : QAbstractTableModel(parent), m_rows(bufferSize) {
 //    m_dbManager = new DBManager(this);
 //    m_dbManager->queryNumRowsForPlaylist(0);
@@ -11,35 +11,38 @@ AsyncBufferedTableModel::AsyncBufferedTableModel(QObject *parent)
 }
 
 
-void AsyncBufferedTableModel::appendItems(QVector<ModFile *> modFiles) {
+void BufferedTableModel::appendItems(QVector<QJsonObject *> modFiles) {
     this->beginResetModel();
 
     for (int i = 0; i < modFiles.size(); ++i) {
-        ModFile *modFile = modFiles.at(i);
+        QJsonObject *modFile = modFiles.at(i);
+        QString fullPath = modFile->value("full_path").toString();
 
-        if (! this->m_modFileNames.contains(modFile->full_path)) {
-            this->m_modFileNames.push_back(modFile->full_path);
+        if (! this->m_modFileNames.contains(fullPath)) {
+            this->m_modFileNames.push_back(fullPath);
             this->m_modFiles.push_back(modFile);
         }
     }
 
     m_count = this->m_modFiles.size();
 
+    qDebug() << "m_count = " << m_count;
+
     this->endResetModel();
 }
 
-int AsyncBufferedTableModel::rowCount(const QModelIndex &) const {
+int BufferedTableModel::rowCount(const QModelIndex &) const {
     return m_count;
 }
 
-void AsyncBufferedTableModel::refresh() {
+void BufferedTableModel::refresh() {
     this->beginResetModel();
     m_rows.clear();
 //    m_count = m_dbManager->queryNumRowsForPlaylist(0);
     this->endResetModel();
 }
 
-QVariant AsyncBufferedTableModel::data(const QModelIndex &index, int role) const {
+QVariant BufferedTableModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -64,21 +67,21 @@ QVariant AsyncBufferedTableModel::data(const QModelIndex &index, int role) const
     }
 
     if (index.column() == 0) {
-        return  m_rows.at(row)->song_name;
+        return  m_rows.at(row)->value("song_name").toString();
     }
     else if (index.column() == 1) {
-        return  m_rows.at(row)->file_name;
+        return  m_rows.at(row)->value("file_name").toString();
     }
 
     return QVariant();
 }
 
-void AsyncBufferedTableModel::cacheRows(int from, int to) const {
+void BufferedTableModel::cacheRows(int from, int to) const {
     for (int i = from; i <= to; ++i)
         m_rows.insert(i, fetchRow(i, 0));
 }
 
-ModFile * AsyncBufferedTableModel::fetchRow(int rowNumber, int playlistId) const {
+QJsonObject * BufferedTableModel::fetchRow(int rowNumber, int playlistId) const {
 //    ModFile *modFile = new ModFile();
 
 //    return modFile;
@@ -94,9 +97,7 @@ ModFile * AsyncBufferedTableModel::fetchRow(int rowNumber, int playlistId) const
 
 
 
-AsyncBufferedTableModel::~AsyncBufferedTableModel() {
-    // Disconnect from DB
-//    m_dbManager->disconnect();
-//    m_dbManager->deleteLater();
+BufferedTableModel::~BufferedTableModel() {
+
 }
 

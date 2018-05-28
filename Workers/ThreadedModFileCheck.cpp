@@ -30,7 +30,7 @@ void ThreadedModFileCheck::run() {
     emit filesCounted(totalFiles);
 
     QVector<QString> badFiles;
-    QVector<ModFile *> goodFiles;
+    QVector<QJsonObject *> goodFiles;
 
     int lastPctDone = 0;
 
@@ -52,17 +52,17 @@ void ThreadedModFileCheck::run() {
             int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
 
             if (goodLoad == openmpt::probe_file_header_result_success) {
-                ModFile *goodFile = new ModFile();
+                QJsonObject *goodFile = new QJsonObject();
 
                 openmpt::module mod(file);
 
                 QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
 
-                goodFile->file_name = fileInfo->fileName();
-                goodFile->file_name_short = fileInfo->baseName();
-                goodFile->parent_directory = fileInfo->absolutePath();
-                goodFile->full_path = filePath;
-                goodFile->song_name = songName;
+                goodFile->insert("file_name", fileInfo->fileName());
+                goodFile->insert("file_name_short", fileInfo->baseName());
+                goodFile->insert("parent_directory", fileInfo->absolutePath());
+                goodFile->insert("full_path", filePath);
+                goodFile->insert("song_name", songName);
 
                 goodFiles.push_back(goodFile);
 
@@ -177,12 +177,12 @@ void ThreadedModFileCheckResults::setBadFileCount(const int64_t &badFileCount)
     m_badFileCount = badFileCount;
 }
 
-QVector<ModFile *> ThreadedModFileCheckResults::goodFiles() const
+QVector<QJsonObject *> ThreadedModFileCheckResults::goodFiles() const
 {
     return m_goodFiles;
 }
 
-void ThreadedModFileCheckResults::setGoodFiles(const QVector<ModFile *> &goodFiles)
+void ThreadedModFileCheckResults::setGoodFiles(const QVector<QJsonObject *> &goodFiles)
 {
     m_goodFiles = goodFiles;
 }

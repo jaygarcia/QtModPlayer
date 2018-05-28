@@ -36,22 +36,16 @@ SOURCES += \
         QtDarkStyle/DarkStyle.cpp \
     playerwidget.cpp \
     Workers/ThreadedModFileCheck.cpp \
-    DBManager/dbmanager.cpp \
-    DBManager/ThreadedModFileInserter.cpp \
     PlaylistWidget/playlistwidget.cpp \
-    modfile.cpp \
-    PlaylistWidget/asyncbufferedtablemodel.cpp
+    PlaylistWidget/bufferedtablemodel.cpp
 
 HEADERS += \
         mainwindow.h \
     QtDarkStyle/DarkStyle.h \
     playerwidget.h \
     Workers/ThreadedModFileCheck.h \
-    DBManager/dbmanager.h \
-    DBManager/ThreadedModFileInserter.h \
     PlaylistWidget/playlistwidget.h \
-    modfile.h \
-    PlaylistWidget/asyncbufferedtablemodel.h
+    PlaylistWidget/bufferedtablemodel.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

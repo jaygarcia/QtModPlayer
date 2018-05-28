@@ -117,7 +117,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
 
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-    AsyncBufferedTableModel *model = (AsyncBufferedTableModel*) this->m_tableView->model();
+    BufferedTableModel *model = (BufferedTableModel*) this->m_tableView->model();
     model->appendItems(results->goodFiles());
 //    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
 }
@@ -131,6 +131,6 @@ void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
 //}
 
 void PlaylistWidget::refreshTableView() {
-    AsyncBufferedTableModel *model = (AsyncBufferedTableModel *)this->m_tableView->model();
+    BufferedTableModel *model = (BufferedTableModel *)this->m_tableView->model();
     model->refresh();
 }

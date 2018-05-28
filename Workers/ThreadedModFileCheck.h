@@ -28,11 +28,11 @@ public :
     void setBadFileCount(const int64_t &badFileCount);
 
 
-    QVector<ModFile *> goodFiles() const;
-    void setGoodFiles(const QVector<ModFile *> &goodFiles);
+    QVector<QJsonObject *> goodFiles() const;
+    void setGoodFiles(const QVector<QJsonObject *> &goodFiles);
 
 private :
-    QVector<ModFile *> m_goodFiles;
+    QVector<QJsonObject *> m_goodFiles;
     QVector<QString> m_badFiles;
     int64_t m_totalFiles;
     int64_t m_goodFileCount;
