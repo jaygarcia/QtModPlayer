@@ -18,7 +18,7 @@
 
 
 
-#include "bufferedtablemodel.h"
+#include "BufferedTableModel_.h"
 #include "PlaylistControls.h"
 
 
