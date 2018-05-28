@@ -5,12 +5,23 @@ PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
     qtAwesome = new QtAwesome(qApp);
     qtAwesome->initFontAwesome();
 
+    QDir homeDir = QDir::home();
 
+    QString dirName = ".QTModPlayer",
+            dataDirName = QDir::home().absolutePath() + dirName;
+
+    if (! homeDir.exists(dirName) && ! homeDir.mkdir(dirName)) {
+        qWarning() << "Cannot make directory :: " << dirName;
+    }
+
+    m_dataDir = QDir(dataDirName);
+}
+
+
+void PlaylistControls::configure() {
     QHBoxLayout *layout = new QHBoxLayout();
     layout->setAlignment(Qt::AlignCenter);
     this->setLayout(layout);
-
-    QSpacerItem *spacer = new QSpacerItem(40, 10);
 
     QLabel *label = new QLabel(this);
 
@@ -27,20 +38,32 @@ PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
 
     layout->addItem(new QSpacerItem(40, 10));
 
-
-
     m_playlistSelector = new QComboBox(this);
+    m_playlistSelector->setFont(QFont("Helvetica", 13, QFont::ExtraLight));
+//    m_playlistSelector->setStyleSheet("QComboBox { padding: 5px }");
+
+     //TODO: Continue here.
+    // - Need method to write a file
+    /*
+     * {
+     *     playlist_name : "",
+     *     date_added : "",
+     *     files : [
+     *         {
+     *             song_name : "",
+     *             full_path : ""
+     *         }
+     *
+     *     ]
+     * }
+     *
+    QStringList *files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
+
     connect(m_playlistSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlaylistControls::onPlaylistSelection);
-    m_playlistSelector->addItem("Default Playlist");
+
     layout->addWidget(m_playlistSelector);
 
-    m_playlistSelector->addItem("Playlist 1");
-    m_playlistSelector->addItem("Playlist 2");
-    m_playlistSelector->addItem("Playlist 3");
-    m_playlistSelector->addItem("Playlist 4");
-
     layout->setStretch(4, 1);
-
 
     QPushButton *savePlaylistButton = this->buildButton("save", "");
     layout->addWidget(savePlaylistButton);
@@ -73,7 +96,6 @@ void PlaylistControls::setPlaylistSelectionObjects(QJsonArray *playlistSelection
     m_playlistSelectionObjects = playlistSelectionObjects;
     // Todo:: iterate and update combo box
 }
-
 
 
 void PlaylistControls::onPlaylistSelection(int itemIndex) {

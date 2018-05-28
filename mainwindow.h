@@ -9,7 +9,6 @@
 #include "playerwidget.h"
 #include "PlaylistWidget/playlistwidget.h"
 
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

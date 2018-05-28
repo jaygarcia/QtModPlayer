@@ -4,6 +4,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 
+    QDir homeDir = QDir::home();
+
+    if (! homeDir.exists(".QTModPlayer") && ! homeDir.mkdir(".QtModPlayer")) {
+        qWarning() << "Cannot make data directory!";
+    }
+
     PlayerWidget *playerWidget = new PlayerWidget(this);
     this->setCentralWidget(playerWidget);
 
@@ -15,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("QtModPlayer");
 
     this->setAcceptDrops(true);
+
+
 }
 
 // Todo: Move to playlist?

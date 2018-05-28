@@ -38,7 +38,6 @@ SOURCES += \
     ThreadedModFileCheck.cpp \
     PlaylistWidget/playlistwidget.cpp \
     PlaylistWidget/bufferedtablemodel.cpp \
-    PlaylistFileManager.cpp \
     PlaylistWidget/PlaylistControls.cpp
 
 HEADERS += \
@@ -48,7 +47,6 @@ HEADERS += \
     ThreadedModFileCheck.h \
     PlaylistWidget/playlistwidget.h \
     PlaylistWidget/bufferedtablemodel.h \
-    PlaylistFileManager.h \
     PlaylistWidget/PlaylistControls.h
 
 RESOURCES += \

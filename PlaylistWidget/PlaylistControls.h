@@ -9,10 +9,14 @@ class PlaylistControls : public QWidget
     Q_OBJECT
 
 private :
+    void configure();
     QtAwesome *qtAwesome;
     QPushButton *buildButton(const char * iconType, const char *label);
     QComboBox *m_playlistSelector;
     QJsonArray *m_playlistSelectionObjects;
+
+    QVector<QJsonObject *> m_filesInDir;
+    QDir m_dataDir;
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);

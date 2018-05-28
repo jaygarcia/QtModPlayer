@@ -8,9 +8,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->setAcceptDrops(true);
 
-//    qtAwesome = new QtAwesome(qApp);
-//    qtAwesome->initFontAwesome();
-
     this->m_progressDialog.cancel();
 
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::Down, this);
@@ -20,11 +17,9 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QHeaderView *verticalHeader = m_tableView->verticalHeader();
-
     verticalHeader->hide();
     verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader->setDefaultSectionSize(24);
-
 
     QFont font = QFont("Helvetica", 13, QFont::ExtraLight);
     m_tableView->setFont(font);
