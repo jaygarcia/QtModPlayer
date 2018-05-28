@@ -98,7 +98,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        thread->quit();
        thread->wait();
 
-       qDebug() << " results.size() == " << results->goodFiles().size();
        this->startFileInsertion(results);
        this->m_progressDialog.hide();
        this->m_countingFiles = false;
@@ -118,7 +117,9 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
 
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
+    AsyncBufferedTableModel *model = (AsyncBufferedTableModel*) this->m_tableView->model();
+    model->appendItems(results->goodFiles());
+//    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
 }
 
 //void PlaylistWidget::onInserterPercentUpdate(int pctDone) {

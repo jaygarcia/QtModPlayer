@@ -54,10 +54,15 @@ void ThreadedModFileCheck::run() {
             if (goodLoad == openmpt::probe_file_header_result_success) {
                 ModFile *goodFile = new ModFile();
 
+                openmpt::module mod(file);
+
+                QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
+
                 goodFile->file_name = fileInfo->fileName();
                 goodFile->file_name_short = fileInfo->baseName();
                 goodFile->parent_directory = fileInfo->absolutePath();
                 goodFile->full_path = filePath;
+                goodFile->song_name = songName;
 
                 goodFiles.push_back(goodFile);
 
