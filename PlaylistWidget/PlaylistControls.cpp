@@ -56,7 +56,7 @@ void PlaylistControls::configure() {
      *
      *     ]
      * }
-     *
+     */
     QStringList *files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
 
     connect(m_playlistSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlaylistControls::onPlaylistSelection);
