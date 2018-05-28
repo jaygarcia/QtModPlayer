@@ -1,4 +1,4 @@
-#include "BufferedTableModel_.h"
+#include "BufferedTableModel.h"
 
 
 BufferedTableModel::BufferedTableModel(QObject *parent)
