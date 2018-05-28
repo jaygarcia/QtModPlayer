@@ -10,7 +10,7 @@ class PlaylistControls : public QWidget
 
 private :
     QtAwesome *qtAwesome;
-    QPushButton *buildButton(const char * iconType);
+    QPushButton *buildButton(const char * iconType, const char *label);
     QComboBox *m_playlistSelector;
     QJsonArray *m_playlistSelectionObjects;
 
