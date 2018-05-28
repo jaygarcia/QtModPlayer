@@ -37,7 +37,9 @@ SOURCES += \
     playerwidget.cpp \
     ThreadedModFileCheck.cpp \
     PlaylistWidget/playlistwidget.cpp \
-    PlaylistWidget/bufferedtablemodel.cpp
+    PlaylistWidget/bufferedtablemodel.cpp \
+    PlaylistFileManager.cpp \
+    PlaylistWidget/PlaylistControls.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,7 +47,9 @@ HEADERS += \
     playerwidget.h \
     ThreadedModFileCheck.h \
     PlaylistWidget/playlistwidget.h \
-    PlaylistWidget/bufferedtablemodel.h
+    PlaylistWidget/bufferedtablemodel.h \
+    PlaylistFileManager.h \
+    PlaylistWidget/PlaylistControls.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

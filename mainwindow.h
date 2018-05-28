@@ -4,9 +4,7 @@
 #include <QMainWindow>
 #include <QProgressDialog>
 
-#include "Workers/ThreadedModFileCheck.h"
-#include "DBManager/ThreadedModFileInserter.h"
-#include "DBManager/dbmanager.h"
+#include "ThreadedModFileCheck.h"
 
 #include "playerwidget.h"
 #include "PlaylistWidget/playlistwidget.h"
@@ -26,7 +24,6 @@ public:
     void dropEvent(QDropEvent *e);
     void onPlayerWidgetShowPlayList();
 
-    ThreadedModFileInserter *m_modFileInserter;
 
     void togglePlaylistWindow();
     void showPlaylistWindow();

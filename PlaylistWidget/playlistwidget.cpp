@@ -1,13 +1,15 @@
 #include "playlistwidget.h"
 
-#include <QTableWidget>
-#include <QHeaderView>
+
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
     this->setAcceptDrops(true);
+
+//    qtAwesome = new QtAwesome(qApp);
+//    qtAwesome->initFontAwesome();
 
     this->m_progressDialog.cancel();
 
@@ -24,7 +26,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     verticalHeader->setDefaultSectionSize(24);
 
 
-    QFont font = QFont("Courier New", 12, QFont::Bold);
+    QFont font = QFont("Helvetica", 13, QFont::ExtraLight);
     m_tableView->setFont(font);
     m_tableView->setModel(&m_model);
     m_tableView->horizontalHeader()->setStretchLastSection(true);
@@ -32,13 +34,18 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     this->layout()->addWidget(m_tableView);
     boxLayout->setStretch(0,1);
 
+    m_playlistControls = new PlaylistControls(this);
+
+    QRect geometry = m_playlistControls->geometry();
+    geometry.setHeight(30);
+    m_playlistControls->setGeometry(geometry);
+
+    this->layout()->addWidget(m_playlistControls);
+
     this->m_countingFiles = false;
 }
 
 
-void PlaylistWidget::setModFileInserter(ThreadedModFileInserter *modFileInserter) {
-    m_modFileInserter = modFileInserter;
-}
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
     if (e->mimeData()->hasUrls() && ! this->m_countingFiles) {
@@ -121,6 +128,9 @@ void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
     model->appendItems(results->goodFiles());
 //    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
 }
+
+
+
 
 //void PlaylistWidget::onInserterPercentUpdate(int pctDone) {
 //    this->refreshTableView();

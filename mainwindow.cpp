@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "DBManager/dbmanager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,15 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("QtModPlayer");
 
     this->setAcceptDrops(true);
-
-    this->m_modFileInserter = new ThreadedModFileInserter();
-
-    connect(this->m_modFileInserter, &ThreadedModFileInserter::insertPercentUpdate, this, &MainWindow::onInserterPercentUpdate);
-    connect(this->m_modFileInserter, &ThreadedModFileInserter::insertComplete, this, &MainWindow::onInserterComplete);
-
-    this->m_playlistWidgetShowing = false;
-    DBManager *dbManager = new DBManager();
-    dbManager->purgeCurrentPlaylist();
 }
 
 // Todo: Move to playlist?
@@ -42,9 +32,6 @@ void MainWindow::dropEvent(QDropEvent *e) {
 
         if (this->m_playlistWidgetShowing == true) {
             this->getPlaylist()->dropEvent(e);
-        }
-        else {
-            qDebug() << "NO PLAYLIST!";
         }
     }
 }
@@ -67,12 +54,12 @@ void MainWindow::showPlaylistWindow() {
 
         PlaylistWidget *playlist = new PlaylistWidget();
 
-        playlist->setModFileInserter(this->m_modFileInserter);
         playlist->setObjectName("playlist");
         playlist->setAttribute(Qt::WA_DeleteOnClose);
         playlist->setFixedWidth(this->geometry().width() * 2);
         playlist->setMinimumHeight(300);
         playlist->setMaximumHeight(500);
+        playlist->setStyleSheet("margin : 0");
 
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
@@ -81,10 +68,7 @@ void MainWindow::showPlaylistWindow() {
         this->m_playlistWindow = playlist;
 
         connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *) {
-//            qDebug() << "playlist destroyed";
             this->m_playlistWidgetShowing = false;
-//            printf("m_playlistWindow %p\n", this->m_playlistWindow);
-//            fflush(stdout);
         });
     }
 }
