@@ -24,6 +24,7 @@ private :
     bool savePlaylist(QString playlistName);
 
     void generateEmptyPlaylist(QString playlistName = "");
+    void refreshComboFromDataDir();
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);
