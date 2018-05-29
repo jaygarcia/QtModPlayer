@@ -1,8 +1,9 @@
 QToolTip{
   color:#ffffff;
   background-color:palette(base);
-  border:1px solid palette(highlight);
+  border:1px solid #777;
   border-radius:4px;
+  font: 12px extra light "Helvetica"
 }
 QStatusBar{
   background-color:qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 rgba(25,25,25,127),stop:1 rgba(53,53,53,75));

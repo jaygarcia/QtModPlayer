@@ -16,7 +16,14 @@ private :
     QJsonArray *m_playlistSelectionObjects;
 
     QVector<QJsonObject *> m_filesInDir;
+
+    QJsonDocument * m_currentPlaylistDocument;
+
     QDir m_dataDir;
+
+    bool savePlaylist(QString playlistName);
+
+    void generateEmptyPlaylist(QString playlistName = "");
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);
@@ -32,6 +39,7 @@ signals:
 
 public slots:
     void onPlaylistSelection(int itemIndex);
+    void onNewPlaylistButtonPress();
 };
 
 #endif // PLAYLISTCONTROLS_H

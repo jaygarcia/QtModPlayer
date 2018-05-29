@@ -32,7 +32,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
     m_playlistControls = new PlaylistControls(this);
 
     QRect geometry = m_playlistControls->geometry();
-    geometry.setHeight(30);
+//    geometry.setHeight(30);
     m_playlistControls->setGeometry(geometry);
 
     this->layout()->addWidget(m_playlistControls);

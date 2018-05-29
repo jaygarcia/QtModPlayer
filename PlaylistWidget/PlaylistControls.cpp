@@ -8,13 +8,17 @@ PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
     QDir homeDir = QDir::home();
 
     QString dirName = ".QTModPlayer",
-            dataDirName = QDir::home().absolutePath() + dirName;
+            dataDirName = QDir::home().absolutePath() + "/" + dirName;
 
     if (! homeDir.exists(dirName) && ! homeDir.mkdir(dirName)) {
         qWarning() << "Cannot make directory :: " << dirName;
     }
 
+
+
     m_dataDir = QDir(dataDirName);
+
+    this->configure();
 }
 
 
@@ -30,34 +34,28 @@ void PlaylistControls::configure() {
     label->setText("File:");
     layout->addWidget(label);
 
-    QPushButton *addFile = this->buildButton("plus", "");
-    layout->addWidget(addFile);
+    QPushButton *addFileButton = this->buildButton("plus", "");
+    addFileButton->setToolTip("Add file(s)");
+    layout->addWidget(addFileButton);
 
-    QPushButton *removeFile = this->buildButton("minus", "");
-    layout->addWidget(removeFile);
+    QPushButton *removeFileButton = this->buildButton("minus", "");
+    removeFileButton->setToolTip("Remove File");
+    layout->addWidget(removeFileButton);
 
     layout->addItem(new QSpacerItem(40, 10));
 
     m_playlistSelector = new QComboBox(this);
-    m_playlistSelector->setFont(QFont("Helvetica", 13, QFont::ExtraLight));
+//    m_playlistSelector->setFont(QFont("Helvetica", 13, QFont::ExtraLight));
 //    m_playlistSelector->setStyleSheet("QComboBox { padding: 5px }");
 
-     //TODO: Continue here.
-    // - Need method to write a file
-    /*
-     * {
-     *     playlist_name : "",
-     *     date_added : "",
-     *     files : [
-     *         {
-     *             song_name : "",
-     *             full_path : ""
-     *         }
-     *
-     *     ]
-     * }
-     */
-    QStringList *files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
+    // Todo: Populate combo box with files
+    QFileInfoList files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
+    qDebug()  << files.size();
+
+    for (int i = 0; i < files.size(); ++i) {
+
+    }
+
 
     connect(m_playlistSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlaylistControls::onPlaylistSelection);
 
@@ -65,11 +63,18 @@ void PlaylistControls::configure() {
 
     layout->setStretch(4, 1);
 
+    QPushButton *newPlaylistButton = this->buildButton("pluscircle", "");
+    newPlaylistButton->setToolTip("Create playlist");
+    layout->addWidget(newPlaylistButton);
+    connect(newPlaylistButton, &QPushButton::clicked, this, &PlaylistControls::onNewPlaylistButtonPress);
+
     QPushButton *savePlaylistButton = this->buildButton("save", "");
+    savePlaylistButton->setToolTip("Save playlist");
     layout->addWidget(savePlaylistButton);
 
 
     QPushButton *deletePlaylistButton = this->buildButton("trash", "");
+    deletePlaylistButton->setToolTip("Delete playlist");
     layout->addWidget(deletePlaylistButton);
 }
 
@@ -84,6 +89,58 @@ QPushButton *PlaylistControls::buildButton(const char *iconType, const char *lab
     button->setStyleSheet(baseButtonStyle);
 
     return button;
+}
+
+void PlaylistControls::onNewPlaylistButtonPress() {
+    bool okPressed;
+
+
+    QString text = QInputDialog::getText(
+        this,
+        "New Playlist",
+        "Enter a new playlist name:",
+        QLineEdit::Normal,
+        "",
+        &okPressed
+    );
+
+
+    if (okPressed && !text.isEmpty()) {
+        text.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\\[\\\]\\\\]")));
+
+        this->generateEmptyPlaylist(text);;
+
+        this->savePlaylist(text);
+//        qDebug() << text;
+    }
+}
+
+void PlaylistControls::generateEmptyPlaylist(QString playlistName) {
+
+    if (playlistName.isEmpty()) {
+        playlistName = "Default playlist";
+    }
+
+    QJsonObject newPlaylist;
+    newPlaylist.insert("playlist_name", playlistName);
+
+    QJsonArray files;
+    newPlaylist.insert("files", files);
+
+    m_currentPlaylistDocument = new QJsonDocument(newPlaylist);
+
+}
+
+bool PlaylistControls::savePlaylist(QString playlistName) {
+
+    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
+
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+
+    out << m_currentPlaylistDocument->toJson();
+
+    return true;
 }
 
 QJsonArray *PlaylistControls::playlistSelectionObjects() const
