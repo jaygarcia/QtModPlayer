@@ -1,7 +1,17 @@
 #include "PlaylistControls.h"
 
-#include <QErrorMessage>
+
 // Begin copy from BOOST library: https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt
+//  portability.cpp  -------------------------------------------------------------------//
+
+//  Copyright 2002-2005 Beman Dawes
+//  Use, modification, and distribution is subject to the Boost Software
+//  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy
+//  at http://www.boost.org/LICENSE_1_0.txt)
+
+//  See library home page at http://www.boost.org/libs/filesystem
+
+//--------------------------------------------------------------------------------------//
 namespace
 {
   const char invalid_chars[] =
@@ -101,8 +111,6 @@ PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
         qWarning() << "Cannot make directory :: " << dirName;
     }
 
-
-
     m_dataDir = QDir(dataDirName);
 
     this->configure();
@@ -132,6 +140,7 @@ void PlaylistControls::configure() {
     layout->addItem(new QSpacerItem(40, 10));
 
     m_playlistSelector = new QComboBox(this);
+    // Todo : Fix issue with selector padding, etc.
 //    m_playlistSelector->setFont(QFont("Helvetica", 13, QFont::ExtraLight));
 //    m_playlistSelector->setStyleSheet("QComboBox { padding: 5px }");
 
@@ -175,7 +184,6 @@ QPushButton *PlaylistControls::buildButton(const char *iconType, const char *lab
 void PlaylistControls::onNewPlaylistButtonPress() {
     bool okPressed;
 
-
     QString text = QInputDialog::getText(
         this,
         "New Playlist",
@@ -207,7 +215,6 @@ void PlaylistControls::onNewPlaylistButtonPress() {
 
             this->savePlaylist(text);
         }
-       //        text.remove(QRegExp(QString::fromUtf8("`~!@#$%^&*()_—+=|:;<>«».?/\'\"\\\\/")));
     }
 }
 
@@ -242,11 +249,12 @@ bool PlaylistControls::savePlaylist(QString playlistName) {
 void PlaylistControls::refreshComboFromDataDir() {
     // Todo: Populate combo box with files
     QFileInfoList files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
-    qDebug()  << files.size();
+
+    m_playlistSelector->clear();
 
     for (int i = 0; i < files.size(); ++i) {
         QFileInfo file = files.at(i);
-
+        m_playlistSelector->addItem(file.baseName(), file.absoluteFilePath());
         qDebug() << file.absoluteFilePath();
     }
 }
@@ -265,5 +273,24 @@ void PlaylistControls::setPlaylistSelectionObjects(QJsonArray *playlistSelection
 
 
 void PlaylistControls::onPlaylistSelection(int itemIndex) {
-    qDebug() << "Item selected " << itemIndex;
+    //    qDebug() << "Item selected " << itemIndex << m_playlistSelector->itemData(itemIndex);
+
+    QFile file(m_playlistSelector->itemData(itemIndex).toString());
+    file.open(QFile::ReadOnly);
+
+    QDataStream in(&file);
+
+    char * jsonStream;
+    in >> jsonStream;
+    qDebug() << jsonStream;
+
+
+    QString qJsonStream(jsonStream);
+
+    QJsonDocument *jsonDoc = new QJsonDocument();
+    jsonDoc->fromJson(qJsonStream.toObject());
+
+    qDebug() << jsonDoc->toJson();
+
+
 }

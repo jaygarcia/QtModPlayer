@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include <QtAwesome.h>
+#include <QErrorMessage>
 
 class PlaylistControls : public QWidget
 {
