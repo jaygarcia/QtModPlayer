@@ -22,10 +22,12 @@ private :
 
     QDir m_dataDir;
 
-    bool savePlaylist(QString playlistName);
+    bool saveEmptyPlaylist(QString playlistName);
 
     void generateEmptyPlaylist(QString playlistName = "");
     void refreshComboFromDataDir();
+    void connectPlaylistSelectorEvents();
+    void disconnectPlaylistSelectorEvents();
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);
@@ -39,8 +41,10 @@ signals:
     void onDeletePlaylist(QJsonObject playlistObject);
     void onSavePlaylist(QJsonObject playlistObject);
 
+    void onPlaylistSelectionRefreshPlaylist(QJsonArray files);
+
 public slots:
-    void onPlaylistSelection(int itemIndex);
+    void onPlaylistSelectorChange(int itemIndex);
     void onNewPlaylistButtonPress();
 };
 

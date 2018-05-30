@@ -37,6 +37,14 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->layout()->addWidget(m_playlistControls);
 
+    connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [](QJsonArray items) {
+        qDebug() << "onPlaylistSelectorChange";
+
+        for (int i = 0; i < items.size(); ++i) {
+            qDebug() <<  items.at(i);
+        }
+    });
+
     this->m_countingFiles = false;
 }
 
@@ -121,19 +129,9 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
     BufferedTableModel *model = (BufferedTableModel*) this->m_tableView->model();
     model->appendItems(results->goodFiles());
-//    this->m_modFileInserter->addToPlaylist(0, results->goodFiles());
+
+//    playlistItems
 }
-
-
-
-
-//void PlaylistWidget::onInserterPercentUpdate(int pctDone) {
-//    this->refreshTableView();
-//}
-
-//void PlaylistWidget::onInserterComplete(int totalFiles) {
-//    this->refreshTableView();
-//}
 
 void PlaylistWidget::refreshTableView() {
     BufferedTableModel *model = (BufferedTableModel *)this->m_tableView->model();
