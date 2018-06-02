@@ -15,7 +15,7 @@ class BufferedTableModel : public QAbstractTableModel {
 
 private:
     void cacheRows(int, int) const;
-    QJsonObject *fetchRow(int rowNumber, int playlistId) const;
+    QJsonObject *fetchRow(int rowNumber) const;
 
     QVector<QJsonObject *> m_modFiles;
     QVector<QString> m_modFileNames;
@@ -35,7 +35,7 @@ public:
     int rowCount(const QModelIndex & = QModelIndex()) const override;
     QVariant data(const QModelIndex &, int) const override;
 
-    void refresh();
+    void clearModel();
 
     int columnCount(const QModelIndex &parent) const override {
         Q_UNUSED(parent);

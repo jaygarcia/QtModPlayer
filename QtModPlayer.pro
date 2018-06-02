@@ -38,7 +38,8 @@ SOURCES += \
     PlaylistWidget/BufferedTableModel.cpp \
     PlaylistWidget/PlaylistWidget.cpp \
     MainWindow.cpp \
-    PlayerWidget.cpp
+    PlayerWidget.cpp \
+    PlaylistWidget/PlaylistDataDelegate.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -47,7 +48,8 @@ HEADERS += \
     PlaylistWidget/BufferedTableModel.h \
     PlaylistWidget/PlaylistWidget.h \
     MainWindow.h \
-    PlayerWidget.h
+    PlayerWidget.h \
+    PlaylistWidget/PlaylistDataDelegate.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

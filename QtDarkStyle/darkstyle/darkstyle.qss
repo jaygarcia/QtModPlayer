@@ -355,3 +355,10 @@ QPushButton:pressed{
   background-color:#555;
 }
 
+QComboBox {
+    padding: 2px 20px 2px 5px;
+}
+
+
+
+

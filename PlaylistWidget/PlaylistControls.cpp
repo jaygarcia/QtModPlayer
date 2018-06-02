@@ -23,7 +23,7 @@ namespace
   const std::string windows_invalid_chars(invalid_chars, sizeof(invalid_chars));
 
   const std::string valid_posix(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-");
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._- ");
 
 } // unnamed namespace
 
@@ -84,6 +84,8 @@ namespace qfs
     bool portable_file_name(const std::string & name)
     {
       std::string::size_type pos;
+
+
       return
          portable_name(name)
          && name != "."
@@ -101,6 +103,9 @@ PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
 {
     qtAwesome = new QtAwesome(qApp);
     qtAwesome->initFontAwesome();
+
+    this->m_defaultPlaylistName = "<Empty Playlist>";
+    this->generateEmptyPlaylist(this->m_defaultPlaylistName);
 
     QDir homeDir = QDir::home();
 
@@ -140,12 +145,10 @@ void PlaylistControls::configure() {
     layout->addItem(new QSpacerItem(40, 10));
 
     m_playlistSelector = new QComboBox(this);
-    // Todo : Fix issue with selector padding, etc.
-//    m_playlistSelector->setFont(QFont("Helvetica", 13, QFont::ExtraLight));
+    m_playlistSelector->setFont(font);
 //    m_playlistSelector->setStyleSheet("QComboBox { padding: 5px }");
 
     this->refreshComboFromDataDir();
-
 
     this->connectPlaylistSelectorEvents();
 
@@ -161,6 +164,7 @@ void PlaylistControls::configure() {
     QPushButton *savePlaylistButton = this->buildButton("save", "");
     savePlaylistButton->setToolTip("Save playlist");
     layout->addWidget(savePlaylistButton);
+    connect(savePlaylistButton, &QPushButton::clicked, this, &PlaylistControls::onSavePlaylistButtonPress);
 
 
     QPushButton *deletePlaylistButton = this->buildButton("trash", "");
@@ -197,8 +201,19 @@ void PlaylistControls::onNewPlaylistButtonPress() {
     if (okPressed && !text.isEmpty()) {
         //https://msdn.microsoft.com/en-us/library/aa365247
         std::string fn = text.toUtf8().constData();
-        bool validName = qfs::portable_file_name(fn);
+#ifdef __APPLE__
+        bool validName = qfs::portable_posix_name(fn);
+#elif _WIN64
+        bool valid_name = qfs::windows_name(fn);
+#elif __linux__
+        bool valid_name = qfs::portable_posix_name(fn);
+#else
+        // NO option here -- wtf are we compiliing to?
+        bool validName = false;
+#endif
 
+        printf("validName == '%s'\t %i\n", fn.c_str(), validName);
+        fflush(stdout);
         if (!validName) {
             QMessageBox *msg = new QMessageBox(this);
             msg->setIcon(QMessageBox::Warning);
@@ -212,33 +227,79 @@ void PlaylistControls::onNewPlaylistButtonPress() {
         }
         else {
             this->generateEmptyPlaylist(text);
-            this->saveEmptyPlaylist(text);
+            this->saveLoadedPlaylist();
+            this->refreshComboFromDataDir();
+            this->appendCurrentPlaylistToSelector();
         }
     }
 }
+// TODO: figure out why we're not seeing the new item in the selector
+void PlaylistControls::onSavePlaylistButtonPress() {
+    QString playlistName = m_currentPlaylistDocument->object().value("playlist_name").toString();
+
+//    qDebug() << playlistName << playlistName.compare(m_defaultPlaylistName);
+    if (playlistName.compare(m_defaultPlaylistName) > 0) {
+        this->saveLoadedPlaylist();
+        return;
+    }
+
+    // Prompt user for a playlist name
+    bool okPressed;
+
+    QString text = QInputDialog::getText(
+        this,
+        "New Playlist",
+        "Enter a new playlist name:",
+        QLineEdit::Normal,
+        "",
+        &okPressed
+    );
+
+
+    if (okPressed && text.compare(m_defaultPlaylistName) == 0) {
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setIcon(QMessageBox::Warning);
+        msg->setText("Error: Please enter a unique playlist name.");
+        msg->show();
+
+        connect(msg, &QMessageBox::buttonClicked, this, [this](QAbstractButton *button) {
+            Q_UNUSED(button);
+            this->onSavePlaylistButtonPress();
+        });
+    }
+    else if (okPressed && (! text.isEmpty())) {
+        std::string fn = text.toUtf8().constData();
+        bool validName = qfs::portable_file_name(fn);
+
+        if (!validName) {
+            QMessageBox *msg = new QMessageBox(this);
+            msg->setIcon(QMessageBox::Warning);
+            msg->setText("Error: The file name entered has invalid characters. Please try again.");
+            msg->show();
+
+            connect(msg, &QMessageBox::buttonClicked, this, [this](QAbstractButton *button) {
+                Q_UNUSED(button);
+                this->onSavePlaylistButtonPress();
+            });
+        }
+        else {
+            // Replace the playlist name
+            m_currentPlaylistDocument->object().remove("playlist_name");
+            m_currentPlaylistDocument->object().insert("playlist_name", text);
+//            this->generateEmptyPlaylist(text);
+            this->saveLoadedPlaylist();
+        }
+    }
+
+
+}
 
 void PlaylistControls::generateEmptyPlaylist(QString playlistName) {
-
-    if (playlistName.isEmpty()) {
-        playlistName = "Default playlist";
-    }
 
     QJsonObject newPlaylist;
     newPlaylist.insert("playlist_name", playlistName);
 
     QJsonArray files;
-
-
-    for (int i = 0; i < 10; ++i) {
-        QString v = "Song_" + QString::number(i);
-        QJsonObject o;
-        o.insert("song_name", v);
-        o.insert("full_path", v);
-
-        files.append(o);
-    }
-
-    qDebug() << " files.size()" << files.size();
     newPlaylist.insert("files", files);
 
     m_currentPlaylistDocument = new QJsonDocument(newPlaylist);
@@ -252,7 +313,9 @@ void PlaylistControls::refreshComboFromDataDir() {
 
     m_playlistSelector->clear();
 
-    m_playlistSelector->addItem("<Empty Playlist>", "");
+    m_playlistSelector->addItem(this->m_defaultPlaylistName, "");
+    m_playlistSelector->insertSeparator(1);
+//    m_playlistSelector->
 
     for (int i = 0; i < files.size(); ++i) {
         QFileInfo file = files.at(i);
@@ -287,32 +350,78 @@ void PlaylistControls::disconnectPlaylistSelectorEvents() {
     );
 }
 
+void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) {
+//    qDebug() << "PlaylistControls::appendFilesToModel() adding files: " << incomingFiles.size();
+    QJsonObject rootObj = m_currentPlaylistDocument->object();
 
-bool PlaylistControls::saveEmptyPlaylist(QString playlistName) {
+    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
+//    qDebug() << " current file count: " << filesArray.size();
+
+    for (int i = 0; i < incomingFiles.size(); ++i) {
+        QJsonObject *srcObj = incomingFiles.at(i);
+        QJsonObject destObj;
+
+        QStringList keys = srcObj->keys();
+        for (int k = 0; k < keys.size(); ++k) {
+            QString key = keys.at(k);
+            destObj.insert(key, srcObj->value(key));
+        }
+
+//        qDebug() << destObj.keys();
+        filesArray.append(destObj);
+    }
+
+
+    rootObj.remove("files");
+    rootObj.insert("files", filesArray);
+
+//    qDebug() << "total files now" << rootObj.value("files").toArray().size();
+
+    m_currentPlaylistDocument->setObject(rootObj);
+
+}
+
+
+bool PlaylistControls::saveLoadedPlaylist() {
+    QJsonObject rootObj = m_currentPlaylistDocument->object();
+    QString playlistName = rootObj.value("playlist_name").toString();
+
+    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
+//    qDebug() << " current file count: " << filesArray.size();
 
     QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
 
-    file.open(QIODevice::WriteOnly);
+//    const char * jsonStr =  m_currentPlaylistDocument->toJson().toStdString().c_str();
+//    printf("%s\n", jsonStr);
 
+    file.open(QIODevice::WriteOnly);
     file.write(m_currentPlaylistDocument->toBinaryData());
 
-    this->m_playlistSelector->addItem(playlistName, file.fileName());
+    return true;
+}
+
+void PlaylistControls::appendCurrentPlaylistToSelector() {
+    QJsonObject rootObj = m_currentPlaylistDocument->object();
+    QString playlistName = rootObj.value("playlist_name").toString();
+
+    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
+
+    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
 
     int selectedIndex = this->m_playlistSelector->findData(file.fileName());
 
     this->disconnectPlaylistSelectorEvents();
     this->m_playlistSelector->setCurrentIndex(selectedIndex);
 
-    emit onPlaylistSelectionRefreshPlaylist(m_currentPlaylistDocument->object().value("files").toArray());
+    QVector<QJsonObject *> filesVector = this->copyJsonArrayToVector(m_currentPlaylistDocument->object().value("files").toArray());
+    emit onPlaylistSelectionRefreshPlaylist(filesVector);
 
     this->connectPlaylistSelectorEvents();
-
-    return true;
 }
 
 void PlaylistControls::onPlaylistSelectorChange(int itemIndex) {
     if (itemIndex == 0) {
-        qDebug() << "INdex is zero!";
+        qDebug() << "Index is zero!";
         // todo ; emit playlist clear
         return;
     }
@@ -328,8 +437,20 @@ void PlaylistControls::onPlaylistSelectorChange(int itemIndex) {
 
     m_currentPlaylistDocument = loadDoc;
 
-    qDebug() << loadDoc->toJson();
+//    qDebug() << loadDoc->toJson();
 
-    emit onPlaylistSelectionRefreshPlaylist(loadDoc->object().value("files").toArray());
+    QVector<QJsonObject *> files = this->copyJsonArrayToVector(loadDoc->object().value("files").toArray());
+    emit onPlaylistSelectionRefreshPlaylist(files);
 
+}
+
+QVector<QJsonObject *> PlaylistControls::copyJsonArrayToVector(QJsonArray jsonFiles) {
+    QVector<QJsonObject *> returnVector;
+
+    for (int i = 0; i < jsonFiles.size(); ++i) {
+        QJsonObject *destObj = new QJsonObject(jsonFiles.at(i).toObject());
+        returnVector.push_back(destObj);
+    }
+
+    return returnVector;
 }

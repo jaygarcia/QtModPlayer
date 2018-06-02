@@ -16,8 +16,6 @@
 #include "ThreadedModFileCheck.h"
 #include <QtAwesome.h>
 
-
-
 #include "BufferedTableModel.h"
 #include "PlaylistControls.h"
 
@@ -40,9 +38,8 @@ public:
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dropEvent(QDropEvent *e) override;
-    void startFileInsertion(ThreadedModFileCheckResults *results);
+    void appendFilesToModel(ThreadedModFileCheckResults *results);
     void refreshTableView();
-
 
 signals:
 

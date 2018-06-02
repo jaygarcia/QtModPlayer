@@ -15,6 +15,7 @@ private :
     QPushButton *buildButton(const char * iconType, const char *label);
     QComboBox *m_playlistSelector;
     QJsonArray *m_playlistSelectionObjects;
+    QString m_defaultPlaylistName;
 
     QVector<QJsonObject *> m_filesInDir;
 
@@ -22,18 +23,22 @@ private :
 
     QDir m_dataDir;
 
-    bool saveEmptyPlaylist(QString playlistName);
+    bool saveLoadedPlaylist();
 
     void generateEmptyPlaylist(QString playlistName = "");
     void refreshComboFromDataDir();
     void connectPlaylistSelectorEvents();
     void disconnectPlaylistSelectorEvents();
+    void addNewItemToSelectorAfterSave();
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);
 
     QJsonArray *playlistSelectionObjects() const;
     void setPlaylistSelectionObjects(QJsonArray *playlistSelectionObjects);
+    QVector<QJsonObject *> copyJsonArrayToVector(QJsonArray inObject);
+    void appendFilesToModel(QVector<QJsonObject *> files);
+    void appendCurrentPlaylistToSelector();
 
 signals:
     void onAddNewPlaylist(QJsonObject playlistObject);
@@ -41,11 +46,13 @@ signals:
     void onDeletePlaylist(QJsonObject playlistObject);
     void onSavePlaylist(QJsonObject playlistObject);
 
-    void onPlaylistSelectionRefreshPlaylist(QJsonArray files);
+    void onPlaylistSelectionRefreshPlaylist(QVector<QJsonObject *> files);
 
 public slots:
     void onPlaylistSelectorChange(int itemIndex);
     void onNewPlaylistButtonPress();
+    void onSavePlaylistButtonPress();
+
 };
 
 #endif // PLAYLISTCONTROLS_H

@@ -35,9 +35,10 @@ int BufferedTableModel::rowCount(const QModelIndex &) const {
     return m_count;
 }
 
-void BufferedTableModel::refresh() {
+void BufferedTableModel::clearModel() {
     this->beginResetModel();
     m_rows.clear();
+    m_modFiles.clear();
 //    m_count = m_dbManager->queryNumRowsForPlaylist(0);
     this->endResetModel();
 }
@@ -54,7 +55,7 @@ QVariant BufferedTableModel::data(const QModelIndex &index, int role) const {
             cacheRows(row - halfLookAhead, qMin(m_count, row + halfLookAhead));
         }
         else while (row > m_rows.lastIndex()) {
-            m_rows.append(fetchRow(m_rows.lastIndex()+1, 0));
+            m_rows.append(fetchRow(m_rows.lastIndex()+1));
         }
     }
     else if (row < m_rows.firstIndex()) {
@@ -62,7 +63,7 @@ QVariant BufferedTableModel::data(const QModelIndex &index, int role) const {
             cacheRows(qMax(0, row - halfLookAhead), row + halfLookAhead);
         }
         else while (row < m_rows.firstIndex()) {
-            m_rows.prepend(fetchRow(m_rows.firstIndex()-1, 0));
+            m_rows.prepend(fetchRow(m_rows.firstIndex()-1));
         }
     }
 
@@ -78,10 +79,10 @@ QVariant BufferedTableModel::data(const QModelIndex &index, int role) const {
 
 void BufferedTableModel::cacheRows(int from, int to) const {
     for (int i = from; i <= to; ++i)
-        m_rows.insert(i, fetchRow(i, 0));
+        m_rows.insert(i, fetchRow(i));
 }
 
-QJsonObject * BufferedTableModel::fetchRow(int rowNumber, int playlistId) const {
+QJsonObject * BufferedTableModel::fetchRow(int rowNumber) const {
 //    ModFile *modFile = new ModFile();
 
 //    return modFile;

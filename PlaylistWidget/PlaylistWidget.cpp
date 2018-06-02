@@ -1,9 +1,6 @@
 #include "PlaylistWidget.h"
 
-
-
-PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
-{
+PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
     this->setAcceptDrops(true);
@@ -37,18 +34,20 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent)
 
     this->layout()->addWidget(m_playlistControls);
 
-    connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [](QJsonArray items) {
-        qDebug() << "onPlaylistSelectorChange";
+    connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [this](QVector<QJsonObject *> items) {
+        qDebug() << "PlalystControls::onPlaylistSelectorChange() total files to model = " << items.size();
 
-        for (int i = 0; i < items.size(); ++i) {
-            qDebug() <<  items.at(i);
-        }
+//        for (int i = 0; i < items.size(); ++i) {
+//            QJsonObject *fileObj = items.at(i);
+//            qDebug() <<  fileObj->keys();
+//        }
+
+        this->m_model.clearModel();
+        this->m_model.appendItems(items);
     });
 
     this->m_countingFiles = false;
 }
-
-
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
     if (e->mimeData()->hasUrls() && ! this->m_countingFiles) {
@@ -108,7 +107,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        thread->quit();
        thread->wait();
 
-       this->startFileInsertion(results);
+       this->appendFilesToModel(results);
        this->m_progressDialog.hide();
        this->m_countingFiles = false;
     });
@@ -126,14 +125,15 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 }
 
 
-void PlaylistWidget::startFileInsertion(ThreadedModFileCheckResults *results){
-    BufferedTableModel *model = (BufferedTableModel*) this->m_tableView->model();
-    model->appendItems(results->goodFiles());
+void PlaylistWidget::appendFilesToModel(ThreadedModFileCheckResults *results){
+    BufferedTableModel *tableModel = (BufferedTableModel*) this->m_tableView->model();
 
-//    playlistItems
+    QVector<QJsonObject *> modFiles = results->goodFiles();
+    tableModel->appendItems(modFiles);
+    m_playlistControls->appendFilesToModel(modFiles);
 }
 
 void PlaylistWidget::refreshTableView() {
     BufferedTableModel *model = (BufferedTableModel *)this->m_tableView->model();
-    model->refresh();
+    model->clearModel();
 }
