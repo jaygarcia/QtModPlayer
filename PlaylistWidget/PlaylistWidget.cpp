@@ -84,9 +84,11 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
 
-    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete) {
+    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QString baseName) {
         if (! this->m_progressDialog.isHidden()) {
             this->m_progressDialog.setValue(pctComplete);
+            this->m_progressDialog.setLabelText(baseName);
+
         }
     });
 

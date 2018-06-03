@@ -41,10 +41,10 @@ void ThreadedModFileCheck::run() {
         }
 
         QFileInfo *fileInfo = new QFileInfo(this->allFiles.at(i));
+        QString filePath = fileInfo->absoluteFilePath();
 
         if (fileInfo->isFile()) {
 
-            QString filePath = fileInfo->absoluteFilePath();
             const char *fileString = filePath.toUtf8();
 
             std::ifstream file(fileString, std::ios::binary);
@@ -77,15 +77,15 @@ void ThreadedModFileCheck::run() {
 
         int pctDone = (int) (percentDone * 100.0);
 
-        if (pctDone > lastPctDone) {
-            if (! QThread::currentThread()->isInterruptionRequested()) {
-                emit fileCheckPercentUpdate(pctDone);
-            }
-            lastPctDone = pctDone;
+//        if (pctDone > lastPctDone || totalFilesChecked % 1 == 0) {
+        if (! QThread::currentThread()->isInterruptionRequested() && fileInfo->isFile()) {
+            emit fileCheckPercentUpdate(pctDone, QString(fileInfo->fileName()));
         }
+//            lastPctDone = pctDone;
+//        }
 
         // Give us a little time to press cancel
-        this->thread()->msleep(1);
+//        this->thread()->msleep(1);
     }
 
 

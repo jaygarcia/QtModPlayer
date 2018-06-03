@@ -57,7 +57,7 @@ private:
 signals:
     void filesCounted(unsigned int filesCounted);
     void countingFiles(unsigned int filesCounted);
-    void fileCheckPercentUpdate(int pctComplete);
+    void fileCheckPercentUpdate(int pctComplete, QString baseName);
     void fileCheckComplete(ThreadedModFileCheckResults* = 0); // <-- To do, find out how to pass a signal
 };
 
