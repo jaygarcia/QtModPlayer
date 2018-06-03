@@ -15,8 +15,9 @@ void BufferedTableModel::appendItems(QVector<QJsonObject *> modFiles) {
     this->beginResetModel();
 
     for (int i = 0; i < modFiles.size(); ++i) {
+//        QJsonObject *modFile = new QJsonObject(QJsonObject::fromVariantHash(modFiles.at(i)->toVariantHash()));
         QJsonObject *modFile = modFiles.at(i);
-        QString fullPath = modFile->value("full_path").toString();
+        QString fullPath = QString(modFile->value("full_path").toString());
 
         if (! this->m_modFileNames.contains(fullPath)) {
             this->m_modFileNames.push_back(fullPath);
@@ -26,7 +27,7 @@ void BufferedTableModel::appendItems(QVector<QJsonObject *> modFiles) {
 
     m_count = this->m_modFiles.size();
 
-    qDebug() << "m_count = " << m_count;
+//    qDebug() << "m_count = " << m_count;
 
     this->endResetModel();
 }
@@ -39,6 +40,7 @@ void BufferedTableModel::clearModel() {
     this->beginResetModel();
     m_rows.clear();
     m_modFiles.clear();
+    m_modFileNames.clear();
 //    m_count = m_dbManager->queryNumRowsForPlaylist(0);
     this->endResetModel();
 }

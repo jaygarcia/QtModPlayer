@@ -150,8 +150,6 @@ void PlaylistControls::configure() {
 
     this->refreshComboFromDataDir();
 
-    this->connectPlaylistSelectorEvents();
-
     layout->addWidget(m_playlistSelector);
 
     layout->setStretch(4, 1);
@@ -201,20 +199,24 @@ void PlaylistControls::onNewPlaylistButtonPress() {
     if (okPressed && !text.isEmpty()) {
         //https://msdn.microsoft.com/en-us/library/aa365247
         std::string fn = text.toUtf8().constData();
+        bool validName;
+        {  // brackets are here so that we can collapse this ugly code!
 #ifdef __APPLE__
-        bool validName = qfs::portable_posix_name(fn);
+        validName = qfs::portable_posix_name(fn);
 #elif _WIN64
-        bool valid_name = qfs::windows_name(fn);
+         valid_name = qfs::windows_name(fn);
 #elif __linux__
-        bool valid_name = qfs::portable_posix_name(fn);
+        valid_name = qfs::portable_posix_name(fn);
 #else
         // NO option here -- wtf are we compiliing to?
-        bool validName = false;
+        validName = false;
 #endif
+        }
+
 
         printf("validName == '%s'\t %i\n", fn.c_str(), validName);
         fflush(stdout);
-        if (!validName) {
+        if (!validName || m_defaultPlaylistName.compare(text, Qt::CaseInsensitive) > 0) {
             QMessageBox *msg = new QMessageBox(this);
             msg->setIcon(QMessageBox::Warning);
             msg->setText("Error: The file name entered has invalid characters. Please try again.");
@@ -233,6 +235,7 @@ void PlaylistControls::onNewPlaylistButtonPress() {
         }
     }
 }
+
 // TODO: figure out why we're not seeing the new item in the selector
 void PlaylistControls::onSavePlaylistButtonPress() {
     QString playlistName = m_currentPlaylistDocument->object().value("playlist_name").toString();
@@ -302,26 +305,88 @@ void PlaylistControls::generateEmptyPlaylist(QString playlistName) {
     QJsonArray files;
     newPlaylist.insert("files", files);
 
-    m_currentPlaylistDocument = new QJsonDocument(newPlaylist);
+    this->m_currentPlaylistDocument = new QJsonDocument(newPlaylist);
 }
 
 
+
+bool PlaylistControls::saveLoadedPlaylist() {
+    QJsonObject rootObj = m_currentPlaylistDocument->object();
+    QString playlistName = rootObj.value("playlist_name").toString();
+
+    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
+
+    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
+
+    file.open(QIODevice::WriteOnly);
+    file.write(m_currentPlaylistDocument->toBinaryData());
+    return true;
+}
 
 void PlaylistControls::refreshComboFromDataDir() {
     // Todo: Populate combo box with files
-    QFileInfoList files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
-
+    this->disconnectPlaylistSelectorEvents();
     m_playlistSelector->clear();
+
+    QFileInfoList files = m_dataDir.entryInfoList(QDir::Files | QDir::Writable, QDir::Name);
 
     m_playlistSelector->addItem(this->m_defaultPlaylistName, "");
     m_playlistSelector->insertSeparator(1);
-//    m_playlistSelector->
 
     for (int i = 0; i < files.size(); ++i) {
         QFileInfo file = files.at(i);
+
         m_playlistSelector->addItem(file.baseName(), file.absoluteFilePath());
     }
+    this->connectPlaylistSelectorEvents();
+
 }
+
+
+void PlaylistControls::appendCurrentPlaylistToSelector() {
+    QJsonObject rootObj = m_currentPlaylistDocument->object();
+    QString playlistName = rootObj.value("playlist_name").toString();
+
+    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
+
+//    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
+
+    int selectedIndex = this->m_playlistSelector->findData(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
+
+    this->disconnectPlaylistSelectorEvents();
+    this->m_playlistSelector->setCurrentIndex(selectedIndex);
+
+    QVector<QJsonObject *> filesVector = this->copyJsonArrayToVector(m_currentPlaylistDocument->object().value("files").toArray());
+    emit onPlaylistSelectionRefreshPlaylist(filesVector);
+
+    this->connectPlaylistSelectorEvents();
+}
+
+void PlaylistControls::onPlaylistSelectorChange(int itemIndex) {
+    if (itemIndex == 0) {
+        qDebug() << "Index is zero!";
+        // todo ; emit playlist clear
+        return;
+    }
+
+//    qDebug() << "Item selected " << itemIndex << m_playlistSelector->itemData(itemIndex);
+
+    QFile file(m_playlistSelector->itemData(itemIndex).toString());
+    file.open(QFile::ReadOnly);
+
+    QByteArray saveData = file.readAll();
+
+    QJsonDocument *loadDoc = new  QJsonDocument(QJsonDocument::fromBinaryData(saveData));
+
+    m_currentPlaylistDocument = loadDoc;
+
+//    qDebug() << "JSON:" << loadDoc->toJson();
+
+    QVector<QJsonObject *> files = this->copyJsonArrayToVector(loadDoc->object().value("files").toArray());
+    emit onPlaylistSelectionRefreshPlaylist(files);
+}
+
+
 
 
 QJsonArray *PlaylistControls::playlistSelectionObjects() const
@@ -332,7 +397,6 @@ QJsonArray *PlaylistControls::playlistSelectionObjects() const
 void PlaylistControls::setPlaylistSelectionObjects(QJsonArray *playlistSelectionObjects)
 {
     m_playlistSelectionObjects = playlistSelectionObjects;
-    // Todo:: iterate and update combo box
 }
 
 
@@ -351,11 +415,9 @@ void PlaylistControls::disconnectPlaylistSelectorEvents() {
 }
 
 void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) {
-//    qDebug() << "PlaylistControls::appendFilesToModel() adding files: " << incomingFiles.size();
     QJsonObject rootObj = m_currentPlaylistDocument->object();
 
     QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
-//    qDebug() << " current file count: " << filesArray.size();
 
     for (int i = 0; i < incomingFiles.size(); ++i) {
         QJsonObject *srcObj = incomingFiles.at(i);
@@ -367,7 +429,6 @@ void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) 
             destObj.insert(key, srcObj->value(key));
         }
 
-//        qDebug() << destObj.keys();
         filesArray.append(destObj);
     }
 
@@ -375,74 +436,10 @@ void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) 
     rootObj.remove("files");
     rootObj.insert("files", filesArray);
 
-//    qDebug() << "total files now" << rootObj.value("files").toArray().size();
-
     m_currentPlaylistDocument->setObject(rootObj);
-
 }
 
 
-bool PlaylistControls::saveLoadedPlaylist() {
-    QJsonObject rootObj = m_currentPlaylistDocument->object();
-    QString playlistName = rootObj.value("playlist_name").toString();
-
-    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
-//    qDebug() << " current file count: " << filesArray.size();
-
-    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
-
-//    const char * jsonStr =  m_currentPlaylistDocument->toJson().toStdString().c_str();
-//    printf("%s\n", jsonStr);
-
-    file.open(QIODevice::WriteOnly);
-    file.write(m_currentPlaylistDocument->toBinaryData());
-
-    return true;
-}
-
-void PlaylistControls::appendCurrentPlaylistToSelector() {
-    QJsonObject rootObj = m_currentPlaylistDocument->object();
-    QString playlistName = rootObj.value("playlist_name").toString();
-
-    QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
-
-    QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
-
-    int selectedIndex = this->m_playlistSelector->findData(file.fileName());
-
-    this->disconnectPlaylistSelectorEvents();
-    this->m_playlistSelector->setCurrentIndex(selectedIndex);
-
-    QVector<QJsonObject *> filesVector = this->copyJsonArrayToVector(m_currentPlaylistDocument->object().value("files").toArray());
-    emit onPlaylistSelectionRefreshPlaylist(filesVector);
-
-    this->connectPlaylistSelectorEvents();
-}
-
-void PlaylistControls::onPlaylistSelectorChange(int itemIndex) {
-    if (itemIndex == 0) {
-        qDebug() << "Index is zero!";
-        // todo ; emit playlist clear
-        return;
-    }
-
-    qDebug() << "Item selected " << itemIndex << m_playlistSelector->itemData(itemIndex);
-
-    QFile file(m_playlistSelector->itemData(itemIndex).toString());
-    file.open(QFile::ReadOnly);
-
-    QByteArray saveData = file.readAll();
-
-    QJsonDocument *loadDoc = new  QJsonDocument(QJsonDocument::fromBinaryData(saveData));
-
-    m_currentPlaylistDocument = loadDoc;
-
-//    qDebug() << loadDoc->toJson();
-
-    QVector<QJsonObject *> files = this->copyJsonArrayToVector(loadDoc->object().value("files").toArray());
-    emit onPlaylistSelectionRefreshPlaylist(files);
-
-}
 
 QVector<QJsonObject *> PlaylistControls::copyJsonArrayToVector(QJsonArray jsonFiles) {
     QVector<QJsonObject *> returnVector;

@@ -35,7 +35,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->layout()->addWidget(m_playlistControls);
 
     connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [this](QVector<QJsonObject *> items) {
-        qDebug() << "PlalystControls::onPlaylistSelectorChange() total files to model = " << items.size();
+//        qDebug() << "PlalystControls::onPlaylistSelectorChange() total files to model = " << items.size();
 
 //        for (int i = 0; i < items.size(); ++i) {
 //            QJsonObject *fileObj = items.at(i);
@@ -44,6 +44,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
         this->m_model.clearModel();
         this->m_model.appendItems(items);
+        this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
     });
 
     this->m_countingFiles = false;
@@ -101,8 +102,8 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     });
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
-       qDebug() << "Total good files " << results->goodFileCount();
-       qDebug() << "Total bad files "  << results->badFileCount();
+//       qDebug() << "Total good files " << results->goodFileCount();
+//       qDebug() << "Total bad files "  << results->badFileCount();
 
        thread->quit();
        thread->wait();
