@@ -70,17 +70,20 @@ void ThreadedModFileCheck::run() {
             else {
                 badFiles.push_back(filePath);
             }
+
+            totalFilesChecked++;
+            percentDone = (float)totalFilesChecked / (float)totalFiles;
+
+            int pctDone = (int) (percentDone * 100.0);
+
+    //        if (pctDone > lastPctDone || totalFilesChecked % 1 == 0) {
+            if (! QThread::currentThread()->isInterruptionRequested()) {
+                emit fileCheckPercentUpdate(pctDone, QString(fileInfo->fileName()));
+            }
+
         }
 
-        totalFilesChecked++;
-        percentDone = (float)totalFilesChecked / (float)totalFiles;
 
-        int pctDone = (int) (percentDone * 100.0);
-
-//        if (pctDone > lastPctDone || totalFilesChecked % 1 == 0) {
-        if (! QThread::currentThread()->isInterruptionRequested() && fileInfo->isFile()) {
-            emit fileCheckPercentUpdate(pctDone, QString(fileInfo->fileName()));
-        }
 //            lastPctDone = pctDone;
 //        }
 
