@@ -38,7 +38,9 @@ SOURCES += \
     PlaylistWidget/BufferedTableModel.cpp \
     PlaylistWidget/PlaylistWidget.cpp \
     MainWindow.cpp \
-    PlayerWidget.cpp
+    PlayerWidget.cpp \
+    DBManager/DBManager.cpp \
+    DBManager/ThreadedModFileInserter.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -47,7 +49,9 @@ HEADERS += \
     PlaylistWidget/BufferedTableModel.h \
     PlaylistWidget/PlaylistWidget.h \
     MainWindow.h \
-    PlayerWidget.h
+    PlayerWidget.h \
+    DBManager/DBManager.h \
+    DBManager/ThreadedModFileInserter.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc
