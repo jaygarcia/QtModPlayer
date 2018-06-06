@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QtCore>
 #include <QtSql>
-#include "../modfile.h"
 
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
@@ -17,14 +16,14 @@ private:
     QSqlDatabase m_db;
     QString m_dbPath;
     QString m_dbFileName;
-    QVector<ModFile *> m_filesToInsert;
+    QVector<QJsonObject *> m_filesToInsert;
     int m_playlistId;
 
 
 
 public:
     explicit DBManager(QObject *parent = nullptr);
-    void queueAddToPlaylist(int playlistId, QVector<ModFile *> filesToInsert);
+    void queueAddToPlaylist(int playlistId, QVector<QJsonObject *> filesToInsert);
     void bulkInsertToPlaylist(); // Executed by thread
     bool checkForDeployedDatabase();
     bool connect();
@@ -41,8 +40,8 @@ public:
     QString dbPath() const;
     void setDbPath(const QString &dbPath);
 
-    QVector<ModFile *> filesToInsert() const;
-    void setFilesToInsert(const QVector<ModFile *> &filesToInsert);
+    QVector<QJsonObject *> filesToInsert() const;
+    void setFilesToInsert(const QVector<QJsonObject *> &filesToInsert);
 
     int playlistId() const;
     void setPlaylistId(int playlistId);

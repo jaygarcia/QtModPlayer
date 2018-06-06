@@ -16,7 +16,6 @@ DROP TABLE IF EXISTS playlist_songs_tmp;
 --     in_queue   INT
 -- );
 
-CREATE TABLE plays (id_md5 TEXT, number_plays INT);
 
 CREATE TABLE playlists (
     id           INTEGER PRIMARY KEY   AUTOINCREMENT,
@@ -26,7 +25,7 @@ CREATE TABLE playlists (
 
 INSERT INTO playlists VALUES(0, "2007-01-01 10:00:00", "default");
 
-CREATE TABLE playlist_songs (
+CREATE TABLE playlist_prototype (
     song_id     INTEGER PRIMARY KEY AUTOINCREMENT,
     playlist_id INT,
     song_name  TEXT,

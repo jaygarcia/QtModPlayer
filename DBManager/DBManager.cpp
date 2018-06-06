@@ -1,5 +1,4 @@
-#include "dbmanager.h"
-#include "../modfile.h"
+#include "DBManager/DBManager.h"
 
 
 
@@ -126,13 +125,13 @@ void DBManager::bulkInsertToPlaylist() {
 
     for (int i = 0; i < totalSize; ++i) {
 
-        ModFile *modFile = m_filesToInsert.at(i);
+        QJsonObject *modFile = m_filesToInsert.at(i);
 
         query.bindValue(":playlist_id", 0);
-        query.bindValue(":file_name", modFile->file_name);
-        query.bindValue(":full_path", modFile->full_path);
+        query.bindValue(":file_name", modFile->value("file_name"));
+        query.bindValue(":full_path", modFile->value("full_path"));
 
-        std::ifstream file(modFile->full_path.toUtf8(), std::ios::binary);
+        std::ifstream file(modFile->value("full_path").toString().toUtf8(), std::ios::binary);
 
         openmpt::module mod(file);
 
@@ -147,7 +146,7 @@ void DBManager::bulkInsertToPlaylist() {
             this->thread()->msleep(1);
         }
         else {
-            qWarning() << m_filesToInsert.at(i)->file_name << "FAILURE!";
+            qWarning() << m_filesToInsert.at(i)->value("file_name").toString() << "FAILURE!";
             qWarning() << query.lastError();
             qWarning() << getLastExecutedQuery(query);
         }
@@ -180,7 +179,7 @@ void DBManager::bulkInsertToPlaylist() {
     this->disconnect();
 }
 
-void DBManager::queueAddToPlaylist(int playlistId, QVector<ModFile *> filesToInsert) {
+void DBManager::queueAddToPlaylist(int playlistId, QVector<QJsonObject *> filesToInsert) {
     this->m_playlistId = playlistId;
     this->m_filesToInsert = filesToInsert;
 }
@@ -338,12 +337,12 @@ void DBManager::setDbPath(const QString &dbPath)
     m_dbPath = dbPath;
 }
 
-QVector<ModFile *> DBManager::filesToInsert() const
+QVector<QJsonObject *> DBManager::filesToInsert() const
 {
     return m_filesToInsert;
 }
 
-void DBManager::setFilesToInsert(const QVector<ModFile *> &filesToInsert)
+void DBManager::setFilesToInsert(const QVector<QJsonObject *> &filesToInsert)
 {
     m_filesToInsert = filesToInsert;
 }

@@ -8,7 +8,7 @@ void ThreadedModFileInserter::run() {
 }
 
 
-void ThreadedModFileInserter::addToPlaylist(int playlistId, QVector<ModFile *> modFiles) {
+void ThreadedModFileInserter::addToPlaylist(int playlistId, QVector<QJsonObject *> modFiles) {
 
     DBManager *dbManager = new DBManager();
     dbManager->setPlaylistId(playlistId);

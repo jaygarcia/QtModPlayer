@@ -1,13 +1,15 @@
 #include "BufferedTableModel.h"
 
 
+
 BufferedTableModel::BufferedTableModel(QObject *parent)
     : QAbstractTableModel(parent), m_rows(bufferSize) {
-//    m_dbManager = new DBManager(this);
-//    m_dbManager->queryNumRowsForPlaylist(0);
-//    m_count = m_dbManager->queryNumRowsForPlaylist(0);
     m_count = 0;
-//    m_dbManager->connect();
+
+    m_dbManager = new DBManager(this);
+    m_dbManager->queryNumRowsForPlaylist(0);
+    m_count = m_dbManager->queryNumRowsForPlaylist(0);
+    m_dbManager->connect();
 }
 
 

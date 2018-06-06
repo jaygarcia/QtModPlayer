@@ -8,8 +8,7 @@
 #include <fstream>
 #include <QThread>
 
-#include "../modfile.h"
-#include "dbmanager.h"
+#include "DBManager.h"
 
 class ThreadedModFileInserterResults : public QObject {
     Q_OBJECT
@@ -33,7 +32,7 @@ private:
 public:
     ThreadedModFileInserter();
     void run();
-    void addToPlaylist(int playlistId, QVector<ModFile *> modFiles);
+    void addToPlaylist(int playlistId, QVector<QJsonObject *> modFiles);
 
 
 signals:

@@ -2,6 +2,7 @@
 #define ASYNCBUFFEREDTABLEMODEL_H
 
 
+#include "../DBManager/DBManager.h"
 #include <QtConcurrent>
 
 #include <QAbstractListModel>
@@ -24,7 +25,7 @@ private:
     int m_count;
     int m_playlistId;
 
-//    DBManager *m_dbManager;
+    DBManager *m_dbManager;
 
 public:
     BufferedTableModel(QObject *parent = 0);

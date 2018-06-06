@@ -35,13 +35,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->layout()->addWidget(m_playlistControls);
 
     connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [this](QVector<QJsonObject *> items) {
-//        qDebug() << "PlalystControls::onPlaylistSelectorChange() total files to model = " << items.size();
-
-//        for (int i = 0; i < items.size(); ++i) {
-//            QJsonObject *fileObj = items.at(i);
-//            qDebug() <<  fileObj->keys();
-//        }
-
         this->m_model.clearModel();
         this->m_model.appendItems(items);
         this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
