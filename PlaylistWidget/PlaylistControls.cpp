@@ -297,6 +297,7 @@ void PlaylistControls::onSavePlaylistButtonPress() {
 
 }
 
+// Todo: Convert to DBManager usage
 void PlaylistControls::generateEmptyPlaylist(QString playlistName) {
 
     QJsonObject newPlaylist;
@@ -309,7 +310,7 @@ void PlaylistControls::generateEmptyPlaylist(QString playlistName) {
 }
 
 
-
+// Todo: Convert to DBManager usage
 bool PlaylistControls::saveLoadedPlaylist() {
     QJsonObject rootObj = m_currentPlaylistDocument->object();
     QString playlistName = rootObj.value("playlist_name").toString();
@@ -323,6 +324,7 @@ bool PlaylistControls::saveLoadedPlaylist() {
     return true;
 }
 
+// Todo: Convert to DBManager usage
 void PlaylistControls::refreshComboFromDataDir() {
     // Todo: Populate combo box with files
     this->disconnectPlaylistSelectorEvents();
@@ -342,7 +344,7 @@ void PlaylistControls::refreshComboFromDataDir() {
 
 }
 
-
+// Todo: Convert to DBManager usage
 void PlaylistControls::appendCurrentPlaylistToSelector() {
     QJsonObject rootObj = m_currentPlaylistDocument->object();
     QString playlistName = rootObj.value("playlist_name").toString();
@@ -362,6 +364,7 @@ void PlaylistControls::appendCurrentPlaylistToSelector() {
     this->connectPlaylistSelectorEvents();
 }
 
+// Todo: Convert to DBManager usage
 void PlaylistControls::onPlaylistSelectorChange(int itemIndex) {
     if (itemIndex == 0) {
         qDebug() << "Index is zero!";
