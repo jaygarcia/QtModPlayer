@@ -5,6 +5,7 @@
 #include <QProgressDialog>
 
 #include "ThreadedModFileCheck.h"
+#include "DBManager/DBManager.h"
 
 #include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
@@ -17,7 +18,11 @@ private:
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
 
+
 public:
+
+    DBManager *m_dbManager;
+
     MainWindow(QWidget *parent = 0);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);

@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS plays;
 DROP INDEX IF EXISTS song_index;
 DROP TABLE IF EXISTS eqSettings;
 DROP TABLE IF EXISTS playlists;
-DROP TABLE IF EXISTS playlist_songs;
+DROP TABLE IF EXISTS playlist_prototype;
 DROP TABLE IF EXISTS playlist_songs_tmp;
 
 -- CREATE TABLE songs (
@@ -18,12 +18,12 @@ DROP TABLE IF EXISTS playlist_songs_tmp;
 
 
 CREATE TABLE playlists (
-    id           INTEGER PRIMARY KEY   AUTOINCREMENT,
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
     dated_modified timestamp default (strftime('%s', 'now')),
-    playlist_name TEXT
+    playlist_name TEXT,
+    playlist_table_name TEXT
 );
 
-INSERT INTO playlists VALUES(0, "2007-01-01 10:00:00", "default");
 
 CREATE TABLE playlist_prototype (
     song_id     INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,20 +32,19 @@ CREATE TABLE playlist_prototype (
     file_name  TEXT, 
     full_path  TEXT, 
     like_value INT,
-    md5        TEXT,
     in_queue   INT default(0),
     unique(full_path)
 );
 
-CREATE 
-    INDEX 
-        song_index 
-    ON 
-        playlist_songs(song_name, file_name) 
-    WHERE 
-        song_name 
-    IS 
-        NOT NULL; 
+-- CREATE 
+--     INDEX 
+--         song_index 
+--     ON 
+--         playlist_songs(song_name, file_name) 
+--     WHERE 
+--         song_name 
+--     IS 
+--         NOT NULL; 
 
 
 /*
@@ -339,3 +338,5 @@ insert into eqSettings VALUES (
     "0",     --8K
     "-1"      --16K
 );
+
+vacuum;

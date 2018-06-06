@@ -24,7 +24,7 @@ DBManager::DBManager(QObject *parent) : QObject(parent)
     QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
             destDbFile  = destDbDir + m_dbFileName;
 
-
+    qDebug() << "DBManager m_dbFileName = " << m_dbFileName;
     this->m_dbPath = destDbFile;
 }
 
@@ -201,7 +201,6 @@ bool DBManager::connect() {
         m_db.setDatabaseName(this->m_dbPath);
         bool hasOpened = m_db.open();
 
-
         if (hasOpened) {
             connectionCount++;
         }
@@ -248,8 +247,8 @@ int DBManager::queryNumRowsForPlaylist(int playlistId)  {
 
 
     QSqlQuery query(this->m_db);
-    query.prepare("select count(*) as num_rows from playlist_songs where playlist_id = 0");
-//    query.bindValue(":playlist_id", playlistId);
+    query.prepare("select count(*) as num_rows from playlist_songs where playlist_id = :playlist_id");
+    query.bindValue(":playlist_id", playlistId);
 
     if (! query.exec()) {
         qWarning() << "Something went wrong with counting songs from a playlist";
@@ -317,6 +316,70 @@ drop table playlist_songs_tmp;
 vacuum;
  */
 
+
+int DBManager::generateNewPlaylist(QString playlistName) {
+    this->connect();
+    QSqlQuery query(this->m_db);
+
+    query.prepare("insert into playlists (playlist_name) values (:playlist_name)");
+    query.bindValue(":playlist_name", playlistName);
+
+    int lastInsertId = -1;
+
+    if (query.exec()) {
+        lastInsertId = query.lastInsertId().toInt();
+
+        QString tableName = "playlist_" + QString::number(lastInsertId);
+
+        query.prepare("update playlists set playlist_table_name = :table_name  where id = :playlist_id;");
+        query.bindValue(":table_name", tableName);
+        query.bindValue(":playlist_id", lastInsertId);
+
+        query.exec();
+
+        QString createPlaylistTableQuery = "create table " + tableName + " as SELECT * from playlist_prototype;";
+        query.exec(createPlaylistTableQuery);
+    }
+    else {
+        qWarning() << "Could not generate playlist" << playlistName ;
+        qWarning() << query.lastError();
+        qWarning() << getLastExecutedQuery(query);
+    }
+
+
+
+    this->disconnect();
+    return lastInsertId;
+}
+
+QVector<QJsonObject *> DBManager::getAllPlaylists(int newlyInsertedId) {
+    QVector<QJsonObject *> playlists;
+    this->connect();
+
+    QSqlQuery query(this->m_db);
+    query.setForwardOnly(true);
+    query.exec("select * from playlists order by playlist_name");
+
+    while (query.next()) {
+        QJsonObject *playlist = new QJsonObject();
+        QSqlRecord record = query.record();
+        int recordId = record.value(0).toInt();
+
+        playlist->insert("id", recordId);
+        playlist->insert("playlist_name", record.value(2).toString());
+        playlist->insert("table_name", record.value(3).toString());
+
+        if (newlyInsertedId > -1 && recordId == newlyInsertedId) {
+            playlist->insert("selected", true);
+        }
+
+        playlists.push_back(playlist);
+    }
+
+    this->disconnect();
+    return playlists;
+}
+
 // Todo: Separate in a DBManager base class
 QSqlDatabase DBManager::db() const {
     return m_db;
@@ -356,3 +419,4 @@ void DBManager::setPlaylistId(int playlistId)
 {
     m_playlistId = playlistId;
 }
+

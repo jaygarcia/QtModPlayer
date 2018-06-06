@@ -10,6 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
         qWarning() << "Cannot make data directory!";
     }
 
+    m_dbManager = new DBManager();
+    m_dbManager->checkForDeployedDatabase();
+
+
     PlayerWidget *playerWidget = new PlayerWidget(this);
     this->setCentralWidget(playerWidget);
 
@@ -21,8 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("QtModPlayer");
 
     this->setAcceptDrops(true);
-
-
 }
 
 // Todo: Move to playlist?
@@ -71,6 +73,7 @@ void MainWindow::showPlaylistWindow() {
 
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
+        playlist->setSharedDbManager(&this->m_dbManager);
 
         this->m_playlistWidgetShowing = true;
         this->m_playlistWindow = playlist;

@@ -11,28 +11,30 @@ class PlaylistControls : public QWidget
 
 private :
     void configure();
-    QtAwesome *qtAwesome;
+    QtAwesome *m_qtAwesome;
     QPushButton *buildButton(const char * iconType, const char *label);
+
+    QPushButton *m_newPlaylistButton,
+                *m_savePlaylistButton,
+                *m_deletePlaylistButton;
+
     QComboBox *m_playlistSelector;
     QJsonArray *m_playlistSelectionObjects;
     QString m_defaultPlaylistName;
 
-    QVector<QJsonObject *> m_filesInDir;
+    QVector<QJsonObject *> m_playlistObjects;
 
-    QJsonDocument * m_currentPlaylistDocument;
-
-    QDir m_dataDir;
 
     bool saveLoadedPlaylist();
 
     void generateEmptyPlaylist(QString playlistName = "");
-    void refreshComboFromDataDir();
     void connectPlaylistSelectorEvents();
     void disconnectPlaylistSelectorEvents();
     void addNewItemToSelectorAfterSave();
 
 public:
     explicit PlaylistControls(QWidget *parent = nullptr);
+    void refreshComboWithData(QVector<QJsonObject *> playlistObjects);
 
     QJsonArray *playlistSelectionObjects() const;
     void setPlaylistSelectionObjects(QJsonArray *playlistSelectionObjects);
@@ -40,18 +42,24 @@ public:
     void appendFilesToModel(QVector<QJsonObject *> files);
     void appendCurrentPlaylistToSelector();
 
-signals:
-    void onAddNewPlaylist(QJsonObject playlistObject);
-    void onSelectPlaylist(QJsonObject playlistObject);
-    void onDeletePlaylist(QJsonObject playlistObject);
-    void onSavePlaylist(QJsonObject playlistObject);
+    QPushButton *newPlaylistButton() const;
+    QPushButton *savePlaylistButton() const;
+    QPushButton *deletePlaylistButton() const;
 
-    void onPlaylistSelectionRefreshPlaylist(QVector<QJsonObject *> files);
+    void setPlaylistObjects(const QVector<QJsonObject *> &playlistObjects);
+
+signals:
+    //    void onAddNewPlaylist(QJsonObject playlistObject);
+    //    void onSelectPlaylist(QJsonObject playlistObject);
+//    void onDeletePlaylist(QJsonObject playlistObject);
+//    void onSavePlaylist(QJsonObject playlistObject);
+    void playlistSelectionChange(QString playlistTableName);
+
 
 public slots:
-    void onPlaylistSelectorChange(int itemIndex);
-    void onNewPlaylistButtonPress();
-    void onSavePlaylistButtonPress();
+    void onPlaylistSelectorChangeIndex(int itemIndex);
+//    void onNewPlaylistButtonPress();
+//    void onSavePlaylistButtonPress();
 
 };
 

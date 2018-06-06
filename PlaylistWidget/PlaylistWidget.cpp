@@ -1,5 +1,11 @@
 #include "PlaylistWidget.h"
 
+// Todo: Smart pointers: https://mbevin.wordpress.com/2012/11/18/smart-pointers/
+void PlaylistWidget::setSharedDbManager(const DBManager &sharedDbManager)
+{
+    m_sharedDbManager = sharedDbManager;
+}
+
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
@@ -27,6 +33,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     boxLayout->setStretch(0,1);
 
     m_playlistControls = new PlaylistControls(this);
+    m_sharedDbManager->getAllPlaylists(0);
 
     QRect geometry = m_playlistControls->geometry();
 //    geometry.setHeight(30);
@@ -34,11 +41,11 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
     this->layout()->addWidget(m_playlistControls);
 
-    connect(m_playlistControls, &PlaylistControls::onPlaylistSelectionRefreshPlaylist, this, [this](QVector<QJsonObject *> items) {
-        this->m_model.clearModel();
-        this->m_model.appendItems(items);
-        this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
-    });
+    connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
+
+    connect(m_playlistControls->newPlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onNewPlaylistButtonPress);
+    connect(m_playlistControls->savePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onSavePlaylistButtonPress);
+    connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
 }
@@ -132,4 +139,47 @@ void PlaylistWidget::appendFilesToModel(ThreadedModFileCheckResults *results){
 void PlaylistWidget::refreshTableView() {
     BufferedTableModel *model = (BufferedTableModel *)this->m_tableView->model();
     model->clearModel();
+}
+
+
+
+void PlaylistWidget::onNewPlaylistButtonPress() {
+    bool okPressed;
+
+    QString text = QInputDialog::getText(
+        this,
+        "New Playlist",
+        "Enter a new playlist name:",
+        QLineEdit::Normal,
+        "",
+        &okPressed
+    );
+
+
+    if (okPressed && !text.isEmpty()) {
+        int newPlaylistId = this->m_sharedDbManager->generateNewPlaylist(text);
+        QVector<QJsonObject *> allPlaylists = this->m_sharedDbManager->getAllPlaylists(newPlaylistId);
+
+        this->m_playlistControls->refreshComboWithData(allPlaylists);
+
+    }
+}
+
+
+void PlaylistWidget::onPlaylistSelectorChange(QString playlistTable) {
+
+
+    qDebug() << "onPlaylistSelectorChange" << playlistTable;
+
+    this->m_model.clearModel();
+    this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
+
+}
+
+void PlaylistWidget::onDeletePlaylistButton() {
+
+}
+
+void PlaylistWidget::onSavePlaylistButtonPress() {
+
 }

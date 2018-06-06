@@ -18,7 +18,7 @@
 
 #include "BufferedTableModel.h"
 #include "PlaylistControls.h"
-
+#include "DBManager/DBManager.h"
 
 
 class PlaylistWidget : public QWidget
@@ -34,6 +34,7 @@ private:
 
 public:
     bool m_countingFiles;
+    DBManager &m_sharedDbManager; // shared with parent
 
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
@@ -41,9 +42,16 @@ public:
     void appendFilesToModel(ThreadedModFileCheckResults *results);
     void refreshTableView();
 
+
+    void setSharedDbManager(const DBManager &sharedDbManager);
+
 signals:
 
 public slots:
+    void onNewPlaylistButtonPress();
+    void onPlaylistSelectorChange(QString playlistTable);
+    void onSavePlaylistButtonPress();
+    void onDeletePlaylistButton();
 //    void onInserterPercentUpdate(int pctDone);
 //    void onInserterComplete(int totalFiles);
 };
