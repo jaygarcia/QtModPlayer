@@ -224,7 +224,7 @@ void PlaylistControls::appendCurrentPlaylistToSelector() {
 // Todo: move to PlaylistWidget
 
 void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
-//    qDebug() << itemIndex;
+    qDebug() << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
     emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex).toString());
 }
 

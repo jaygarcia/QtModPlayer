@@ -38,6 +38,8 @@ public:
     PlaylistWidget *getPlaylist() const;
     void setPlaylist(PlaylistWidget *playlist);
 
+    DBManager *getDbManager() const;
+
 signals :
 
 

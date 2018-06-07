@@ -18,7 +18,6 @@ private :
                 *m_savePlaylistButton,
                 *m_deletePlaylistButton;
 
-    QComboBox *m_playlistSelector;
     QJsonArray *m_playlistSelectionObjects;
     QString m_defaultPlaylistName;
 
@@ -33,6 +32,8 @@ private :
     void addNewItemToSelectorAfterSave();
 
 public:
+    QComboBox *m_playlistSelector;
+
     explicit PlaylistControls(QWidget *parent = nullptr);
     void refreshComboWithData(QVector<QJsonObject *> playlistObjects);
 

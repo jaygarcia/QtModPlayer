@@ -367,7 +367,7 @@ QVector<QJsonObject *> DBManager::getAllPlaylists(int newlyInsertedId) {
 
         playlist->insert("id", recordId);
         playlist->insert("playlist_name", record.value(2).toString());
-        playlist->insert("table_name", record.value(3).toString());
+        playlist->insert("playlist_table_name", record.value(3).toString());
 
         if (newlyInsertedId > -1 && recordId == newlyInsertedId) {
             playlist->insert("selected", true);

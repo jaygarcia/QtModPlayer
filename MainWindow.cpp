@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -73,7 +74,6 @@ void MainWindow::showPlaylistWindow() {
 
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
-        playlist->setSharedDbManager(&this->m_dbManager);
 
         this->m_playlistWidgetShowing = true;
         this->m_playlistWindow = playlist;
@@ -113,6 +113,11 @@ PlaylistWidget *MainWindow::getPlaylist() const
 void MainWindow::setPlaylist(PlaylistWidget *playlist)
 {
     m_playlistWindow = playlist;
+}
+
+DBManager *MainWindow::getDbManager() const
+{
+    return m_dbManager;
 }
 
 

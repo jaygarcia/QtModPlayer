@@ -30,11 +30,11 @@ private:
     QTableView *m_tableView;
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
+    DBManager *m_dbManager;
 //    QtAwesome *qtAwesome;
 
 public:
     bool m_countingFiles;
-    DBManager &m_sharedDbManager; // shared with parent
 
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
@@ -43,7 +43,9 @@ public:
     void refreshTableView();
 
 
-    void setSharedDbManager(const DBManager &sharedDbManager);
+
+
+
 
 signals:
 

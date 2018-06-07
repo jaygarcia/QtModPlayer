@@ -1,11 +1,5 @@
 #include "PlaylistWidget.h"
 
-// Todo: Smart pointers: https://mbevin.wordpress.com/2012/11/18/smart-pointers/
-void PlaylistWidget::setSharedDbManager(const DBManager &sharedDbManager)
-{
-    m_sharedDbManager = sharedDbManager;
-}
-
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->setWindowTitle("QtModPlayer :: Playlist");
 
@@ -33,13 +27,16 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     boxLayout->setStretch(0,1);
 
     m_playlistControls = new PlaylistControls(this);
-    m_sharedDbManager->getAllPlaylists(0);
+
+    m_dbManager = new DBManager(this);
+
 
     QRect geometry = m_playlistControls->geometry();
 //    geometry.setHeight(30);
     m_playlistControls->setGeometry(geometry);
-
     this->layout()->addWidget(m_playlistControls);
+
+
 
     connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
 
@@ -48,7 +45,12 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
+
+    QVector<QJsonObject *> playlists = m_dbManager->getAllPlaylists();
+    this->m_playlistControls->refreshComboWithData(playlists);
+    this->m_playlistControls->m_playlistSelector->setCurrentIndex(0);
 }
+
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
     if (e->mimeData()->hasUrls() && ! this->m_countingFiles) {
@@ -157,23 +159,17 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 
 
     if (okPressed && !text.isEmpty()) {
-        int newPlaylistId = this->m_sharedDbManager->generateNewPlaylist(text);
-        QVector<QJsonObject *> allPlaylists = this->m_sharedDbManager->getAllPlaylists(newPlaylistId);
+        int newPlaylistId = this->m_dbManager->generateNewPlaylist(text);
+        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
-
     }
 }
 
 
 void PlaylistWidget::onPlaylistSelectorChange(QString playlistTable) {
-
-
-    qDebug() << "onPlaylistSelectorChange" << playlistTable;
-
     this->m_model.clearModel();
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
-
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {
