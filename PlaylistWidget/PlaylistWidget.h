@@ -43,12 +43,13 @@ public:
     void appendFilesToModel(ThreadedModFileCheckResults *results);
     void refreshTableView();
     bool getNewPlaylistNameFromUser();
-
+    void loadPlaylist(QString playlistTableName);
 
 
 
 
 signals:
+    void playlistSelected(QString playlistTable);
 
 public slots:
     void onNewPlaylistButtonPress();

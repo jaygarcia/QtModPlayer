@@ -34,10 +34,8 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
 
     QRect geometry = m_playlistControls->geometry();
-//    geometry.setHeight(30);
     m_playlistControls->setGeometry(geometry);
     this->layout()->addWidget(m_playlistControls);
-
 
 
     connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
@@ -50,6 +48,11 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
 }
 
+void PlaylistWidget::loadPlaylist(QString playlistTableName) {
+
+    this->m_playlistControls->selectPlaylistViaTableName(playlistTableName);
+
+}
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
     if (e->mimeData()->hasUrls() && ! this->m_countingFiles) {
@@ -200,7 +203,7 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
-
+    emit playlistSelected(selectedTableName);
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {

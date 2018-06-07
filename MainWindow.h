@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 private:
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
-
+    QString m_playlistSelected;
 
 public:
 

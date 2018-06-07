@@ -178,16 +178,9 @@ void PlaylistControls::seedComboData(QVector<QJsonObject *> playlistObjects) {
 
     m_playlistSelector->addItem("","");
 
-    int selectedIndex = -1;
-
     for (int i = 0; i < playlistObjects.size(); ++i) {
         QJsonObject *playlistObj = playlistObjects.at(i);
 
-        QJsonValue selected = playlistObj->take("selected");
-
-        if (selected != QJsonValue::Undefined) {
-            selectedIndex = i;
-        }
 
         m_playlistSelector->addItem(
             playlistObj->value("playlist_name").toString(),
@@ -214,7 +207,7 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
         if (selected != QJsonValue::Undefined) {
             selectedIndex = i;
         }
-//        qDebug() << playlistObj->keys();
+
         m_playlistSelector->addItem(
             playlistObj->value("playlist_name").toString(),
             playlistObj->value("playlist_table_name").toString()
@@ -226,6 +219,28 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
     if (selectedIndex > -1) {
         m_playlistSelector->setCurrentIndex(selectedIndex);
     }
+}
+
+void PlaylistControls::selectPlaylistViaTableName(QString tableName) {
+//    bool oldState = m_playlistSelector->blockSignals(true);
+
+//    m_playlistSelector->setCurrentIndex(selectedIndex);
+
+//    m_playlistSelector->blockSignals(oldState);
+    if (tableName.isEmpty() || tableName.isNull()) {
+        return;
+    }
+
+    int numItems = m_playlistSelector->count();
+
+    for (int i = 0; i < numItems; i++) {
+        if (m_playlistSelector->itemData(i).toString().compare(tableName) > 0) {
+//            qDebug() << Q_FUNC_INFO << m_playlistSelector->itemData(i).toString() << i << tableName;
+            m_playlistSelector->setCurrentIndex(i);
+        }
+    }
+
+
 }
 
 // Todo: Convert to DBManager usage

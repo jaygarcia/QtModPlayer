@@ -37,6 +37,7 @@ public:
     explicit PlaylistControls(QWidget *parent = nullptr);
     void refreshComboWithData(QVector<QJsonObject *> playlistObjects);
     void seedComboData(QVector<QJsonObject *> playlistObjects);
+    void selectPlaylistViaTableName(QString tableName);
 
     QJsonArray *playlistSelectionObjects() const;
     void setPlaylistSelectionObjects(QJsonArray *playlistSelectionObjects);

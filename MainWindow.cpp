@@ -64,7 +64,6 @@ void MainWindow::showPlaylistWindow() {
     if (this->m_playlistWidgetShowing == false) {
 
         PlaylistWidget *playlist = new PlaylistWidget();
-
         playlist->setObjectName("playlist");
         playlist->setAttribute(Qt::WA_DeleteOnClose);
         playlist->setFixedWidth(this->geometry().width() * 2);
@@ -75,11 +74,18 @@ void MainWindow::showPlaylistWindow() {
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
 
+        playlist->loadPlaylist(this->m_playlistSelected);
+
+
         this->m_playlistWidgetShowing = true;
         this->m_playlistWindow = playlist;
 
         connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *) {
             this->m_playlistWidgetShowing = false;
+        });
+
+        connect(playlist, &PlaylistWidget::playlistSelected, this, [this](QString playlistTable) {
+           this->m_playlistSelected = playlistTable;
         });
     }
 }
