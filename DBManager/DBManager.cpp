@@ -24,7 +24,7 @@ DBManager::DBManager(QObject *parent) : QObject(parent)
     QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
             destDbFile  = destDbDir + m_dbFileName;
 
-    qDebug() << "DBManager m_dbFileName = " << m_dbFileName;
+    qDebug() << "DBManager destDbFile = " << destDbFile;
     this->m_dbPath = destDbFile;
 }
 
@@ -97,6 +97,37 @@ bool DBManager::checkForDeployedDatabase() {
     return true;
 }
 
+void DBManager::addToPlaylist(QString tableName, QJsonObject *modFile) {
+    if (! this->connect()) {
+        qWarning() << Q_FUNC_INFO<< "Cannot connect to database!";
+        return;
+    }
+    QSqlQuery query(this->m_db);
+
+    query.prepare(
+        "INSERT OR IGNORE INTO " + tableName + " (song_name, file_name, full_path) "
+        "VALUES (:song_name, :file_name, :full_path) "
+    );
+
+
+    query.bindValue(":song_name", modFile->value("song_name").toString());
+    query.bindValue(":file_name", modFile->value("file_name").toString());
+    query.bindValue(":full_path", modFile->value("full_path").toString());
+
+    if (query.exec()) {
+        query.finish();
+        this->m_db.commit();
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << modFile->value("file_name").toString() << "FAILURE!";
+        qWarning() << Q_FUNC_INFO << query.lastError();
+        qWarning() << Q_FUNC_INFO << getLastExecutedQuery(query);
+    }
+
+    this->disconnect();
+}
+
+// this is executed via ThreadedModFileInserter (currently not in service).
 void DBManager::bulkInsertToPlaylist() {
     if (! this->connect()) {
         qWarning() << "Cannot connect to database! Cannot bulkInsertToPlaylist()";
@@ -120,7 +151,7 @@ void DBManager::bulkInsertToPlaylist() {
 
     int totalSize = m_filesToInsert.size();
 
-    bool firstFlush = false;
+//    bool firstFlush = false;
 
 
     for (int i = 0; i < totalSize; ++i) {
@@ -242,23 +273,19 @@ bool DBManager::disconnect() {
 }
 
 
-int DBManager::queryNumRowsForPlaylist(int playlistId)  {
+int DBManager::getNumRowsForPlaylist(QString tableName)  {
     this->connect();
 
-
     QSqlQuery query(this->m_db);
-    query.prepare("select count(*) as num_rows from playlist_songs where playlist_id = :playlist_id");
-    query.bindValue(":playlist_id", playlistId);
+    QString queryString = "select count(*) as num_rows from " + tableName;
+    query.prepare(queryString);
 
     if (! query.exec()) {
         qWarning() << "Something went wrong with counting songs from a playlist";
     }
     else {
         query.seek(0);
-
         return query.record().value(0).toInt();
-//        qDebug() << "num_records=" << value;
-//        qDebug() << getLastExecutedQuery(query);
     }
 
     this->disconnect();
@@ -266,10 +293,10 @@ int DBManager::queryNumRowsForPlaylist(int playlistId)  {
     return 0;
 }
 
-QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
+QSqlRecord DBManager::getRecordAt(int rowId, QString tableName) {
     QSqlQuery query(this->m_db);
-    query.prepare("select * from playlist_songs where playlist_id = :playlist_id and song_id = :row_id    ");
-    query.bindValue(":playlist_id", playlistId);
+    QString queryString = "select song_name, file_name from " + tableName + " where rowid = :row_id";
+    query.prepare(queryString);
     query.bindValue(":row_id", rowId);
 
     if (! query.exec()) {
@@ -278,16 +305,11 @@ QSqlRecord DBManager::getRecordAt(int rowId, int playlistId) {
     }
     else {
         query.seek(0);
-
     }
-    QSqlRecord record = query.record();
 
-//    qWarning() << getLastExecutedQuery(query);
-
-//    qDebug() << rowId << record.value("song_name").toString() << record.value(0).toString();
+//    QSqlRecord record = query.record();
 
     return query.record();
-
 }
 
 /*  --- To be used on row removal
@@ -345,8 +367,6 @@ int DBManager::generateNewPlaylist(QString playlistName) {
         qWarning() << query.lastError();
         qWarning() << getLastExecutedQuery(query);
     }
-
-
 
     this->disconnect();
     return lastInsertId;

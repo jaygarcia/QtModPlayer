@@ -29,6 +29,8 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     m_playlistControls = new PlaylistControls(this);
 
     m_dbManager = new DBManager(this);
+    QVector<QJsonObject *> playlists = m_dbManager->getAllPlaylists();
+    this->m_playlistControls->seedComboData(playlists);
 
 
     QRect geometry = m_playlistControls->geometry();
@@ -39,16 +41,13 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
 
     connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
-
     connect(m_playlistControls->newPlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onNewPlaylistButtonPress);
     connect(m_playlistControls->savePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onSavePlaylistButtonPress);
     connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
 
-    QVector<QJsonObject *> playlists = m_dbManager->getAllPlaylists();
-    this->m_playlistControls->refreshComboWithData(playlists);
-    this->m_playlistControls->m_playlistSelector->setCurrentIndex(0);
+
 }
 
 
@@ -86,11 +85,12 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
 
-    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QString baseName) {
+    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QJsonObject *modFile) {
         if (! this->m_progressDialog.isHidden()) {
             this->m_progressDialog.setValue(pctComplete);
-            this->m_progressDialog.setLabelText(baseName);
-
+            this->m_progressDialog.setLabelText(modFile->value("file_name").toString());
+            this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
+            this->m_model.refresh(this->m_selectedTableName);
         }
     });
 
@@ -112,9 +112,11 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
        thread->quit();
        thread->wait();
 
-       this->appendFilesToModel(results);
+//       this->appendFilesToModel(results);
        this->m_progressDialog.hide();
        this->m_countingFiles = false;
+       this->m_model.refresh(this->m_selectedTableName);
+
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
@@ -167,9 +169,13 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 }
 
 
-void PlaylistWidget::onPlaylistSelectorChange(QString playlistTable) {
-    this->m_model.clearModel();
+void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
+    qDebug() << Q_FUNC_INFO << selectedTableName;
+    this->m_selectedTableName = selectedTableName;
+    this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
+
+
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {

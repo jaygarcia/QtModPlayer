@@ -170,6 +170,34 @@ bool PlaylistControls::saveLoadedPlaylist() {
     return true;
 }
 
+void PlaylistControls::seedComboData(QVector<QJsonObject *> playlistObjects) {
+    bool oldState = m_playlistSelector->blockSignals(true);
+    m_playlistSelector->clear();
+
+    this->m_playlistObjects = playlistObjects;
+
+    m_playlistSelector->addItem("","");
+
+    int selectedIndex = -1;
+
+    for (int i = 0; i < playlistObjects.size(); ++i) {
+        QJsonObject *playlistObj = playlistObjects.at(i);
+
+        QJsonValue selected = playlistObj->take("selected");
+
+        if (selected != QJsonValue::Undefined) {
+            selectedIndex = i;
+        }
+
+        m_playlistSelector->addItem(
+            playlistObj->value("playlist_name").toString(),
+            playlistObj->value("playlist_table_name").toString()
+        );
+    }
+
+    m_playlistSelector->blockSignals(oldState);
+
+}
 void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjects) {
     this->m_playlistObjects = playlistObjects;
 
@@ -186,7 +214,7 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
         if (selected != QJsonValue::Undefined) {
             selectedIndex = i;
         }
-        qDebug() << playlistObj->keys();
+//        qDebug() << playlistObj->keys();
         m_playlistSelector->addItem(
             playlistObj->value("playlist_name").toString(),
             playlistObj->value("playlist_table_name").toString()
@@ -224,8 +252,21 @@ void PlaylistControls::appendCurrentPlaylistToSelector() {
 // Todo: move to PlaylistWidget
 
 void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
-    qDebug() << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
-    emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex).toString());
+    qDebug() << "onPlaylistSelectorChangeIndex" << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
+
+    QString indexZeroItem = m_playlistSelector->itemText(0);
+    if (indexZeroItem.isEmpty()) {
+        bool oldState = m_playlistSelector->blockSignals(true);
+        m_playlistSelector->removeItem(0);
+
+        m_playlistSelector->blockSignals(oldState);
+        emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex - 1).toString());
+
+    }
+    else {
+        emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex).toString());
+    }
+
 }
 
 

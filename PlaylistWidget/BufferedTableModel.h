@@ -25,6 +25,7 @@ private:
     int m_count;
     int m_playlistId;
 
+    QString currentTableName;
     DBManager *m_dbManager;
 
 public:
@@ -37,6 +38,7 @@ public:
     QVariant data(const QModelIndex &, int) const override;
 
     void clearModel();
+    void refresh(QString tableName);
 
     int columnCount(const QModelIndex &parent) const override {
         Q_UNUSED(parent);

@@ -42,9 +42,26 @@ void BufferedTableModel::clearModel() {
     m_rows.clear();
     m_modFiles.clear();
     m_modFileNames.clear();
-//    m_count = m_dbManager->queryNumRowsForPlaylist(0);
+    m_count = 0;
     this->endResetModel();
 }
+
+void BufferedTableModel::refresh(QString tableName) {
+    this->beginResetModel();
+    m_rows.clear();
+    m_modFiles.clear();
+    m_modFileNames.clear();
+    if (! tableName.isNull()) {
+        this->currentTableName = tableName;
+        m_count = this->m_dbManager->getNumRowsForPlaylist(this->currentTableName);
+    }
+    else {
+        m_count = 0;
+    }
+
+    this->endResetModel();
+}
+
 
 QVariant BufferedTableModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole) {
@@ -86,22 +103,21 @@ void BufferedTableModel::cacheRows(int from, int to) const {
 }
 
 QJsonObject * BufferedTableModel::fetchRow(int rowNumber) const {
-//    ModFile *modFile = new ModFile();
+    QSqlRecord rowRecord = m_dbManager->getRecordAt(rowNumber + 1, this->currentTableName);
 
-//    return modFile;
+    QJsonObject *newObject = new QJsonObject();
 
-    return this->m_modFiles.at(rowNumber);
+    newObject->insert("file_name", rowRecord.value("file_name").toString());
+    newObject->insert("song_name", rowRecord.value("song_name").toString());
 
-//    QString rowData =  QString::number(position) + " | row";
-
-//    QSqlRecord rowRecord = m_dbManager->getRecordAt(rowNumber + 1, playlistId);
-
-//    return rowRecord;
+//    qDebug() << Q_FUNC_INFO << rowRecord.value("file_name") << rowRecord.value("song_name");
+    return newObject;
 }
 
 
 
-BufferedTableModel::~BufferedTableModel() {
 
+BufferedTableModel::~BufferedTableModel() {
+    
 }
 

@@ -44,6 +44,7 @@ void ThreadedModFileCheck::run() {
         QString filePath = fileInfo->absoluteFilePath();
 
         if (fileInfo->isFile()) {
+            QJsonObject *goodFile = new QJsonObject();
 
             const char *fileString = filePath.toUtf8();
 
@@ -52,17 +53,16 @@ void ThreadedModFileCheck::run() {
             int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
 
             if (goodLoad == openmpt::probe_file_header_result_success) {
-                QJsonObject *goodFile = new QJsonObject();
 
                 openmpt::module mod(file);
 
                 QString songName = QString::fromUtf8(mod.get_metadata("title").c_str());
 
                 goodFile->insert("file_name", fileInfo->fileName());
-                goodFile->insert("file_name_short", fileInfo->baseName());
+//                goodFile->insert("base_name", fileInfo->baseName());
                 goodFile->insert("parent_directory", fileInfo->absolutePath());
                 goodFile->insert("full_path", filePath);
-                goodFile->insert("song_name", songName);
+                goodFile->insert("song_name", songName.trimmed());
 
                 goodFiles.push_back(goodFile);
 
@@ -78,7 +78,7 @@ void ThreadedModFileCheck::run() {
 
     //        if (pctDone > lastPctDone || totalFilesChecked % 1 == 0) {
             if (! QThread::currentThread()->isInterruptionRequested()) {
-                emit fileCheckPercentUpdate(pctDone, QString(fileInfo->fileName()));
+                emit fileCheckPercentUpdate(pctDone, goodFile);
             }
 
         }

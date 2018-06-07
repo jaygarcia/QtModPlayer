@@ -26,8 +26,7 @@ CREATE TABLE playlists (
 
 
 CREATE TABLE playlist_prototype (
-    song_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-    playlist_id INT,
+    song_id    INTEGER PRIMARY KEY AUTOINCREMENT,
     song_name  TEXT,
     file_name  TEXT, 
     full_path  TEXT, 

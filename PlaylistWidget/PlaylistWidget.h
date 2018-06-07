@@ -31,6 +31,7 @@ private:
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
+    QString m_selectedTableName;
 //    QtAwesome *qtAwesome;
 
 public:

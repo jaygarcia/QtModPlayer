@@ -23,6 +23,7 @@ private:
 
 public:
     explicit DBManager(QObject *parent = nullptr);
+    void addToPlaylist(QString tableName, QJsonObject *modFile);
     void queueAddToPlaylist(int playlistId, QVector<QJsonObject *> filesToInsert);
     void bulkInsertToPlaylist(); // Executed by thread
     bool checkForDeployedDatabase();
@@ -31,8 +32,8 @@ public:
     void purgeCurrentPlaylist();
 
     // Todo: Push into another class?
-    int queryNumRowsForPlaylist(int playlistId);
-    QSqlRecord getRecordAt(int rowNumber, int playlistId);
+    int getNumRowsForPlaylist(QString tableName);
+    QSqlRecord getRecordAt(int rowNumber, QString tableName);
 
     QSqlDatabase db() const;
     void setDb(const QSqlDatabase &db);
