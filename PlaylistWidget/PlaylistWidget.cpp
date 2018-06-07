@@ -88,9 +88,14 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QJsonObject *modFile) {
         if (! this->m_progressDialog.isHidden()) {
             this->m_progressDialog.setValue(pctComplete);
-            this->m_progressDialog.setLabelText(modFile->value("file_name").toString());
-            this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
-            this->m_model.refresh(this->m_selectedTableName);
+
+            QString fileName = modFile->value("file_name").toString();
+            if (!fileName.isEmpty() || !fileName.isNull()) {
+                this->m_progressDialog.setLabelText(fileName);
+                this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
+                this->m_model.refresh(this->m_selectedTableName);
+            }
+
         }
     });
 
@@ -106,6 +111,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     });
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
+        Q_UNUSED(results);
 //       qDebug() << "Total good files " << results->goodFileCount();
 //       qDebug() << "Total bad files "  << results->badFileCount();
 
@@ -150,7 +156,7 @@ void PlaylistWidget::refreshTableView() {
 void PlaylistWidget::onNewPlaylistButtonPress() {
     bool okPressed;
 
-    QString text = QInputDialog::getText(
+    QString newPlaylistName = QInputDialog::getText(
         this,
         "New Playlist",
         "Enter a new playlist name:",
@@ -160,11 +166,12 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
     );
 
 
-    if (okPressed && !text.isEmpty()) {
-        int newPlaylistId = this->m_dbManager->generateNewPlaylist(text);
+    if (okPressed && !newPlaylistName.isEmpty()) {
+        int newPlaylistId = this->m_dbManager->generateNewPlaylist(newPlaylistName);
         QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
+        this->m_selectedTableName = "playlist_" + QString::number(newPlaylistId);
     }
 }
 
