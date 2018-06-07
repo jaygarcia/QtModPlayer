@@ -42,7 +42,7 @@ public:
     void dropEvent(QDropEvent *e) override;
     void appendFilesToModel(ThreadedModFileCheckResults *results);
     void refreshTableView();
-
+    bool getNewPlaylistNameFromUser();
 
 
 

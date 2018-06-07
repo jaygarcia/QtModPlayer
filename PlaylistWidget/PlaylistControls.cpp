@@ -252,7 +252,7 @@ void PlaylistControls::appendCurrentPlaylistToSelector() {
 // Todo: move to PlaylistWidget
 
 void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
-    qDebug() << "onPlaylistSelectorChangeIndex" << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
+//    qDebug() << "onPlaylistSelectorChangeIndex" << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
 
     QString indexZeroItem = m_playlistSelector->itemText(0);
     if (indexZeroItem.isEmpty()) {

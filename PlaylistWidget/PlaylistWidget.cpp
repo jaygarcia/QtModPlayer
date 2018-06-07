@@ -60,6 +60,18 @@ void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
 void PlaylistWidget::dropEvent(QDropEvent *e) {
     QVector<QString> droppedFiles;
 
+
+    if (this->m_selectedTableName.isEmpty() || this->m_selectedTableName.isNull()) {
+        if (! this->getNewPlaylistNameFromUser()) {
+            QMessageBox msgBox;
+            msgBox.setText("A valid playlist is required to drop files.");
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+
+            return;
+        }
+    }
+
     this->m_countingFiles = true;
 
     foreach (const QUrl &url, e->mimeData()->urls()) {
@@ -152,8 +164,7 @@ void PlaylistWidget::refreshTableView() {
 }
 
 
-
-void PlaylistWidget::onNewPlaylistButtonPress() {
+bool PlaylistWidget::getNewPlaylistNameFromUser() {
     bool okPressed;
 
     QString newPlaylistName = QInputDialog::getText(
@@ -172,7 +183,14 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
         this->m_selectedTableName = "playlist_" + QString::number(newPlaylistId);
+        return true;
     }
+
+    return false;
+}
+
+void PlaylistWidget::onNewPlaylistButtonPress() {
+    this->getNewPlaylistNameFromUser();
 }
 
 
