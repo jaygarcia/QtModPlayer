@@ -108,7 +108,10 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
             if (!fileName.isEmpty() || !fileName.isNull()) {
                 this->m_progressDialog.setLabelText(fileName);
                 this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
-                this->m_model.refresh(this->m_selectedTableName);
+//                if (pctComplete % 10 == 0) {
+//                    this->m_model.refresh(this->m_selectedTableName);
+
+//                }
             }
 
         }
@@ -129,12 +132,15 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         Q_UNUSED(results);
 //       qDebug() << "Total good files " << results->goodFileCount();
 //       qDebug() << "Total bad files "  << results->badFileCount();
+        this->m_progressDialog.setLabelText("...");
+        this->m_progressDialog.setValue(0);
+        this->m_progressDialog.hide();
 
        thread->quit();
        thread->wait();
 
+
 //       this->appendFilesToModel(results);
-       this->m_progressDialog.hide();
        this->m_countingFiles = false;
        this->m_model.refresh(this->m_selectedTableName);
 
