@@ -3,24 +3,25 @@
 
 #include <QMainWindow>
 #include <QProgressDialog>
+#include <QThread>
+#include <QtCore>
 
 #include "ThreadedModFileCheck.h"
 #include "DBManager/DBManager.h"
 
 #include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
-#include "SoundManager.h"
+#include "SoundManager/SoundManager.h"
 
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
     QString m_playlistSelected;
-    SoundManager m_soundManager;
+    SoundManager *m_soundManager = nullptr;
 
 public:
 

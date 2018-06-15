@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
         qWarning() << "Cannot make data directory!";
     }
 
+
+
     m_dbManager = new DBManager();
     m_dbManager->checkForDeployedDatabase();
 
@@ -80,6 +82,7 @@ void MainWindow::showPlaylistWindow() {
         this->m_playlistWidgetShowing = true;
         this->m_playlistWindow = playlist;
 
+        // Todo: visit these and see if we should use lambdas or not.
         connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *) {
             this->m_playlistWidgetShowing = false;
         });
@@ -88,8 +91,30 @@ void MainWindow::showPlaylistWindow() {
            this->m_playlistSelected = playlistTable;
         });
 
-        connect(playlist, &PlaylistWidget::songSelectionChange, this, [this](QString fileName) {
-            qDebug() << "Playlist selection" << fileName;
+        connect(playlist, &PlaylistWidget::songSelectionChange, this, [this](QJsonObject *fileObject) {
+            if (this->m_soundManager == 0) {
+                this->m_soundManager = new SoundManager();
+            }
+            else {
+                this->m_soundManager->stop();
+                this->m_soundManager->thread()->quit();
+                this->m_soundManager->thread()->wait();
+                this->m_soundManager = new SoundManager();
+
+            }
+
+            qDebug() << "Current soundMan" << m_soundManager;
+
+            QThread *thread = new QThread();
+            connect(thread, &QThread::started, m_soundManager, &SoundManager::run);
+            connect(thread, &QThread::finished, m_soundManager, &QObject::deleteLater);
+
+            m_soundManager->moveToThread(thread);
+
+            m_soundManager->loadFile(fileObject);
+
+            thread->start();
+//            qDebug() << Q_FUNC_INFO << "Playlist selection" << fileObject->value("full_path").toString();
         });
     }
 }

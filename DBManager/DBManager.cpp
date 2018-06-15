@@ -295,7 +295,7 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
 
 QSqlRecord DBManager::getRecordAt(int rowId, QString tableName) {
     QSqlQuery query(this->m_db);
-    QString queryString = "select song_name, file_name from " + tableName + " where rowid = :row_id";
+    QString queryString = "select song_name, file_name, full_path from " + tableName + " where rowid = :row_id";
     query.prepare(queryString);
     query.bindValue(":row_id", rowId);
 

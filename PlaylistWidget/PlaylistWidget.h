@@ -51,7 +51,7 @@ public:
 
 signals:
     void playlistSelected(QString playlistTable);
-    void songSelectionChange(QString fileName, QString songName, int selectedIndex);
+    void songSelectionChange(QJsonObject * fileObject);
 
 public slots:
     void onNewPlaylistButtonPress();

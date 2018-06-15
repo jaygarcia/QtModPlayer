@@ -28,8 +28,6 @@ void BufferedTableModel::appendItems(QVector<QJsonObject *> modFiles) {
 
     m_count = this->m_modFiles.size();
 
-//    qDebug() << "m_count = " << m_count;
-
     this->endResetModel();
 }
 
@@ -109,6 +107,7 @@ QJsonObject * BufferedTableModel::fetchRow(int rowNumber) const {
 
     newObject->insert("file_name", rowRecord.value("file_name").toString());
     newObject->insert("song_name", rowRecord.value("song_name").toString());
+    newObject->insert("full_path", rowRecord.value("full_path").toString());
 
 //    qDebug() << Q_FUNC_INFO << rowRecord.value("file_name") << rowRecord.value("song_name");
     return newObject;

@@ -97,7 +97,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     m_progressDialog.setFixedSize(this->geometry().width() - 30, m_progressDialog.geometry().height());
     m_progressDialog.open();
 
-
     QThread *thread = new QThread();
     connect(thread, &QThread::finished, checker, &QObject::deleteLater);
 
@@ -115,7 +114,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
                 this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
 //                if (pctComplete % 10 == 0) {
 //                    this->m_model.refresh(this->m_selectedTableName);
-
 //                }
             }
 
@@ -203,14 +201,18 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 }
 
 void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
-    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
+    Q_UNUSED(deselected);
+
+
+//    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
     QModelIndexList list = selected.indexes();
 
+    BufferedTableModel *tableModel = (BufferedTableModel*) list.at(0).model();
+    int selectedRow = list.at(0).row();
 
+    QJsonObject *rowObject = tableModel->fetchRow(selectedRow);
 
-    qDebug() << list.at(0).row();
-    // Todo:: Emit selection event to allow loading of record
-
+    emit songSelectionChange(rowObject);
 }
 
 
