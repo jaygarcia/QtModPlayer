@@ -15,6 +15,7 @@
 
 #include "ThreadedModFileCheck.h"
 #include <QtAwesome.h>
+#include <QItemSelectionModel>
 
 #include "BufferedTableModel.h"
 #include "PlaylistControls.h"
@@ -27,7 +28,6 @@ class PlaylistWidget : public QWidget
 
 private:
     QProgressDialog m_progressDialog;
-    QTableView *m_tableView;
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
@@ -36,6 +36,7 @@ private:
 
 public:
     bool m_countingFiles;
+    QTableView *m_tableView;
 
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
@@ -50,12 +51,14 @@ public:
 
 signals:
     void playlistSelected(QString playlistTable);
+    void songSelectionChange(QString fileName, QString songName, int selectedIndex);
 
 public slots:
     void onNewPlaylistButtonPress();
     void onPlaylistSelectorChange(QString playlistTable);
     void onSavePlaylistButtonPress();
     void onDeletePlaylistButton();
+    void onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 //    void onInserterPercentUpdate(int pctDone);
 //    void onInserterComplete(int totalFiles);
 };

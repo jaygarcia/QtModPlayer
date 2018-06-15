@@ -9,6 +9,8 @@
 
 #include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
+#include "SoundManager.h"
+
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +20,7 @@ private:
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
     QString m_playlistSelected;
+    SoundManager m_soundManager;
 
 public:
 

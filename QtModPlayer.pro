@@ -40,7 +40,8 @@ SOURCES += \
     MainWindow.cpp \
     PlayerWidget.cpp \
     DBManager/DBManager.cpp \
-    DBManager/ThreadedModFileInserter.cpp
+    DBManager/ThreadedModFileInserter.cpp \
+    SoundManager.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -51,7 +52,8 @@ HEADERS += \
     MainWindow.h \
     PlayerWidget.h \
     DBManager/DBManager.h \
-    DBManager/ThreadedModFileInserter.h
+    DBManager/ThreadedModFileInserter.h \
+    SoundManager.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

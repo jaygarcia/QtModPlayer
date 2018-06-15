@@ -87,6 +87,10 @@ void MainWindow::showPlaylistWindow() {
         connect(playlist, &PlaylistWidget::playlistSelected, this, [this](QString playlistTable) {
            this->m_playlistSelected = playlistTable;
         });
+
+        connect(playlist, &PlaylistWidget::songSelectionChange, this, [this](QString fileName) {
+            qDebug() << "Playlist selection" << fileName;
+        });
     }
 }
 

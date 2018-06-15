@@ -1,4 +1,5 @@
 #include "PlaylistWidget.h"
+#include <QItemSelectionModel>
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->setWindowTitle("QtModPlayer :: Playlist");
@@ -12,6 +13,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
     m_tableView = new QTableView(this);
     m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     QHeaderView *verticalHeader = m_tableView->verticalHeader();
     verticalHeader->hide();
@@ -37,6 +39,9 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     m_playlistControls->setGeometry(geometry);
     this->layout()->addWidget(m_playlistControls);
 
+    QItemSelectionModel *selectionModel = m_tableView->selectionModel();
+
+    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &PlaylistWidget::onTableViewSelectionChange);
 
     connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
     connect(m_playlistControls->newPlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onNewPlaylistButtonPress);
@@ -130,27 +135,22 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
         Q_UNUSED(results);
-//       qDebug() << "Total good files " << results->goodFileCount();
-//       qDebug() << "Total bad files "  << results->badFileCount();
         this->m_progressDialog.setLabelText("...");
         this->m_progressDialog.setValue(0);
         this->m_progressDialog.hide();
 
-       thread->quit();
-       thread->wait();
+        thread->quit();
+        thread->wait();
 
-
-//       this->appendFilesToModel(results);
-       this->m_countingFiles = false;
-       this->m_model.refresh(this->m_selectedTableName);
-
+        this->m_countingFiles = false;
+        this->m_model.refresh(this->m_selectedTableName);
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
         thread->requestInterruption();
         thread->quit();
         thread->wait();
-        this->thread()->msleep(10);
+//        this->thread()->msleep(10);
         m_progressDialog.hide();
         this->m_countingFiles = false;
     });
@@ -200,6 +200,17 @@ bool PlaylistWidget::getNewPlaylistNameFromUser() {
 
 void PlaylistWidget::onNewPlaylistButtonPress() {
     this->getNewPlaylistNameFromUser();
+}
+
+void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
+    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
+    QModelIndexList list = selected.indexes();
+
+
+
+    qDebug() << list.at(0).row();
+    // Todo:: Emit selection event to allow loading of record
+
 }
 
 
