@@ -9,12 +9,20 @@
 #include <QtCore>
 #include <QThread>
 
+#include <QAudio>
+#include <QAudioFormat>
+#include <QAudioBuffer>
+#include <QAudioOutput>
+
 class SoundManager : public QObject {
     Q_OBJECT
 
 private:
     openmpt::module_ext *m_modFile = nullptr;
     QMutex *m_mutex;
+
+    QAudioFormat m_audioFormat;
+    QAudioOutput *m_audioOutput;
 
 
     bool isLoaded = false;
@@ -30,6 +38,10 @@ public:
     void play();
     void stop();
     bool loadFile(QJsonObject *fileObject);
+
+
+public slots:
+    void handleAudioStateChange(QAudio::State newState);
 };
 
 #endif // SOUNDMANAGER_H
