@@ -140,9 +140,6 @@ void SoundManager::run() {
             currentRow     = currentModData[2];
         }
 
-
-
-
         mutex->unlock();
         this->thread()->msleep(50);
     }
@@ -152,30 +149,29 @@ void SoundManager::run() {
 }
 
 
-bool SoundManager::loadFile(QJsonObject *fileObject) {
+QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
     this->stop();
 
     mutex->lock();
-    bool retValue = false;
 
     QString filePath =  fileObject->value("full_path").toString();
     const char *fileString = filePath.toUtf8();
 
     std::ifstream file(fileString, std::ios::binary);
+    modInfoJsonObject = new QJsonObject();
 
     int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
 
     if (goodLoad == openmpt::probe_file_header_result_success) {
 
         modFile = new openmpt::module_ext(file);
-        retValue = true;
 
         // Todo:: Setup as a configuration option from the UI
         modFile->set_repeat_count(999999);
 
         QString songName = QString::fromUtf8(modFile->get_metadata("title").c_str());
 
-        modInfoJsonObject = new QJsonObject();
+
 
         modInfoJsonObject->insert("numPatterns", modFile->get_num_patterns());
         modInfoJsonObject->insert("numChannels",  modFile->get_num_channels());
@@ -203,7 +199,8 @@ bool SoundManager::loadFile(QJsonObject *fileObject) {
 
     mutex->unlock();
     this->pause();
-    return retValue;
+
+    return modInfoJsonObject;
 }
 
 QJsonObject *SoundManager::getModMetaData() {

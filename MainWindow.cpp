@@ -22,6 +22,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(playerWidget, &PlayerWidget::showPlaylist, this, &MainWindow::onPlayerWidgetShowPlayList);
 
+    connect(playerWidget, &PlayerWidget::play, this, [this]() {
+//        emit pause();
+        if (m_soundManager) {
+            m_soundManager->play();
+        }
+    });
+
+    connect(playerWidget, &PlayerWidget::pause, this, [this]() {
+        if (m_soundManager) {
+            m_soundManager->pause();
+        }
+    });
+
+    connect(playerWidget, &PlayerWidget::stop, this, [this]() {
+        if (m_soundManager) {
+            m_soundManager->stop();
+        }
+    });
+
+
+
     this->setAnimated(true);
     this->setFixedSize(300, 150);
 
@@ -159,6 +180,7 @@ DBManager *MainWindow::getDbManager() const
 }
 
 void MainWindow::onModPositionChanged(int order, int pattern, int row) {
+    // Todo update slider
     qDebug() << order << pattern << row;
 }
 

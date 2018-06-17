@@ -100,6 +100,9 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 
     QPushButton *playButton = this->buildButton("play");
     layout->addWidget(playButton);
+    connect(playButton, &QPushButton::clicked, this, [this]() {
+       emit play();
+    });
 
     QPushButton *fastForwardButton = this->buildButton("forward");
     layout->addWidget(fastForwardButton);

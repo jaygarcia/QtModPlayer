@@ -27,9 +27,17 @@ public:
 signals:
     void play();
     void pause();
+    void stop();
+
     void next();
     void previous();
+
+
+//    void nextPattern();
+//    void prevoiusPattern();
+
     void shuffle();
+
     void repeat();
     void showPlaylist();
 

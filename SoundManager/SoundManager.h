@@ -26,7 +26,7 @@ public:
     void pause();
     void play();
     void stop();
-    bool loadFile(QJsonObject *fileObject);
+    QJsonObject *loadFile(QJsonObject *fileObject);
     QJsonObject *getModMetaData();
 
 public slots:
