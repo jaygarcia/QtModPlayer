@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui concurrent sql multimedia
+QT       += core gui concurrent sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -59,12 +59,23 @@ RESOURCES += \
         QtDarkStyle/darkstyle.qrc
 
 
-macx: LIBS += -L$$PWD/libraries/libopenmpt/lib/ -lopenmpt
 
-INCLUDEPATH += $$PWD/libraries/libopenmpt/include
-DEPENDPATH += $$PWD/libraries/libopenmpt/include
+INCLUDEPATH += \
+    $$PWD/libraries/libopenmpt/include \
+    $$PWD/libraries/portaudio/include \
 
-macx: PRE_TARGETDEPS += $$PWD/libraries/libopenmpt/lib/libopenmpt.a
+DEPENDPATH += \
+    $$PWD/libraries/libopenmpt/include \
+    $$PWD/libraries/portaudio/include
+
+# Link
+macx: LIBS += \
+    -L$$PWD/libraries/libopenmpt/lib/ -lopenmpt \
+    -L$$PWD/libraries/portaudio/lib/ -lportaudio
+
+macx: PRE_TARGETDEPS += \
+    $$PWD/libraries/libopenmpt/lib/libopenmpt.a \
+    $$PWD/libraries/portaudio/lib/libportaudio.a
 
 ## Include Database file
 macx {

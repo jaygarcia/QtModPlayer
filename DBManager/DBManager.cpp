@@ -208,6 +208,8 @@ void DBManager::bulkInsertToPlaylist() {
     emit insertComplete(totalDone);
 
     this->disconnect();
+//    emit finished();
+
 }
 
 void DBManager::queueAddToPlaylist(int playlistId, QVector<QJsonObject *> filesToInsert) {

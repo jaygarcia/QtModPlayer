@@ -100,20 +100,23 @@ void MainWindow::showPlaylistWindow() {
                 this->m_soundManager->thread()->quit();
                 this->m_soundManager->thread()->wait();
                 this->m_soundManager = new SoundManager();
-
             }
 
-            qDebug() << "Current soundMan" << m_soundManager;
+//            qDebug() << "Current soundMan" << m_soundManager;
 
             QThread *thread = new QThread();
             connect(thread, &QThread::started, m_soundManager, &SoundManager::run);
             connect(thread, &QThread::finished, m_soundManager, &QObject::deleteLater);
+
+            connect(m_soundManager, &SoundManager::modPositionChanged, this, &MainWindow::onModPositionChanged);
 
             m_soundManager->moveToThread(thread);
 
             m_soundManager->loadFile(fileObject);
 
             thread->start();
+
+            m_soundManager->play();
 //            qDebug() << Q_FUNC_INFO << "Playlist selection" << fileObject->value("full_path").toString();
         });
     }
@@ -155,6 +158,9 @@ DBManager *MainWindow::getDbManager() const
     return m_dbManager;
 }
 
+void MainWindow::onModPositionChanged(int order, int pattern, int row) {
+    qDebug() << order << pattern << row;
+}
 
 
 // Destructor
