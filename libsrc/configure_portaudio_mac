@@ -1,0 +1,3 @@
+cd portaudio;
+./configure --disable-mac-universal MACOSX_DEPLOYMENT_TARGET=10.6
+
