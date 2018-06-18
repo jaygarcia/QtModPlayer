@@ -32,7 +32,7 @@ public:
 public slots:
 
 signals:
-    void modPositionChanged(int order, int pattern, int row);
+    void modPositionChanged(QJsonObject *modInfoObject);
 };
 
 #endif // SOUNDMANAGER_H

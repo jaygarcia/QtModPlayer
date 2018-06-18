@@ -51,7 +51,7 @@ public slots:
     //    void onFileCountComplete(ThreadedModFileCheckResults);
     void onInserterPercentUpdate(int pctComplete);
     void onInserterComplete(int totalFiles);
-    void onModPositionChanged(int order, int pattern, int row);
+    void onModPositionChanged(QJsonObject *modInfoObject);
 };
 
 #endif // MAINWINDOW_H

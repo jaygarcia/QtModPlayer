@@ -31,6 +31,7 @@ public:
 
     void setSongText(QString songText);
     void initializeSlider();
+    void updateSongInformation(QJsonObject *modInfoObject);
 
 signals:
     void play();
@@ -45,6 +46,7 @@ signals:
 //    void prevoiusPattern();
 
     void shuffle();
+
 
     void repeat();
     void showPlaylist();

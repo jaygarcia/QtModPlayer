@@ -11,11 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
         qWarning() << "Cannot make data directory!";
     }
 
-
-
     m_dbManager = new DBManager();
     m_dbManager->checkForDeployedDatabase();
-
 
     m_playerWidget = new PlayerWidget(this);
     this->setCentralWidget(m_playerWidget);
@@ -40,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_soundManager->stop();
         }
     });
-
 
 
     this->setAnimated(true);
@@ -123,7 +119,6 @@ void MainWindow::showPlaylistWindow() {
                 this->m_soundManager = new SoundManager();
             }
 
-//            qDebug() << "Current soundMan" << m_soundManager;
 
             QThread *thread = new QThread();
             connect(thread, &QThread::started, m_soundManager, &SoundManager::run);
@@ -134,7 +129,7 @@ void MainWindow::showPlaylistWindow() {
             m_soundManager->moveToThread(thread);
 
             QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
-            m_playerWidget->setSongText(modFileObject->value("song_name").toString());
+            m_playerWidget->updateSongInformation(modFileObject);
 
             thread->start();
 
@@ -180,9 +175,11 @@ DBManager *MainWindow::getDbManager() const
     return m_dbManager;
 }
 
-void MainWindow::onModPositionChanged(int order, int pattern, int row) {
+void MainWindow::onModPositionChanged(QJsonObject *modInfoObject) {
     // Todo update slider
-    qDebug() << order << pattern << row;
+//    qDebug() << order << pattern << row;
+    qDebug() << modInfoObject->value("song_name").toString() << modInfoObject->value("current_row").toInt();
+    m_playerWidget->updateSongInformation(modInfoObject);
 }
 
 

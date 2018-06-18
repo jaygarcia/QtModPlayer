@@ -85,9 +85,9 @@ int initializePortAudio() {
 
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
-    fprintf( stderr, "Error number: %d\n", err );
-    fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+    fprintf(stderr, "An error occured while using the portaudio stream\n");
+    fprintf(stderr, "Error number: %d\n", err);
+    fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
     return err;
 }
 
@@ -118,18 +118,20 @@ void SoundManager::run() {
     mutex->unlock();
 
     while (playMode > 0 && ! QThread::currentThread()->isInterruptionRequested() && modFile) {
-//        qDebug() << Q_FUNC_INFO << "running..." << modFile;
-
 
         mutex->lock();
 
-
         if (currentOrder != currentModData[0] || currentPattern != currentModData[1] || currentRow != currentModData[2]) {
-            emit modPositionChanged(currentModData[0], currentModData[1], currentModData[2]);
 
             currentOrder   = currentModData[0];
             currentPattern = currentModData[1];
             currentRow     = currentModData[2];
+
+            modInfoJsonObject->insert("current_order", currentOrder);
+            modInfoJsonObject->insert("current_pattern", currentPattern);
+            modInfoJsonObject->insert("current_row", currentRow);
+
+            emit modPositionChanged(modInfoJsonObject);
         }
 
         mutex->unlock();
@@ -172,8 +174,9 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
         modInfoJsonObject->insert("speed",  modFile->get_current_speed());
         modInfoJsonObject->insert("bpm",  modFile->get_current_tempo());
         modInfoJsonObject->insert("length",  modFile->get_duration_seconds());
-        modInfoJsonObject->insert("current_pattern ",  modFile->get_current_pattern());
-        modInfoJsonObject->insert("num_orders  ",  modFile->get_num_orders());
+        modInfoJsonObject->insert("current_pattern",  modFile->get_current_pattern());
+        modInfoJsonObject->insert("current_order", modFile->get_current_order());
+        modInfoJsonObject->insert("num_orders",  modFile->get_num_orders());
 
 
         modInfoJsonObject->insert("artist",  modFile->get_metadata("artist").c_str());
@@ -188,9 +191,8 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
         modInfoJsonObject->insert("warnings",  modFile->get_metadata("warnings").c_str());
     }
     else {
+        // Mod file did not load
         modFile = nullptr;
-        printf("modfile %p\n", modFile);
-        fflush(stdout);
     }
 
     mutex->unlock();

@@ -160,6 +160,22 @@ QWidget *PlayerWidget::buildBottomControlUI() {
 }
 
 void PlayerWidget::setSongText(QString songText) {
-
     m_songLabel->setText(songText);
+}
+
+
+void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
+    QString songName = modInfoObject->value("song_name").toString();
+
+    if (m_songLabel->text().compare(songName)) {
+        m_songLabel->setText(songName);
+    }
+
+    int currentOrder = modInfoObject->value("current_order").toInt(),
+        numOrders = modInfoObject->value("num_orders").toInt();
+
+    m_songStartLabel->setText(QString::number(currentOrder));
+    m_songEndLabel->setText(QString::number(numOrders));
+
+
 }
