@@ -17,25 +17,25 @@ MainWindow::MainWindow(QWidget *parent)
     m_dbManager->checkForDeployedDatabase();
 
 
-    PlayerWidget *playerWidget = new PlayerWidget(this);
-    this->setCentralWidget(playerWidget);
+    m_playerWidget = new PlayerWidget(this);
+    this->setCentralWidget(m_playerWidget);
 
-    connect(playerWidget, &PlayerWidget::showPlaylist, this, &MainWindow::onPlayerWidgetShowPlayList);
+    connect(m_playerWidget, &PlayerWidget::showPlaylist, this, &MainWindow::onPlayerWidgetShowPlayList);
 
-    connect(playerWidget, &PlayerWidget::play, this, [this]() {
+    connect(m_playerWidget, &PlayerWidget::play, this, [this]() {
 //        emit pause();
         if (m_soundManager) {
             m_soundManager->play();
         }
     });
 
-    connect(playerWidget, &PlayerWidget::pause, this, [this]() {
+    connect(m_playerWidget, &PlayerWidget::pause, this, [this]() {
         if (m_soundManager) {
             m_soundManager->pause();
         }
     });
 
-    connect(playerWidget, &PlayerWidget::stop, this, [this]() {
+    connect(m_playerWidget, &PlayerWidget::stop, this, [this]() {
         if (m_soundManager) {
             m_soundManager->stop();
         }
@@ -133,7 +133,8 @@ void MainWindow::showPlaylistWindow() {
 
             m_soundManager->moveToThread(thread);
 
-            m_soundManager->loadFile(fileObject);
+            QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
+            m_playerWidget->setSongText(modFileObject->value("song_name").toString());
 
             thread->start();
 

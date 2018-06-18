@@ -22,7 +22,7 @@ private:
     bool m_playlistWidgetShowing;
     QString m_playlistSelected;
     SoundManager *m_soundManager = nullptr;
-
+    PlayerWidget *m_playerWidget;
 public:
 
     DBManager *m_dbManager;

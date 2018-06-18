@@ -9,8 +9,6 @@ bool isLoaded = false;
 
 #define bufferSize 1024
 
-float bufferLeft[bufferSize];
-float bufferRight[bufferSize];
 int playMode = 0; // 0 stopped, 1 playing, 2 paused;
 
 typedef struct {
@@ -44,15 +42,17 @@ static int static_paStreamCallback(const void *inputBuffer,
 
     float *out = (float*)outputBuffer;
 
+    if (modFile != nullptr) {
 
-    modFile->read_interleaved_stereo(44100, framesPerBuffer, out);
+        modFile->read_interleaved_stereo(44100, framesPerBuffer, out);
 
-    mutex->lock();
+        mutex->lock();
 
-    currentModData[0] = (int)modFile->get_current_order();
-    currentModData[1] = (int)modFile->get_current_pattern();
-    currentModData[2] = (int)modFile->get_current_row();
-    currentModData[3] = (int)modFile->get_pattern_num_rows(currentModData[1]);
+        currentModData[0] = (int)modFile->get_current_order();
+        currentModData[1] = (int)modFile->get_current_pattern();
+        currentModData[2] = (int)modFile->get_current_row();
+        currentModData[3] = (int)modFile->get_pattern_num_rows(currentModData[1]);
+    }
 
     mutex->unlock();
 
@@ -64,10 +64,7 @@ PaStream *stream;
 int initializePortAudio() {
     PaError err;
 
-    printf("PortAudio Test: output sawtooth wave.\n");
-    /* Initialize our data for use by callback. */
 
-    /* Initialize library before making any other calls. */
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -84,9 +81,6 @@ int initializePortAudio() {
 
     if( err != paNoError ) goto error;
 
-//    err = Pa_StartStream( stream );
-//    if( err != paNoError ) goto error;
-
     return err;
 
 error:
@@ -100,35 +94,33 @@ error:
 SoundManager::SoundManager(QObject *parent) : QObject(parent) {
     mutex = new QMutex();
 
-    for (int i = 0; i < bufferSize; i++) {
-        bufferLeft[i] = bufferRight[i] = 0;
-    }
-
-
     if (initializePortAudio() > 0) {
         return;
     }
-
 }
 
 
 void SoundManager::run() {
     qDebug() << Q_FUNC_INFO << "Start of run!()";
 
-    int currentOrder,
-        currentPattern,
-        currentRow;
+    int currentOrder = -1,
+        currentPattern = -1,
+        currentRow = -1;
+
 
     mutex->lock();
 
-    currentModData[0] = (int)modFile->get_current_order();
-    currentModData[1] = (int)modFile->get_current_pattern();
-    currentModData[2] = (int)modFile->get_current_row();
-    currentModData[3] = (int)modFile->get_pattern_num_rows(currentModData[1]);
+    currentModData[0] = -1;
+    currentModData[1] = -1;
+    currentModData[2] = -1;
+    currentModData[3] = -1;
 
     mutex->unlock();
-    while (playMode > 0 && ! QThread::currentThread()->isInterruptionRequested()) {
+
+    while (playMode > 0 && ! QThread::currentThread()->isInterruptionRequested() && modFile) {
 //        qDebug() << Q_FUNC_INFO << "running..." << modFile;
+
+
         mutex->lock();
 
 
@@ -170,23 +162,23 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
         modFile->set_repeat_count(999999);
 
         QString songName = QString::fromUtf8(modFile->get_metadata("title").c_str());
+        qDebug() << "Song Name" << songName;
+        modInfoJsonObject->insert("song_name", songName);
 
-
-
-        modInfoJsonObject->insert("numPatterns", modFile->get_num_patterns());
-        modInfoJsonObject->insert("numChannels",  modFile->get_num_channels());
-        modInfoJsonObject->insert("numSamples",  modFile->get_num_samples());
-        modInfoJsonObject->insert("numInstr",  modFile->get_num_instruments());
+        modInfoJsonObject->insert("num_patterns", modFile->get_num_patterns());
+        modInfoJsonObject->insert("num_channels",  modFile->get_num_channels());
+        modInfoJsonObject->insert("num_samples",  modFile->get_num_samples());
+        modInfoJsonObject->insert("num_instruments",  modFile->get_num_instruments());
         modInfoJsonObject->insert("speed",  modFile->get_current_speed());
         modInfoJsonObject->insert("bpm",  modFile->get_current_tempo());
         modInfoJsonObject->insert("length",  modFile->get_duration_seconds());
-        modInfoJsonObject->insert("currentPat ",  modFile->get_current_pattern());
-        modInfoJsonObject->insert("numOrders  ",  modFile->get_num_orders());
+        modInfoJsonObject->insert("current_pattern ",  modFile->get_current_pattern());
+        modInfoJsonObject->insert("num_orders  ",  modFile->get_num_orders());
 
 
         modInfoJsonObject->insert("artist",  modFile->get_metadata("artist").c_str());
         modInfoJsonObject->insert("type",  modFile->get_metadata("type").c_str());
-        modInfoJsonObject->insert("typeLong",  modFile->get_metadata("type_long").c_str());
+        modInfoJsonObject->insert("type_long",  modFile->get_metadata("type_long").c_str());
         modInfoJsonObject->insert("container",  modFile->get_metadata("container").c_str());
         modInfoJsonObject->insert("container_long",  modFile->get_metadata("container_long").c_str());
         modInfoJsonObject->insert("tracker",  modFile->get_metadata("tracker").c_str());
@@ -194,7 +186,11 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
         modInfoJsonObject->insert("date",  modFile->get_metadata("date").c_str());
         modInfoJsonObject->insert("message",  modFile->get_metadata("message").c_str());
         modInfoJsonObject->insert("warnings",  modFile->get_metadata("warnings").c_str());
-        modInfoJsonObject->insert("container",  modFile->get_metadata("container_long").c_str());
+    }
+    else {
+        modFile = nullptr;
+        printf("modfile %p\n", modFile);
+        fflush(stdout);
     }
 
     mutex->unlock();

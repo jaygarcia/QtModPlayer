@@ -2,8 +2,8 @@
 
 PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 {
-    qtAwesome = new QtAwesome(qApp);
-    qtAwesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
+    m_qtAwesome = new QtAwesome(qApp);
+    m_qtAwesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
     this->configure();
     this->addChildren();
 }
@@ -20,12 +20,12 @@ void PlayerWidget::addChildren() {
     mainLayout->setGeometry(this->geometry());
     mainLayout->setSpacing(0);
 
-    songLabel = new QLabel(this);
-    songLabel->setText("0BiT - Fax Spider 2.1 kg.xm");
-    songLabel->setStyleSheet("font-size: 12px;");
-//    songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    songLabel->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(songLabel);
+    m_songLabel = new QLabel(this);
+    m_songLabel->setText("");
+    m_songLabel->setStyleSheet("font-size: 12px;");
+//    m_songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_songLabel->setAlignment(Qt::AlignCenter);
+    mainLayout->addWidget(m_songLabel);
 
     QWidget *songInfoWidget = this->buildSongInformationUI();
     mainLayout->addWidget(songInfoWidget, 0, Qt::AlignTop);
@@ -54,12 +54,12 @@ QWidget *PlayerWidget::buildSongInformationUI() {
 
     // TODO: Make public
     int labelWidth = 35;
-    QLabel *songStartLabel = new QLabel(songInfoWidget);
-    songStartLabel->setText("SS:SS");
-    songStartLabel->setAlignment(Qt::AlignJustify);
-    songStartLabel->setFixedWidth(labelWidth);
-    songStartLabel->setStyleSheet("font-size: 10px;");
-    songInfoLayout->addWidget(songStartLabel);
+    m_songStartLabel = new QLabel(songInfoWidget);
+    m_songStartLabel->setText("0");
+    m_songStartLabel->setAlignment(Qt::AlignRight);
+    m_songStartLabel->setFixedWidth(labelWidth);
+    m_songStartLabel->setStyleSheet("font-size: 10px;");
+    songInfoLayout->addWidget(m_songStartLabel);
 
 
     QSlider *songSlider = new QSlider(Qt::Horizontal, songInfoWidget);
@@ -68,12 +68,12 @@ QWidget *PlayerWidget::buildSongInformationUI() {
     songInfoLayout->addWidget(songSlider);
 
     // TODO: Make public
-    QLabel *songEndLabel = new QLabel(songInfoWidget);
-    songEndLabel->setText("EE:EE");
-    songEndLabel->setAlignment(Qt::AlignJustify);
-    songEndLabel->setFixedWidth(labelWidth);
-    songEndLabel->setStyleSheet("font-size: 10px;");
-    songInfoLayout->addWidget(songEndLabel);
+    m_songEndLabel = new QLabel(songInfoWidget);
+    m_songEndLabel->setText("0");
+    m_songEndLabel->setAlignment(Qt::AlignLeft);
+    m_songEndLabel->setFixedWidth(labelWidth);
+    m_songEndLabel->setStyleSheet("font-size: 10px;");
+    songInfoLayout->addWidget(m_songEndLabel);
 
     return songInfoWidget;
 }
@@ -122,7 +122,7 @@ QPushButton * PlayerWidget::buildButton(const char * iconType) {
     options.insert("color" , QColor(200,200,200));
     options.insert("color-active", QColor(200,200,200));
 
-    QPushButton *button = new QPushButton(this->qtAwesome->icon(iconType, options), "");
+    QPushButton *button = new QPushButton(this->m_qtAwesome->icon(iconType, options), "");
 
     button->setStyleSheet(baseButtonStyle);
     return button;
@@ -145,16 +145,21 @@ QWidget *PlayerWidget::buildBottomControlUI() {
     options.insert("color" , QColor(200,200,200));
     options.insert("color-active", QColor(200,200,200));
 
-    QPushButton *volumeLow = new QPushButton(this->qtAwesome->icon("volumedown", options), "");
+    QPushButton *volumeLow = new QPushButton(this->m_qtAwesome->icon("volumedown", options), "");
     volumeLow->setStyleSheet("border-radius:99px");
     widget->layout()->addWidget(volumeLow);
 
     QSlider *volumeSlider = new QSlider(Qt::Horizontal);
     widget->layout()->addWidget(volumeSlider);
 
-    QPushButton *volumeHigh = new QPushButton(this->qtAwesome->icon("volumeup", options), "");
+    QPushButton *volumeHigh = new QPushButton(this->m_qtAwesome->icon("volumeup", options), "");
     volumeHigh->setStyleSheet("border-radius:99px");
     widget->layout()->addWidget(volumeHigh);
 
     return widget;
+}
+
+void PlayerWidget::setSongText(QString songText) {
+
+    m_songLabel->setText(songText);
 }

@@ -13,9 +13,14 @@ class PlayerWidget : public QWidget
 public:
     explicit PlayerWidget(QWidget *parent = nullptr);
 
-    QLabel *songLabel;
-    QtAwesome *qtAwesome;
+    // Members
+    QLabel *m_songLabel;
+    QtAwesome *m_qtAwesome;
+    QLabel *m_songStartLabel;
+    QLabel *m_songEndLabel;
 
+
+    // Methods
     void configure();
     void addChildren();
 
@@ -23,6 +28,9 @@ public:
     QWidget *buildPlayerControlUI();
     QPushButton *buildButton(const char *iconType);
     QWidget *buildBottomControlUI();
+
+    void setSongText(QString songText);
+    void initializeSlider();
 
 signals:
     void play();
