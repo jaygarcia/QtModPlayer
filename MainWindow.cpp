@@ -136,8 +136,8 @@ void MainWindow::showPlaylistWindow() {
 
             QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
 
-            m_playerWidget->m_currentOrder = -1; // Make sure the order is flushed
             m_playerWidget->updateSongInformation(modFileObject);
+            m_playerWidget->m_currentOrder = 0; // Make sure the order is flushed
 
             thread->start();
 

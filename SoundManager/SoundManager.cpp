@@ -174,7 +174,7 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
         modInfoJsonObject->insert("length",  modFile->get_duration_seconds());
         modInfoJsonObject->insert("current_pattern",  modFile->get_current_pattern());
         modInfoJsonObject->insert("current_order", modFile->get_current_order());
-        modInfoJsonObject->insert("num_orders",  modFile->get_num_orders());
+        modInfoJsonObject->insert("num_orders",  modFile->get_num_orders() - 1);
 
 
         modInfoJsonObject->insert("artist",  modFile->get_metadata("artist").c_str());

@@ -176,15 +176,16 @@ void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
     int currentOrder = modInfoObject->value("current_order").toInt(),
         numOrders = modInfoObject->value("num_orders").toInt();
 
-    m_songStartLabel->setText(QString::number(currentOrder));
-    m_songEndLabel->setText(QString::number(numOrders));
+    m_songStartLabel->setText(QString::number(currentOrder + 1));
+    m_songEndLabel->setText(QString::number(numOrders + 1));
 
     if (m_songPositionSlider->tickInterval() != numOrders) {
 //        m_songPositionSlider->setTickInterval(numOrders);
         m_songPositionSlider->setMaximum(numOrders);
     }
 
-    if (m_currentOrder != currentOrder && m_songPositionSlider->value() != currentOrder) {
+
+    if (m_currentOrder != currentOrder || m_songPositionSlider->value() != currentOrder) {
         m_songPositionSlider->blockSignals(true);
         m_songPositionSlider->setValue(m_currentOrder = currentOrder);
         m_songPositionSlider->blockSignals(false);
