@@ -19,6 +19,11 @@ public:
     QLabel *m_songStartLabel;
     QLabel *m_songEndLabel;
     QSlider *m_songPositionSlider;
+    QPushButton *m_playButton;
+    QPushButton *m_previousPatternButton;
+    QPushButton *m_nextPatternButton;
+    QPushButton *m_previousTrackButton;
+    QPushButton *m_nextTrackButton;
 
     int m_currentOrder = -1;
     // Methods

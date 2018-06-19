@@ -93,23 +93,34 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     layout->addWidget(repeatButton);
 
 
-    QSpacerItem *spacer = new QSpacerItem(30, 10);
-    layout->addItem(spacer);
+    QSpacerItem *largeSpacer = new QSpacerItem(30, 10);
+    QSpacerItem *smallSpacer = new QSpacerItem(5, 10);
+    layout->addItem(largeSpacer);
 
 
-    QPushButton *rewindButton = this->buildButton("backward");
-    layout->addWidget(rewindButton);
+    m_previousTrackButton = this->buildButton("fastbackward");
+    layout->addWidget(m_previousTrackButton);
+    layout->addItem(smallSpacer);
 
-    QPushButton *playButton = this->buildButton("play");
-    layout->addWidget(playButton);
-    connect(playButton, &QPushButton::clicked, this, [this]() {
-       emit play();
-    });
 
-    QPushButton *fastForwardButton = this->buildButton("forward");
-    layout->addWidget(fastForwardButton);
+    m_previousPatternButton = this->buildButton("backward");
+    layout->addWidget(m_previousPatternButton);
 
-    layout->addItem(spacer);
+    m_playButton = this->buildButton("play");
+    layout->addWidget(m_playButton);
+
+
+    m_nextPatternButton = this->buildButton("forward");
+    layout->addWidget(m_nextPatternButton);
+
+
+    layout->addItem(smallSpacer);
+
+
+    m_previousTrackButton = this->buildButton("fastforward");
+    layout->addWidget(m_previousTrackButton);
+
+    layout->addItem(largeSpacer);
 
     QPushButton *shuffleButton = this->buildButton("random");
     layout->addWidget(shuffleButton);
