@@ -18,8 +18,9 @@ public:
     QtAwesome *m_qtAwesome;
     QLabel *m_songStartLabel;
     QLabel *m_songEndLabel;
+    QSlider *m_songPositionSlider;
 
-
+    int m_currentOrder = -1;
     // Methods
     void configure();
     void addChildren();

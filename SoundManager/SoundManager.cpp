@@ -101,7 +101,6 @@ SoundManager::SoundManager(QObject *parent) : QObject(parent) {
 
 
 void SoundManager::run() {
-    qDebug() << Q_FUNC_INFO << "Start of run!()";
 
     int currentOrder = -1,
         currentPattern = -1,
@@ -137,9 +136,8 @@ void SoundManager::run() {
         mutex->unlock();
         this->thread()->msleep(50);
     }
-    this->stop();
 
-    qDebug() << Q_FUNC_INFO << "End of run!()";
+    this->stop();
 }
 
 
@@ -205,6 +203,18 @@ QJsonObject *SoundManager::getModMetaData() {
     return modInfoJsonObject;
 }
 
+void SoundManager::setModPosition(int order) {
+    if (! modFile) {
+        return;
+    }
+
+    mutex->lock();
+
+    modFile->set_position_order_row(order, 0);
+
+
+    mutex->unlock();
+};
 
 void SoundManager::pause() {
     qDebug() << Q_FUNC_INFO;

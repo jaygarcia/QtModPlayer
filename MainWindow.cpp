@@ -38,6 +38,12 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
+    connect(m_playerWidget->m_songPositionSlider, &QSlider::valueChanged, this, [this](int sliderValue) {
+        qDebug() << "sliderValue" << sliderValue;
+        m_soundManager->setModPosition(sliderValue);
+        m_playerWidget->m_currentOrder = sliderValue;
+    });
+
 
     this->setAnimated(true);
     this->setFixedSize(300, 150);
@@ -129,6 +135,8 @@ void MainWindow::showPlaylistWindow() {
             m_soundManager->moveToThread(thread);
 
             QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
+
+            m_playerWidget->m_currentOrder = -1; // Make sure the order is flushed
             m_playerWidget->updateSongInformation(modFileObject);
 
             thread->start();
@@ -178,7 +186,7 @@ DBManager *MainWindow::getDbManager() const
 void MainWindow::onModPositionChanged(QJsonObject *modInfoObject) {
     // Todo update slider
 //    qDebug() << order << pattern << row;
-    qDebug() << modInfoObject->value("song_name").toString() << modInfoObject->value("current_row").toInt();
+//    qDebug() << modInfoObject->value("song_name").toString() << modInfoObject->value("current_row").toInt();
     m_playerWidget->updateSongInformation(modInfoObject);
 }
 

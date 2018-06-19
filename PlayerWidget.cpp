@@ -21,7 +21,7 @@ void PlayerWidget::addChildren() {
     mainLayout->setSpacing(0);
 
     m_songLabel = new QLabel(this);
-    m_songLabel->setText("");
+    m_songLabel->setText("(Load music)");
     m_songLabel->setStyleSheet("font-size: 12px;");
 //    m_songLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_songLabel->setAlignment(Qt::AlignCenter);
@@ -62,10 +62,12 @@ QWidget *PlayerWidget::buildSongInformationUI() {
     songInfoLayout->addWidget(m_songStartLabel);
 
 
-    QSlider *songSlider = new QSlider(Qt::Horizontal, songInfoWidget);
-    songSlider->setStyleSheet("QSlider {height: 5px}");
+    m_songPositionSlider = new QSlider(Qt::Horizontal, songInfoWidget);
+    m_songPositionSlider->setSingleStep(1);
+    m_songPositionSlider->setStyleSheet("QSlider {height: 5px}");
+    m_songPositionSlider->setMinimum(0);
 //    songSlider->setStyleSheet("QSlider::handle:horizontal {width: 5px;}");
-    songInfoLayout->addWidget(songSlider);
+    songInfoLayout->addWidget(m_songPositionSlider);
 
     // TODO: Make public
     m_songEndLabel = new QLabel(songInfoWidget);
@@ -167,7 +169,7 @@ void PlayerWidget::setSongText(QString songText) {
 void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
     QString songName = modInfoObject->value("song_name").toString();
 
-    if (m_songLabel->text().compare(songName)) {
+    if (m_songLabel->text().compare(songName) < 0) {
         m_songLabel->setText(songName);
     }
 
@@ -177,5 +179,15 @@ void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
     m_songStartLabel->setText(QString::number(currentOrder));
     m_songEndLabel->setText(QString::number(numOrders));
 
+    if (m_songPositionSlider->tickInterval() != numOrders) {
+//        m_songPositionSlider->setTickInterval(numOrders);
+        m_songPositionSlider->setMaximum(numOrders);
+    }
+
+    if (m_currentOrder != currentOrder && m_songPositionSlider->value() != currentOrder) {
+        m_songPositionSlider->blockSignals(true);
+        m_songPositionSlider->setValue(m_currentOrder = currentOrder);
+        m_songPositionSlider->blockSignals(false);
+    }
 
 }

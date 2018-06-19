@@ -28,6 +28,7 @@ public:
     void stop();
     QJsonObject *loadFile(QJsonObject *fileObject);
     QJsonObject *getModMetaData();
+    void setModPosition(int position);
 
 public slots:
 
