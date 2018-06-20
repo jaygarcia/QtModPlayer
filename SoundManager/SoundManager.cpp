@@ -145,6 +145,7 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
     this->stop();
 
     mutex->lock();
+//    qDebug() << Q_FUNC_INFO << fileObject->value("file_name").toString();
 
     QString filePath =  fileObject->value("full_path").toString();
     const char *fileString = filePath.toUtf8();
@@ -156,13 +157,14 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
 
     if (goodLoad == openmpt::probe_file_header_result_success) {
 
+
         modFile = new openmpt::module_ext(file);
 
         // Todo:: Setup as a configuration option from the UI
         modFile->set_repeat_count(999999);
 
         QString songName = QString::fromUtf8(modFile->get_metadata("title").c_str());
-        qDebug() << "Song Name" << songName;
+        modInfoJsonObject->insert("file_name", fileObject->value("file_name").toString());
         modInfoJsonObject->insert("song_name", songName);
 
         modInfoJsonObject->insert("num_patterns", modFile->get_num_patterns());

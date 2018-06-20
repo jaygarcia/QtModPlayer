@@ -19,16 +19,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_playerWidget, &PlayerWidget::showPlaylist, this, &MainWindow::onPlayerWidgetShowPlayList);
 
-    connect(m_playerWidget, &PlayerWidget::play, this, [this]() {
+    connect(m_playerWidget->m_playButton, &QPushButton::clicked, this, [this]() {
 //        emit pause();
         if (m_soundManager) {
             m_soundManager->play();
+            m_playerWidget->hidePauseShowPlayButton();
         }
     });
 
-    connect(m_playerWidget, &PlayerWidget::pause, this, [this]() {
+    connect(m_playerWidget->m_pauseButton, &QPushButton::clicked, this, [this]() {
         if (m_soundManager) {
             m_soundManager->pause();
+            m_playerWidget->showPlayHidePauseButton();
         }
     });
 
@@ -42,7 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "sliderValue" << sliderValue;
         m_soundManager->setModPosition(sliderValue);
         m_playerWidget->m_currentOrder = sliderValue;
+        m_playerWidget->m_songStartLabel->setText(QString::number(sliderValue + 1));
     });
+
 
 
     this->setAnimated(true);
@@ -115,7 +119,7 @@ void MainWindow::showPlaylistWindow() {
         });
 
         connect(playlist, &PlaylistWidget::songSelectionChange, this, [this](QJsonObject *fileObject) {
-            if (this->m_soundManager == 0) {
+            if (this->m_soundManager == nullptr) {
                 this->m_soundManager = new SoundManager();
             }
             else {
@@ -137,11 +141,13 @@ void MainWindow::showPlaylistWindow() {
             QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
 
             m_playerWidget->updateSongInformation(modFileObject);
+            m_playerWidget->setSongPositionSliderValueSilent(0);
             m_playerWidget->m_currentOrder = 0; // Make sure the order is flushed
 
             thread->start();
 
             m_soundManager->play();
+            m_playerWidget->hidePauseShowPlayButton();
 //            qDebug() << Q_FUNC_INFO << "Playlist selection" << fileObject->value("full_path").toString();
         });
     }

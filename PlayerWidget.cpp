@@ -109,6 +109,9 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     m_playButton = this->buildButton("play");
     layout->addWidget(m_playButton);
 
+    m_pauseButton = this->buildButton("pause");
+    layout->addWidget(m_pauseButton);
+    this->showPlayHidePauseButton();
 
     m_nextPatternButton = this->buildButton("forward");
     layout->addWidget(m_nextPatternButton);
@@ -176,7 +179,15 @@ void PlayerWidget::setSongText(QString songText) {
 
 
 void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
-    QString songName = modInfoObject->value("song_name").toString();
+    QString songName;
+
+
+    if (modInfoObject->value("song_name").toString().isEmpty()) {
+        songName = modInfoObject->value("file_name").toString();
+    }
+    else {
+        songName = modInfoObject->value("song_name").toString();
+    }
 
     if (m_songLabel->text().compare(songName) < 0) {
         m_songLabel->setText(songName);
@@ -189,15 +200,27 @@ void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
     m_songEndLabel->setText(QString::number(numOrders + 1));
 
     if (m_songPositionSlider->tickInterval() != numOrders) {
-//        m_songPositionSlider->setTickInterval(numOrders);
         m_songPositionSlider->setMaximum(numOrders);
     }
 
-
     if (m_currentOrder != currentOrder || m_songPositionSlider->value() != currentOrder) {
-        m_songPositionSlider->blockSignals(true);
-        m_songPositionSlider->setValue(m_currentOrder = currentOrder);
-        m_songPositionSlider->blockSignals(false);
+        this->setSongPositionSliderValueSilent(m_currentOrder = currentOrder);
     }
 
+}
+
+void PlayerWidget::showPlayHidePauseButton() {
+    m_playButton->show();
+    m_pauseButton->hide();
+}
+
+void PlayerWidget::hidePauseShowPlayButton() {
+    m_pauseButton->show();
+    m_playButton->hide();
+}
+
+void PlayerWidget::setSongPositionSliderValueSilent(int value) {
+    m_songPositionSlider->blockSignals(true);
+    m_songPositionSlider->setValue(value);
+    m_songPositionSlider->blockSignals(false);
 }

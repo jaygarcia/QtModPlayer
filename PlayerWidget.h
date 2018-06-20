@@ -19,7 +19,9 @@ public:
     QLabel *m_songStartLabel;
     QLabel *m_songEndLabel;
     QSlider *m_songPositionSlider;
+
     QPushButton *m_playButton;
+    QPushButton *m_pauseButton;
     QPushButton *m_previousPatternButton;
     QPushButton *m_nextPatternButton;
     QPushButton *m_previousTrackButton;
@@ -38,6 +40,12 @@ public:
     void setSongText(QString songText);
     void initializeSlider();
     void updateSongInformation(QJsonObject *modInfoObject);
+    void setSongPositionSliderValueSilent(int value);
+
+    void showPlayHidePauseButton();
+
+    void hidePauseShowPlayButton();
+
 
 signals:
     void play();
