@@ -106,6 +106,17 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     m_previousPatternButton = this->buildButton("backward");
     layout->addWidget(m_previousPatternButton);
 
+    connect(m_previousPatternButton, &QPushButton::clicked, this, [this](){
+       int newSliderValue = m_songPositionSlider->value() - 1;
+
+       if (newSliderValue < m_songPositionSlider->minimum()) {
+           newSliderValue = 0;
+       }
+       m_songPositionSlider->setValue(newSliderValue);
+    });
+
+
+
     m_playButton = this->buildButton("play");
     layout->addWidget(m_playButton);
 
@@ -115,6 +126,15 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 
     m_nextPatternButton = this->buildButton("forward");
     layout->addWidget(m_nextPatternButton);
+    connect(m_nextPatternButton, &QPushButton::clicked, this, [this](){
+       int newSliderValue = m_songPositionSlider->value() + 1;
+
+       if (newSliderValue > m_songPositionSlider->maximum()) {
+           newSliderValue = m_songPositionSlider->maximum();
+       }
+       m_songPositionSlider->setValue(newSliderValue);
+    });
+
 
     layout->addItem(smallSpacer);
 
