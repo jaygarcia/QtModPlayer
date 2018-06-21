@@ -24,6 +24,7 @@ public:
     QPushButton *m_pauseButton;
     QPushButton *m_previousPatternButton;
     QPushButton *m_nextPatternButton;
+
     QPushButton *m_previousTrackButton;
     QPushButton *m_nextTrackButton;
 

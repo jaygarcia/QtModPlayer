@@ -23,11 +23,14 @@ private:
     QString m_playlistSelected;
     SoundManager *m_soundManager = nullptr;
     PlayerWidget *m_playerWidget;
+
+
 public:
+    MainWindow(QWidget *parent = 0);
 
     DBManager *m_dbManager;
+    QJsonObject *m_currentModFileObject;
 
-    MainWindow(QWidget *parent = 0);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
     void onPlayerWidgetShowPlayList();

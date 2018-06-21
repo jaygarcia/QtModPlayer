@@ -314,6 +314,8 @@ QSqlRecord DBManager::getRecordAt(int rowId, QString tableName) {
     return query.record();
 }
 
+
+
 /*  --- To be used on row removal
 
 drop table if exists playlist_songs_tmp;
@@ -401,6 +403,28 @@ QVector<QJsonObject *> DBManager::getAllPlaylists(int newlyInsertedId) {
     this->disconnect();
     return playlists;
 }
+
+
+int DBManager::getNextSong(QString tableName, QString fileName) {
+    this->connect();
+
+    QSqlQuery query(this->m_db);
+    query.setForwardOnly(true);
+    query.prepare("select rowid from :table_name where file_name like :file_name");
+    query.bindValue(":file_name", fileName);
+    query.bindValue(":table_name", tableName);
+
+    query.exec();
+
+
+    qDebug() << Q_FUNC_INFO << getLastExecutedQuery(query);
+
+    qDebug() << query.record().value("rowid");
+
+    this->disconnect();
+    return 1;
+}
+
 
 // Todo: Separate in a DBManager base class
 QSqlDatabase DBManager::db() const {

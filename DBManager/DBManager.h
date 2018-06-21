@@ -44,6 +44,8 @@ public:
     QVector<QJsonObject *> filesToInsert() const;
     void setFilesToInsert(const QVector<QJsonObject *> &filesToInsert);
 
+    int getNextSong(QString tableName, QString fileName);
+
     /**** Playlist stuff ***/
     int playlistId() const;
     void setPlaylistId(int playlistId);

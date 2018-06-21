@@ -126,6 +126,7 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 
     m_nextPatternButton = this->buildButton("forward");
     layout->addWidget(m_nextPatternButton);
+
     connect(m_nextPatternButton, &QPushButton::clicked, this, [this](){
        int newSliderValue = m_songPositionSlider->value() + 1;
 
@@ -138,8 +139,8 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 
     layout->addItem(smallSpacer);
 
-    m_previousTrackButton = this->buildButton("fastforward");
-    layout->addWidget(m_previousTrackButton);
+    m_nextTrackButton = this->buildButton("fastforward");
+    layout->addWidget(m_nextTrackButton);
 
     layout->addItem(largeSpacer);
 

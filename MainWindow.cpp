@@ -48,6 +48,15 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
 
+    connect(m_playerWidget->m_nextTrackButton, &QPushButton::clicked, this, [this]() {
+        m_dbManager->getNextSong(m_playlistSelected, m_currentModFileObject->value("file_name").toString());
+    });
+
+    connect(m_playerWidget->m_previousTrackButton, &QPushButton::clicked, this, [this]() {
+
+    });
+
+
 
     this->setAnimated(true);
     this->setFixedSize(300, 150);
@@ -139,6 +148,7 @@ void MainWindow::showPlaylistWindow() {
             m_soundManager->moveToThread(thread);
 
             QJsonObject *modFileObject = m_soundManager->loadFile(fileObject);
+            m_currentModFileObject = modFileObject;
 
             m_playerWidget->updateSongInformation(modFileObject);
             m_playerWidget->setSongPositionSliderValueSilent(0);
