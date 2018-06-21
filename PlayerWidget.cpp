@@ -209,7 +209,8 @@ void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
         songName = modInfoObject->value("song_name").toString();
     }
 
-    if (m_songLabel->text().compare(songName) < 0) {
+
+    if (m_songLabel->text().compare(songName) != 0) {
         m_songLabel->setText(songName);
     }
 
