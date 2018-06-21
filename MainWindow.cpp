@@ -56,6 +56,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     });
 
+    connect(m_playerWidget->m_randomButton, &QPushButton::clicked, this, [this]() {
+        m_playerWidget->m_randomButton->setDown(m_stateRandomOn = ! m_stateRandomOn);
+    });
+
+
+    connect(m_playerWidget->m_repeatButton, &QPushButton::clicked, this, [this]() {
+        m_playerWidget->m_repeatButton->setDown(m_repeatStateOn = !m_repeatStateOn);
+    });
+
 
 
     this->setAnimated(true);

@@ -89,8 +89,8 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     widget->setLayout(layout);
 
 
-    QPushButton *repeatButton = this->buildButton("refresh");
-    layout->addWidget(repeatButton);
+    m_repeatButton = this->buildButton("refresh");
+    layout->addWidget(m_repeatButton);
 
 
     QSpacerItem *largeSpacer = new QSpacerItem(30, 10);
@@ -144,8 +144,8 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 
     layout->addItem(largeSpacer);
 
-    QPushButton *shuffleButton = this->buildButton("random");
-    layout->addWidget(shuffleButton);
+    m_randomButton = this->buildButton("random");
+    layout->addWidget(m_randomButton);
 
     return widget;
 }

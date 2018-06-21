@@ -28,6 +28,10 @@ public:
     QPushButton *m_previousTrackButton;
     QPushButton *m_nextTrackButton;
 
+    QPushButton *m_repeatButton;
+    QPushButton *m_randomButton;
+
+
     int m_currentOrder = -1;
     // Methods
     void configure();

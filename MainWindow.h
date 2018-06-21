@@ -23,7 +23,8 @@ private:
     QString m_playlistSelected;
     SoundManager *m_soundManager = nullptr;
     PlayerWidget *m_playerWidget;
-
+    bool m_stateRandomOn;
+    bool m_repeatStateOn;
 
 public:
     MainWindow(QWidget *parent = 0);
