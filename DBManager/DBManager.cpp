@@ -48,9 +48,9 @@ void DBManager::purgeCurrentPlaylist() {
     query.exec("insert into "
         "playlist_songs (playlist_id, song_name, file_name, full_path, like_value, md5, in_queue) "
         "SELECT playlist_id, song_name, file_name, full_path, like_value, md5, in_queue "
-        "FROM playlist_songs_tmp; ");
+        "FROM playlist_songs_tmp;");
 
-    query.exec("drop table playlist_songs_tmp; ");
+    query.exec("drop table playlist_songs_tmp;");
 
     query.exec("vacuum;");
 
@@ -295,9 +295,9 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
     return 0;
 }
 
-QSqlRecord DBManager::getRecordAt(int rowId, QString tableName) {
+QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
     QSqlQuery query(this->m_db);
-    QString queryString = "select song_name, file_name, full_path from " + tableName + " where rowid = :row_id";
+    QString queryString = "select rowid, song_name, file_name, full_path from " + tableName + " where rowid = :row_id";
     query.prepare(queryString);
     query.bindValue(":row_id", rowId);
 
@@ -309,9 +309,18 @@ QSqlRecord DBManager::getRecordAt(int rowId, QString tableName) {
         query.seek(0);
     }
 
-//    QSqlRecord record = query.record();
+    QSqlRecord sqlRecord = query.record();
 
-    return query.record();
+
+    QJsonObject *newObject = new QJsonObject();
+
+    newObject->insert("file_name", sqlRecord.value("file_name").toString());
+    newObject->insert("song_name", sqlRecord.value("song_name").toString());
+    newObject->insert("full_path", sqlRecord.value("full_path").toString());
+    newObject->insert("rowid", sqlRecord.value("rowid").toInt());
+    newObject->insert("table_name", tableName);
+
+    return newObject;
 }
 
 
@@ -405,24 +414,24 @@ QVector<QJsonObject *> DBManager::getAllPlaylists(int newlyInsertedId) {
 }
 
 
-int DBManager::getNextSong(QString tableName, QString fileName) {
+int DBManager::getSongCountFromPlaylist(QString tableName) {
     this->connect();
 
     QSqlQuery query(this->m_db);
-    query.setForwardOnly(true);
-    query.prepare("select rowid from :table_name where file_name like :file_name");
-    query.bindValue(":file_name", fileName);
-    query.bindValue(":table_name", tableName);
 
-    query.exec();
+    query.prepare("select MAX(rowid) as max_rowid from " + tableName);
 
-
-    qDebug() << Q_FUNC_INFO << getLastExecutedQuery(query);
-
-    qDebug() << query.record().value("rowid");
+    if (! query.exec()) {
+        qWarning() << "Something went wrong with counting songs from a playlist";
+        qWarning() << getLastExecutedQuery(query);
+        qWarning() << query.lastError();
+    }
+    else {
+        query.seek(0);
+    }
 
     this->disconnect();
-    return 1;
+    return query.record().value("max_rowid").toInt();
 }
 
 

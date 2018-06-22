@@ -56,6 +56,7 @@ public slots:
     void onInserterPercentUpdate(int pctComplete);
     void onInserterComplete(int totalFiles);
     void onModPositionChanged(QJsonObject *modInfoObject);
+    void onSongSelectionChange(QJsonObject *fileObject);
 };
 
 #endif // MAINWINDOW_H

@@ -157,7 +157,6 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
 
     if (goodLoad == openmpt::probe_file_header_result_success) {
 
-
         modFile = new openmpt::module_ext(file);
 
         // Todo:: Setup as a configuration option from the UI
@@ -239,6 +238,7 @@ void SoundManager::play() {
 
 void SoundManager::stop() {
     qDebug() << Q_FUNC_INFO;
+
 
     mutex->lock();
     // Todo : set mod to zero position

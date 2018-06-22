@@ -7,6 +7,7 @@
 
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
+#include <QJsonObject>
 
 class DBManager : public QObject
 {
@@ -33,7 +34,7 @@ public:
 
     // Todo: Push into another class?
     int getNumRowsForPlaylist(QString tableName);
-    QSqlRecord getRecordAt(int rowNumber, QString tableName);
+    QJsonObject *getRecordAt(int rowNumber, QString tableName);
 
     QSqlDatabase db() const;
     void setDb(const QSqlDatabase &db);
@@ -44,7 +45,7 @@ public:
     QVector<QJsonObject *> filesToInsert() const;
     void setFilesToInsert(const QVector<QJsonObject *> &filesToInsert);
 
-    int getNextSong(QString tableName, QString fileName);
+    int getSongCountFromPlaylist(QString tableName);
 
     /**** Playlist stuff ***/
     int playlistId() const;

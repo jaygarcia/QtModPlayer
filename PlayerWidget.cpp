@@ -151,14 +151,15 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
 }
 
 QPushButton * PlayerWidget::buildButton(const char * iconType) {
-    const char * baseButtonStyle = "color: #FEFEFE; height: 30px; width: 30px; ";
+    const char * baseButtonStyle = "height: 30px; width: 30px; ";
 
     QVariantMap options;
     options.insert("color" , QColor(200,200,200));
     options.insert("color-active", QColor(200,200,200));
 
     QPushButton *button = new QPushButton(this->m_qtAwesome->icon(iconType, options), "");
-
+    qDebug() << iconType << button->autoExclusive();
+    button->setAutoExclusive(true);
     button->setStyleSheet(baseButtonStyle);
     return button;
 }
