@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
         else {
             // Todo: build a "Stack model". this is completely random!
             newIndex = tableView->model()->index(rand() % songCount, 0);
+
         }
 
         tableView->setCurrentIndex(newIndex);
@@ -282,9 +283,9 @@ void MainWindow::onSongSelectionChange(QJsonObject *fileObject) {
 
     modFileObject->insert("rowid", fileObject->value("rowid").toInt());
 
-    m_playerWidget->updateSongInformation(modFileObject);
     m_playerWidget->setSongPositionSliderValueSilent(0);
     m_playerWidget->m_currentOrder = 0; // Make sure the order is flushed
+    m_playerWidget->updateSongInformation(modFileObject);
 
     thread->start();
 
