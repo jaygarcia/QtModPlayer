@@ -26,6 +26,9 @@ private:
     bool m_stateRandomOn;
     bool m_repeatStateOn;
 
+    QList<QModelIndex> m_randomPlaylistStack;
+    int m_randomPlaylistStackPosition = 0;
+
 public:
     MainWindow(QWidget *parent = 0);
 

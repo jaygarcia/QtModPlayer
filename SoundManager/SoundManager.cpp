@@ -218,7 +218,7 @@ void SoundManager::setModPosition(int order) {
 };
 
 void SoundManager::pause() {
-    qDebug() << Q_FUNC_INFO;
+//    qDebug() << Q_FUNC_INFO;
     mutex->lock();
     playMode = 2;
     Pa_StopStream(stream);
@@ -227,7 +227,7 @@ void SoundManager::pause() {
 }
 
 void SoundManager::play() {
-    qDebug() << Q_FUNC_INFO;
+//    qDebug() << Q_FUNC_INFO;
     mutex->lock();
     playMode = 1;
 
@@ -237,9 +237,7 @@ void SoundManager::play() {
 }
 
 void SoundManager::stop() {
-    qDebug() << Q_FUNC_INFO;
-
-
+//    qDebug() << Q_FUNC_INFO;
     mutex->lock();
     // Todo : set mod to zero position
     playMode = 0;

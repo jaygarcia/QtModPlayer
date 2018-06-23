@@ -64,7 +64,7 @@ QWidget *PlayerWidget::buildSongInformationUI() {
 
     m_songPositionSlider = new QSlider(Qt::Horizontal, songInfoWidget);
     m_songPositionSlider->setSingleStep(1);
-    m_songPositionSlider->setStyleSheet("QSlider {height: 5px}");
+//    m_songPositionSlider->setStyleSheet("QSlider {height: 5px}");
     m_songPositionSlider->setMinimum(0);
 //    songSlider->setStyleSheet("QSlider::handle:horizontal {width: 5px;}");
     songInfoLayout->addWidget(m_songPositionSlider);
@@ -190,7 +190,16 @@ QWidget *PlayerWidget::buildBottomControlUI() {
 
     QPushButton *volumeHigh = new QPushButton(this->m_qtAwesome->icon("volumeup", options), "");
     volumeHigh->setStyleSheet("border-radius:99px");
+
+
+
+
     widget->layout()->addWidget(volumeHigh);
+
+    widget->layout()->addItem(new QSpacerItem(5, 0));
+    m_favoriteButton = this->buildButton("star");
+    widget->layout()->addWidget(m_favoriteButton);
+
 
     return widget;
 }

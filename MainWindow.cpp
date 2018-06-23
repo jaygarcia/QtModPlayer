@@ -41,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_playerWidget->m_songPositionSlider, &QSlider::valueChanged, this, [this](int sliderValue) {
-        qDebug() << "sliderValue" << sliderValue;
         m_soundManager->setModPosition(sliderValue);
         m_playerWidget->m_currentOrder = sliderValue;
         m_playerWidget->m_songStartLabel->setText(QString::number(sliderValue + 1));
@@ -49,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(m_playerWidget->m_nextTrackButton, &QPushButton::clicked, this, [this]() {
-        if (! this->m_currentModFileObject) {
+        if (m_playlistSelected.isEmpty()) {
             return;
         }
 
@@ -61,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
         // Sequential song selection handling, forward direction
         if (! m_stateRandomOn) {
 
-            int currentSongIndex = this->m_currentModFileObject->value("rowid").toInt();
+            int currentSongIndex = (m_currentModFileObject) ? this->m_currentModFileObject->value("rowid").toInt() : 0;
 
             if (songCount > currentSongIndex) {
                 // we use currentIndex because rowId is always 1 value ahead of the tableview.
@@ -75,15 +74,28 @@ MainWindow::MainWindow(QWidget *parent)
             // Todo: build a "Stack model". this is completely random!
             newIndex = tableView->model()->index(rand() % songCount, 0);
 
+            if (m_randomPlaylistStack.isEmpty()) {
+                // Start from zero
+                m_randomPlaylistStack.push_back(newIndex);
+                m_randomPlaylistStackPosition = 0;
+            }
+            else if (m_randomPlaylistStackPosition < m_randomPlaylistStack.count() - 1) {
+                // Forward one in the stack
+                newIndex = m_randomPlaylistStack.at(++m_randomPlaylistStackPosition);
+            }
+            else {
+                // Push to the stack
+                m_randomPlaylistStack.push_back(newIndex);
+                m_randomPlaylistStackPosition = m_randomPlaylistStack.count() - 1;
+            }
+
         }
 
         tableView->setCurrentIndex(newIndex);
-
-
     });
 
     connect(m_playerWidget->m_previousTrackButton, &QPushButton::clicked, this, [this]() {
-        if (! this->m_currentModFileObject) {
+        if (m_playlistSelected.isEmpty()) {
             return;
         }
 
@@ -95,19 +107,31 @@ MainWindow::MainWindow(QWidget *parent)
 
         // Sequential song selection handling, forward direction
         if (! m_stateRandomOn) {
-
-            int currentSongIndex = this->m_currentModFileObject->value("rowid").toInt();
+            int currentSongIndex = m_currentModFileObject ? this->m_currentModFileObject->value("rowid").toInt() : 0;
 
             newSongIndex = (currentSongIndex == 1) ? 0 : currentSongIndex - 2;
 
             // we use currentIndex because rowId is always 1 value ahead of the tableview.
             newIndex = tableView->model()->index(newSongIndex, 0);
-
         }
         else {
             // Todo: build a "Stack model". this is completely random!
             newIndex = tableView->model()->index(rand() % songCount, 0);
+
+            if (m_randomPlaylistStack.isEmpty()) {
+                m_randomPlaylistStack.push_front(newIndex);
+                m_randomPlaylistStackPosition = 0;
+            }
+            else if (m_randomPlaylistStackPosition > 0) {
+                newIndex = m_randomPlaylistStack.at(--m_randomPlaylistStackPosition);
+            }
+            else if (m_randomPlaylistStackPosition <= 0){
+                m_randomPlaylistStack.push_front(newIndex);
+                m_randomPlaylistStackPosition = 0;
+
+            }
         }
+
 
         tableView->setCurrentIndex(newIndex);
     });
@@ -120,8 +144,9 @@ MainWindow::MainWindow(QWidget *parent)
             m_playerWidget->m_randomButton->setStyleSheet("background-color: #555; height: 30px; width: 30px;");
         }
         else {
+            m_randomPlaylistStack.clear();
+            m_randomPlaylistStackPosition = -1;
             m_playerWidget->m_randomButton->setStyleSheet("height: 30px; width: 30px;");
-
         }
 
     });
@@ -207,7 +232,17 @@ void MainWindow::showPlaylistWindow() {
         });
 
         connect(playlist, &PlaylistWidget::playlistSelected, this, [this](QString playlistTable) {
-           this->m_playlistSelected = playlistTable;
+            this->m_playlistSelected = playlistTable;
+            if (m_stateRandomOn) {
+                m_randomPlaylistStack.clear();
+                m_randomPlaylistStackPosition = 0;
+            }
+            if (m_soundManager) {
+                this->m_soundManager->stop();
+                this->m_soundManager->thread()->quit();
+                this->m_soundManager->thread()->wait();
+                this->m_soundManager = nullptr;
+            }
         });
 
         connect(playlist, &PlaylistWidget::songSelectionChange, this, &MainWindow::onSongSelectionChange);
@@ -251,9 +286,6 @@ DBManager *MainWindow::getDbManager() const
 }
 
 void MainWindow::onModPositionChanged(QJsonObject *modInfoObject) {
-    // Todo update slider
-//    qDebug() << order << pattern << row;
-//    qDebug() << modInfoObject->value("song_name").toString() << modInfoObject->value("current_row").toInt();
     m_playerWidget->updateSongInformation(modInfoObject);
 }
 

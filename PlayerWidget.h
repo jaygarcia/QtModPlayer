@@ -30,6 +30,7 @@ public:
 
     QPushButton *m_repeatButton;
     QPushButton *m_randomButton;
+    QPushButton *m_favoriteButton;
 
 
     int m_currentOrder = -1;
