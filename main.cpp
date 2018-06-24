@@ -7,16 +7,21 @@
 #include <QtAwesome.h>
 
 #include <DarkStyle.h>
+#include <QWidget>
+#include <QObject>
 
 int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
     a.setStyle(new DarkStyle);
+    a.setQuitOnLastWindowClosed(false);
 
     // Enable high-DPI display support
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+
 
     MainWindow w;
     w.show();
