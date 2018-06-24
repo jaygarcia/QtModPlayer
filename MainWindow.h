@@ -11,7 +11,7 @@
 
 #include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
-#include "SoundManager/SoundManager.h"
+#include "SoundManager.h"
 
 
 class MainWindow : public QMainWindow {
