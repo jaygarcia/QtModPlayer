@@ -4,7 +4,7 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
 {
     m_qtAwesome = new QtAwesome(qApp);
     m_qtAwesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
-    this->configure();
+//    this->configure();
     this->addChildren();
 }
 
@@ -30,6 +30,7 @@ void PlayerWidget::addChildren() {
     QWidget *songInfoWidget = this->buildSongInformationUI();
     mainLayout->addWidget(songInfoWidget, 0, Qt::AlignTop);
 //    songInfoWidget->setStyleSheet("background-color: #F99");
+
 
     QWidget *songControlWidget = this->buildPlayerControlUI();
     mainLayout->addWidget(songControlWidget, 1, Qt::AlignTop);
@@ -80,6 +81,13 @@ QWidget *PlayerWidget::buildSongInformationUI() {
     return songInfoWidget;
 }
 
+QSpacerItem *PlayerWidget::buildLargeSpacer() {
+    return new QSpacerItem(30, 10);
+}
+QSpacerItem *PlayerWidget::buildSmallSpacer() {
+    return new QSpacerItem(5, 10);
+}
+
 QWidget *PlayerWidget::buildPlayerControlUI() {
     QWidget *widget = new QWidget(this);
 
@@ -88,19 +96,16 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     layout->setSpacing(0);
     widget->setLayout(layout);
 
-
     m_repeatButton = this->buildButton("refresh");
     layout->addWidget(m_repeatButton);
 
 
-    QSpacerItem *largeSpacer = new QSpacerItem(30, 10);
-    QSpacerItem *smallSpacer = new QSpacerItem(5, 10);
-    layout->addItem(largeSpacer);
+    layout->addItem(this->buildLargeSpacer());
 
 
     m_previousTrackButton = this->buildButton("fastbackward");
     layout->addWidget(m_previousTrackButton);
-    layout->addItem(smallSpacer);
+    layout->addItem(this->buildSmallSpacer());
 
 
     m_previousPatternButton = this->buildButton("backward");
@@ -137,12 +142,12 @@ QWidget *PlayerWidget::buildPlayerControlUI() {
     });
 
 
-    layout->addItem(smallSpacer);
+    layout->addItem(this->buildSmallSpacer());
 
     m_nextTrackButton = this->buildButton("fastforward");
     layout->addWidget(m_nextTrackButton);
 
-    layout->addItem(largeSpacer);
+    layout->addItem(this->buildLargeSpacer());
 
     m_randomButton = this->buildButton("random");
     layout->addWidget(m_randomButton);
@@ -255,4 +260,11 @@ void PlayerWidget::setSongPositionSliderValueSilent(int value) {
     m_songPositionSlider->blockSignals(true);
     m_songPositionSlider->setValue(value);
     m_songPositionSlider->blockSignals(false);
+}
+
+
+// Destructor
+PlayerWidget::~PlayerWidget()
+{
+
 }

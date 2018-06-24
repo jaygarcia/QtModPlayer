@@ -217,7 +217,7 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 
 
 void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
-    qDebug() << Q_FUNC_INFO << selectedTableName;
+//    qDebug() << Q_FUNC_INFO << selectedTableName;
     this->m_selectedTableName = selectedTableName;
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());

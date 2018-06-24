@@ -12,6 +12,7 @@ class PlayerWidget : public QWidget
     Q_OBJECT
 public:
     explicit PlayerWidget(QWidget *parent = nullptr);
+    ~PlayerWidget();
 
     // Members
     QLabel *m_songLabel;
@@ -51,7 +52,8 @@ public:
     void showPlayHidePauseButton();
 
     void hidePauseShowPlayButton();
-
+    QSpacerItem *buildLargeSpacer();
+    QSpacerItem *buildSmallSpacer();
 
 signals:
     void play();

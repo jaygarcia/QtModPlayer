@@ -8,7 +8,7 @@ QString getLastExecutedQuery(const QSqlQuery& query)
     QMapIterator<QString, QVariant> it(query.boundValues());
     while (it.hasNext()) {
         it.next();
-        str.replace(it.key(),it.value().toString());
+        str.replace(it.key(), it.value().toString());
     }
 
     return str;
@@ -24,7 +24,7 @@ DBManager::DBManager(QObject *parent) : QObject(parent)
     QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
             destDbFile  = destDbDir + m_dbFileName;
 
-    qDebug() << "DBManager destDbFile = " << destDbFile;
+//    qDebug() << "DBManager destDbFile = " << destDbFile;
     this->m_dbPath = destDbFile;
 }
 
