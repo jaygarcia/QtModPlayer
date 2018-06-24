@@ -32,6 +32,8 @@ private:
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
     QString m_selectedTableName;
+
+    QJsonObject *uiState;
 //    QtAwesome *qtAwesome;
 
 public:
@@ -48,6 +50,9 @@ public:
 
 
 
+
+    QJsonObject *getUiState() const;
+    void setUiState(QJsonObject *value);
 
 signals:
     void playlistSelected(QString playlistTable);

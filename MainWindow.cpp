@@ -245,6 +245,17 @@ void MainWindow::showPlaylistWindow() {
         });
 
         connect(playlist, &PlaylistWidget::songSelectionChange, this, &MainWindow::onSongSelectionChange);
+
+
+        // Todo: figure out a way to get this to a global state store.
+        connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *widgetObject) {
+            PlaylistWidget *playlist = (PlaylistWidget *) widgetObject;
+
+            QJsonObject *playlistUiState = playlist->getUiState();
+
+            qDebug() << playlistUiState->keys();
+
+        });
     }
 }
 

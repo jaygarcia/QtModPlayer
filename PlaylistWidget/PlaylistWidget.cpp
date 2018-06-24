@@ -1,7 +1,12 @@
 #include "PlaylistWidget.h"
 #include <QItemSelectionModel>
 
+
+
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
+
+    this->uiState = new QJsonObject();
+
     this->setWindowTitle("QtModPlayer :: Playlist");
 
     this->setAcceptDrops(true);
@@ -44,13 +49,12 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &PlaylistWidget::onTableViewSelectionChange);
 
     connect(m_playlistControls, &PlaylistControls::playlistSelectionChange, this, &PlaylistWidget::onPlaylistSelectorChange);
+
     connect(m_playlistControls->newPlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onNewPlaylistButtonPress);
     connect(m_playlistControls->savePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onSavePlaylistButtonPress);
     connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
-
-
 }
 
 void PlaylistWidget::loadPlaylist(QString playlistTableName) {
@@ -203,14 +207,16 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     Q_UNUSED(deselected);
 
-
 //    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
     QModelIndexList list = selected.indexes();
 
-    BufferedTableModel *tableModel = (BufferedTableModel*) list.at(0).model();
+    BufferedTableModel *tableModel = (BufferedTableModel*)list.at(0).model();
     int selectedRow = list.at(0).row();
 
     QJsonObject *rowObject = tableModel->fetchRow(selectedRow);
+
+    this->uiState->insert("selectedRowIndex", selectedRow);
+    this->uiState->insert("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
 
     emit songSelectionChange(rowObject);
 }
@@ -222,6 +228,7 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
+    this->uiState->insert("selectedTableName", selectedTableName);
     emit playlistSelected(selectedTableName);
 }
 
@@ -231,4 +238,15 @@ void PlaylistWidget::onDeletePlaylistButton() {
 
 void PlaylistWidget::onSavePlaylistButtonPress() {
 
+}
+
+
+QJsonObject *PlaylistWidget::getUiState() const
+{
+    return uiState;
+}
+
+void PlaylistWidget::setUiState(QJsonObject *value)
+{
+    uiState = value;
 }
