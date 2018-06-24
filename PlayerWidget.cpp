@@ -163,7 +163,7 @@ QPushButton * PlayerWidget::buildButton(const char * iconType) {
     options.insert("color-active", QColor(200,200,200));
 
     QPushButton *button = new QPushButton(this->m_qtAwesome->icon(iconType, options), "");
-    qDebug() << iconType << button->autoExclusive();
+
     button->setAutoExclusive(true);
     button->setStyleSheet(baseButtonStyle);
     return button;
