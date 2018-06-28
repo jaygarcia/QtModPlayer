@@ -21,22 +21,21 @@
 #include "PlaylistControls.h"
 #include "DBManager/DBManager.h"
 #include <QItemSelectionModel>
-#include "WidgetStateStore.h"
-
+#include "UiStateObject.h"
 
 class PlaylistWidget : public QWidget
 {
     Q_OBJECT
 
 private:
-    QJsonObject m_state;
+    UiStateObject *m_uiState;
+
     QProgressDialog m_progressDialog;
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
     QString m_selectedTableName;
 
-    QJsonObject *uiState;
 //    QtAwesome *qtAwesome;
 
 public:
@@ -50,11 +49,6 @@ public:
     void refreshTableView();
     bool getNewPlaylistNameFromUser();
     void loadPlaylist(QString playlistTableName);
-
-
-
-    QJsonObject *getUiState() const;
-    void setUiState(QJsonObject *value);
 
 signals:
     void playlistSelected(QString playlistTable);

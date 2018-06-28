@@ -3,17 +3,13 @@
 
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
-    m_state = WidgetStateStore::CreateNewStateObject("playlistwidget");
-    if (! m_state.contains("test")) {
-        qDebug() << "No value";
-        m_state.insert("test", true);
-    }
-    else {
-        qDebug() << "Found value" << m_state.value("test");
-    }
+    m_uiState = new UiStateObject("PlaylistWidget");
+//    if (! m_uiState->contains("test")) {
+//        m_uiState->setState("test",  (int)(random() % 1000));
+//    }
+//    qDebug() << Q_FUNC_INFO << m_uiState->keys();
+//    fflush(stdout);
 
-
-    this->uiState = new QJsonObject();
 
     this->setWindowTitle("QtModPlayer :: Playlist");
 
@@ -226,8 +222,8 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 
     QJsonObject *rowObject = tableModel->fetchRow(selectedRow);
 
-    this->uiState->insert("selectedRowIndex", selectedRow);
-    this->uiState->insert("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
+    m_uiState->setState("selectedRowIndex", selectedRow);
+    m_uiState->setState("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
 
     emit songSelectionChange(rowObject);
 }
@@ -239,7 +235,7 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
-    this->uiState->insert("selectedTableName", selectedTableName);
+    m_uiState->setState("selectedTableName", selectedTableName);
     emit playlistSelected(selectedTableName);
 }
 
@@ -251,13 +247,3 @@ void PlaylistWidget::onSavePlaylistButtonPress() {
 
 }
 
-
-QJsonObject *PlaylistWidget::getUiState() const
-{
-    return uiState;
-}
-
-void PlaylistWidget::setUiState(QJsonObject *value)
-{
-    uiState = value;
-}

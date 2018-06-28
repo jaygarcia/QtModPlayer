@@ -42,7 +42,8 @@ SOURCES += \
     DBManager/DBManager.cpp \
     DBManager/ThreadedModFileInserter.cpp \
     SoundManager.cpp \
-    WidgetStateStore.cpp
+    WidgetStateStore.cpp \
+    UiStateObject.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -55,7 +56,8 @@ HEADERS += \
     DBManager/DBManager.h \
     DBManager/ThreadedModFileInserter.h \
     SoundManager.h \
-    WidgetStateStore.h
+    WidgetStateStore.h \
+    UiStateObject.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

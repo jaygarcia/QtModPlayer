@@ -251,9 +251,9 @@ void MainWindow::showPlaylistWindow() {
         connect(playlist, &PlaylistWidget::destroyed, this, [this](QObject *widgetObject) {
             PlaylistWidget *playlist = (PlaylistWidget *) widgetObject;
 
-            QJsonObject *playlistUiState = playlist->getUiState();
+//            QJsonObject *playlistUiState = playlist->getUiState();
 
-            qDebug() << playlistUiState->keys();
+//            qDebug() << "playlistUiState->keys == " << playlistUiState->keys();
 
         });
     }
