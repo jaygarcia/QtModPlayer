@@ -20,6 +20,8 @@
 #include "BufferedTableModel.h"
 #include "PlaylistControls.h"
 #include "DBManager/DBManager.h"
+#include <QItemSelectionModel>
+#include "WidgetStateStore.h"
 
 
 class PlaylistWidget : public QWidget
@@ -27,6 +29,7 @@ class PlaylistWidget : public QWidget
     Q_OBJECT
 
 private:
+    QJsonObject m_state;
     QProgressDialog m_progressDialog;
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
@@ -47,7 +50,6 @@ public:
     void refreshTableView();
     bool getNewPlaylistNameFromUser();
     void loadPlaylist(QString playlistTableName);
-
 
 
 

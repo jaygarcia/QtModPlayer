@@ -1,9 +1,17 @@
 #include "PlaylistWidget.h"
-#include <QItemSelectionModel>
 
 
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
+    m_state = WidgetStateStore::CreateNewStateObject("playlistwidget");
+    if (! m_state.contains("test")) {
+        qDebug() << "No value";
+        m_state.insert("test", true);
+    }
+    else {
+        qDebug() << "Found value" << m_state.value("test");
+    }
+
 
     this->uiState = new QJsonObject();
 
@@ -55,6 +63,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
+
 }
 
 void PlaylistWidget::loadPlaylist(QString playlistTableName) {
@@ -212,6 +221,8 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 
     BufferedTableModel *tableModel = (BufferedTableModel*)list.at(0).model();
     int selectedRow = list.at(0).row();
+
+//    WidgetStateStore::setStateValue("playlistwidget.selected");
 
     QJsonObject *rowObject = tableModel->fetchRow(selectedRow);
 
