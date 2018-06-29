@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
         QJsonObject *newModFile;
         // Sequential song selection handling, forward direction
         if (! m_stateRandomOn) {
-
+            qDebug() << "********** SEQUENTIAL forward!!";
             if (songCount > currentIndex) {
                 // we use currentIndex because rowId is always 1 value ahead of the tableview.
                 newIndex = currentIndex + 1;
@@ -76,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
         //  Randomized
         else {
             // Random File
+            qDebug() << "********** RANDOM() forward!!";
+
             newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
             newIndex = newModFile->value("rowid").toInt();
 
