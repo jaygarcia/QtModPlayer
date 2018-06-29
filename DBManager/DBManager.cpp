@@ -304,7 +304,7 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
 }
 
 
-
+// rowId of -1 value is random
 QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
     this->connect();
     QSqlQuery query(this->m_db);

@@ -75,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         //  Randomized
         else {
-            // Random File
             qDebug() << "********** RANDOM() forward!!";
 
             newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
@@ -86,13 +85,6 @@ MainWindow::MainWindow(QWidget *parent)
                 newIndex = m_randomPlaylistStack.at(++m_randomPlaylistStackPosition);
             }
             else {
-//                if (m_randomPlaylistStack.isEmpty()) {
-//                    // Start from zero
-//                    m_randomPlaylistStackPosition = 0;
-//                }
-//                else {
-//                    m_randomPlaylistStackPosition = m_randomPlaylistStack.count() - 1;
-//                }
 
                 m_randomPlaylistStackPosition = m_randomPlaylistStack.count();
                 // Push to the stack
@@ -114,53 +106,78 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else if (newModFile) {
             // Force a song load
-
             this->onSongSelectionChange(newModFile);
-//            QJsonObject("");
-            // Todo: set state on the PlaylistWindow object to change index
         }
     });
 
     connect(m_playerWidget->m_previousTrackButton, &QPushButton::clicked, this, [this]() {
-//        if (m_selectedPlaylistTable.isEmpty()) {
-//            return;
-//        }
+        if (m_selectedPlaylistTable.isEmpty()) {
+            qWarning() << Q_FUNC_INFO << "m_selectedPlaylistTable is empty!";
+            return;
+        }
 
-//        QTableView *tableView =  m_playlistWindow->m_tableView;
-//        QModelIndex newIndex;
+        int songCount = m_dbManager->getSongCountFromPlaylist(m_selectedPlaylistTable);
 
-//        int songCount = m_dbManager->getSongCountFromPlaylist(m_selectedPlaylistTable);
-//        int newSongIndex;
+        int newIndex = 0;
 
-//        // Sequential song selection handling, forward direction
-//        if (! m_stateRandomOn) {
-//            int currentSongIndex = m_currentModFileObject ? this->m_currentModFileObject->value("rowid").toInt() : 0;
+        int currentIndex = (m_currentModFileObject) ? this->m_currentModFileObject->value("rowid").toInt() : 0;
+        if (m_currentModFileObject) {
+            qDebug() << Q_FUNC_INFO << m_currentModFileObject->value("file_name").toString();
+        }
 
-//            newSongIndex = (currentSongIndex == 1) ? 0 : currentSongIndex - 2;
+        QJsonObject *newModFile;
+        // Sequential song selection handling, forward direction
+        if (! m_stateRandomOn) {
+            qDebug() << "********** SEQUENTIAL backward!!";
+            if (currentIndex > 1) {
+                // we use currentIndex because rowId is always 1 value ahead of the tableview.
+                newIndex = currentIndex - 1;
+            }
+            else {
+                newIndex = songCount;
+            }
 
-//            // we use currentIndex because rowId is always 1 value ahead of the tableview.
-//            newIndex = tableView->model()->index(newSongIndex, 0);
-//        }
-//        else {
-//            // Todo: build a "Stack model". this is completely random!
-//            newIndex = tableView->model()->index(rand() % songCount, 0);
-
-//            if (m_randomPlaylistStack.isEmpty()) {
-////                m_randomPlaylistStack.push_front(newIndex);
-//                m_randomPlaylistStackPosition = 0;
-//            }
-//            else if (m_randomPlaylistStackPosition > 0) {
-////                newIndex = m_randomPlaylistStack.at(--m_randomPlaylistStackPosition);
-//            }
-//            else if (m_randomPlaylistStackPosition <= 0){
-////                m_randomPlaylistStack.push_front(newIndex);
-//                m_randomPlaylistStackPosition = 0;
-
-//            }
-//        }
+            newModFile = this->m_dbManager->getRecordAt(newIndex, this->m_selectedPlaylistTable);
+        }
+        //  Randomized
+        else {
+            qDebug() << "********** RANDOM() backward!!";
 
 
-//        tableView->setCurrentIndex(newIndex);
+            if (m_randomPlaylistStack.isEmpty() || m_randomPlaylistStackPosition <= 0) {
+                newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
+                newIndex = newModFile->value("rowid").toInt();
+
+                m_randomPlaylistStack.push_front(newIndex);
+                m_randomPlaylistStackPosition = 0;
+            }
+            else {
+                newModFile = this->m_dbManager->getRecordAt(m_randomPlaylistStack.at(--m_randomPlaylistStackPosition), this->m_selectedPlaylistTable);
+                newIndex = newModFile->value("rowid").toInt();
+            }
+
+
+
+        }
+
+        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
+        fflush(stdout);
+
+        if (m_playlistWindow) {
+            // Normal workflow
+            QTableView *tableView = m_playlistWindow->m_tableView;
+            if (newIndex > 0) {
+                newIndex--;
+            }
+            tableView->setCurrentIndex(tableView->model()->index(newIndex, 0));
+        }
+        else if (newModFile) {
+            // Force a song load
+
+            this->onSongSelectionChange(newModFile);
+        }
+
+
     });
 
     connect(m_playerWidget->m_randomButton, &QPushButton::clicked, this, [this]() {
