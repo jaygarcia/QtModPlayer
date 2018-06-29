@@ -75,27 +75,31 @@ MainWindow::MainWindow(QWidget *parent)
         }
         //  Randomized
         else {
-            newModFile = this->m_dbManager->getRandomRecordForTable(this->m_selectedPlaylistTable);
+            // Random File
+            newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
             newIndex = newModFile->value("rowid").toInt();
 
-            if (m_randomPlaylistStack.isEmpty()) {
-                // Start from zero
-                m_randomPlaylistStack.push_back(newIndex);
-                m_randomPlaylistStackPosition = 0;
-            }
-            else if (m_randomPlaylistStackPosition < m_randomPlaylistStack.count() - 1) {
+            if (m_randomPlaylistStackPosition < m_randomPlaylistStack.count() - 1) {
                 // Forward one in the stack
                 newIndex = m_randomPlaylistStack.at(++m_randomPlaylistStackPosition);
             }
             else {
+//                if (m_randomPlaylistStack.isEmpty()) {
+//                    // Start from zero
+//                    m_randomPlaylistStackPosition = 0;
+//                }
+//                else {
+//                    m_randomPlaylistStackPosition = m_randomPlaylistStack.count() - 1;
+//                }
+
+                m_randomPlaylistStackPosition = m_randomPlaylistStack.count();
                 // Push to the stack
                 m_randomPlaylistStack.push_back(newIndex);
-                m_randomPlaylistStackPosition = m_randomPlaylistStack.count() - 1;
             }
 
         }
 
-        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\n", currentIndex, newIndex, songCount);
+        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
         fflush(stdout);
 
         if (m_playlistWindow) {

@@ -34,7 +34,6 @@ public:
     // Todo: Push into another class?
     int getNumRowsForPlaylist(QString tableName);
     QJsonObject *getRecordAt(int rowNumber, QString tableName);
-    QJsonObject *getRandomRecordForTable(QString tableName);
 
     void deleteTable(QString tableName);
 

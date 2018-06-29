@@ -308,11 +308,20 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
 QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
     this->connect();
     QSqlQuery query(this->m_db);
-    QString queryString = "select rowid, song_name, file_name, full_path from " + tableName + " where rowid = :row_id";
-    query.prepare(queryString);
-    query.bindValue(":row_id", rowId);
 
-    if (! query.exec()) {
+    QString queryString;
+
+    // Randomized
+    if (rowId == -1) {
+        queryString = "SELECT rowid, song_name, file_name, full_path FROM " + tableName + " ORDER BY RANDOM() LIMIT 1;";
+    }
+    else {
+        queryString = "select rowid, song_name, file_name, full_path from " + tableName + " where rowid = " + QString::number(rowId);
+    }
+
+//    query.prepare(queryString);
+
+    if (! query.exec(queryString)) {
         qWarning() << "Something went wrong with getting record at " << rowId << "for table" << tableName;
         qWarning() << getLastExecutedQuery(query);
     }
@@ -334,37 +343,6 @@ QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
 
     return newObject;
 }
-
-QJsonObject *DBManager::getRandomRecordForTable(QString tableName) {
-    this->connect();
-    QSqlQuery query(this->m_db);
-    QString queryString = "SELECT rowid, song_name, file_name, full_path FROM " + tableName + " ORDER BY RANDOM() LIMIT 1;";
-    query.prepare(queryString);
-
-    if (! query.exec()) {
-        qWarning() << "Something went wrong with getting random record for " << tableName;
-        qWarning() << getLastExecutedQuery(query);
-    }
-    else {
-        query.seek(0);
-    }
-
-    QSqlRecord sqlRecord = query.record();
-
-
-    QJsonObject *newObject = new QJsonObject();
-
-    newObject->insert("file_name", sqlRecord.value("file_name").toString());
-    newObject->insert("song_name", sqlRecord.value("song_name").toString());
-    newObject->insert("full_path", sqlRecord.value("full_path").toString());
-    newObject->insert("rowid",     sqlRecord.value("rowid").toInt());
-    newObject->insert("table_name", tableName);
-
-    this->disconnect();
-    return newObject;
-}
-
-
 
 /*  --- To be used on row removal
 
