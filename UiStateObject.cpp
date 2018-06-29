@@ -10,7 +10,7 @@ UiStateObject::UiStateObject(const QString &name)
         // apply values from existing object
         QStringList keys = preExistingObject.keys();
         for (int i = 0; i < keys.count(); i++) {
-            qDebug() << "inserting " << keys.at(i) << preExistingObject.value(keys.at(i));
+//            qDebug() << "inserting " << keys.at(i) << preExistingObject.value(keys.at(i));
 
             this->insert(keys.at(i), preExistingObject.value(keys.at(i)));
         }

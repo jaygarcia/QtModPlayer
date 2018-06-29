@@ -20,13 +20,13 @@ class MainWindow : public QMainWindow {
 private:
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
-    QString m_playlistSelected;
+    QString m_selectedPlaylistTable;
     SoundManager *m_soundManager = nullptr;
     PlayerWidget *m_playerWidget;
     bool m_stateRandomOn;
     bool m_repeatStateOn;
 
-    QList<QModelIndex> m_randomPlaylistStack;
+    QList<int> m_randomPlaylistStack;
     int m_randomPlaylistStackPosition = 0;
 
 public:

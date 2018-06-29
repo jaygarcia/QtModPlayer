@@ -65,6 +65,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 void PlaylistWidget::loadPlaylist(QString playlistTableName) {
 
     this->m_playlistControls->selectPlaylistViaTableName(playlistTableName);
+    m_uiState->setState("playlistTableName", playlistTableName);
 
 }
 
@@ -198,7 +199,8 @@ bool PlaylistWidget::getNewPlaylistNameFromUser() {
         QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
-        this->m_selectedTableName = "playlist_" + QString::number(newPlaylistId);
+        this->onPlaylistSelectorChange("playlist_" + QString::number(newPlaylistId));
+
         return true;
     }
 
@@ -216,13 +218,13 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
     QModelIndexList list = selected.indexes();
 
     BufferedTableModel *tableModel = (BufferedTableModel*)list.at(0).model();
-    int selectedRow = list.at(0).row();
+    int selectedRowIndex = list.at(0).row();
 
 //    WidgetStateStore::setStateValue("playlistwidget.selected");
 
-    QJsonObject *rowObject = tableModel->fetchRow(selectedRow);
+    QJsonObject *rowObject = tableModel->fetchRow(selectedRowIndex);
 
-    m_uiState->setState("selectedRowIndex", selectedRow);
+    m_uiState->setState("selectedRowIndex", selectedRowIndex);
     m_uiState->setState("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
 
     emit songSelectionChange(rowObject);
@@ -240,9 +242,13 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {
-
+    // Todo: Confirmation dialogue
+    // on "YES" - Delete table (DBManager)
+    //          - Clear table model
+    //          - Clear selected item from drop down (maybe add item zero [empty] back in?)
 }
 
+// Todo: remove this method, it's prototype and the related button
 void PlaylistWidget::onSavePlaylistButtonPress() {
 
 }

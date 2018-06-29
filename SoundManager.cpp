@@ -153,6 +153,12 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
     std::ifstream file(fileString, std::ios::binary);
     modInfoJsonObject = new QJsonObject();
 
+
+    QStringList keys = fileObject->keys();
+    for (int i = 0; i < keys.count(); i++) {
+        modInfoJsonObject->insert(keys.at(i), fileObject->value(keys.at(i)));
+    }
+
     int goodLoad = openmpt::probe_file_header(openmpt::probe_file_header_flags_default, file);
 
     if (goodLoad == openmpt::probe_file_header_result_success) {

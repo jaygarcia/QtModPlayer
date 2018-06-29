@@ -21,7 +21,6 @@ private:
     int m_playlistId;
 
 
-
 public:
     explicit DBManager(QObject *parent = nullptr);
     void addToPlaylist(QString tableName, QJsonObject *modFile);
@@ -35,6 +34,9 @@ public:
     // Todo: Push into another class?
     int getNumRowsForPlaylist(QString tableName);
     QJsonObject *getRecordAt(int rowNumber, QString tableName);
+    QJsonObject *getRandomRecordForTable(QString tableName);
+
+    void deleteTable(QString tableName);
 
     QSqlDatabase db() const;
     void setDb(const QSqlDatabase &db);

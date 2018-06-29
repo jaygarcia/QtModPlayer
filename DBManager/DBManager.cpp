@@ -17,6 +17,7 @@ QString getLastExecutedQuery(const QSqlQuery& query)
 
 int connectionCount = 0;
 
+
 DBManager::DBManager(QObject *parent) : QObject(parent)
 {
     m_dbFileName  = "modmusic.db";
@@ -237,6 +238,9 @@ bool DBManager::connect() {
         if (hasOpened) {
             connectionCount++;
         }
+        else {
+            qWarning() << "Cannot connect to database!";
+        }
 
         return hasOpened;
     }
@@ -250,6 +254,9 @@ bool DBManager::connect() {
 //        qDebug() << "hasOpened" << m_db.isOpen();
 
         bool wasOpen = m_db.isOpen();
+        if (!wasOpen) {
+            qWarning() << "Cannot connect to database!";
+        }
 
         return wasOpen;
     }
@@ -284,6 +291,7 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
 
     if (! query.exec()) {
         qWarning() << "Something went wrong with counting songs from a playlist";
+        qWarning() << getLastExecutedQuery(query);
     }
     else {
         query.seek(0);
@@ -295,14 +303,46 @@ int DBManager::getNumRowsForPlaylist(QString tableName)  {
     return 0;
 }
 
+
+
 QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
+    this->connect();
     QSqlQuery query(this->m_db);
     QString queryString = "select rowid, song_name, file_name, full_path from " + tableName + " where rowid = :row_id";
     query.prepare(queryString);
     query.bindValue(":row_id", rowId);
 
     if (! query.exec()) {
-        qWarning() << "Something went wrong with counting songs from a playlist";
+        qWarning() << "Something went wrong with getting record at " << rowId << "for table" << tableName;
+        qWarning() << getLastExecutedQuery(query);
+    }
+    else {
+        query.seek(0);
+    }
+
+    QSqlRecord sqlRecord = query.record();
+
+    QJsonObject *newObject = new QJsonObject();
+
+    newObject->insert("file_name", sqlRecord.value("file_name").toString());
+    newObject->insert("song_name", sqlRecord.value("song_name").toString());
+    newObject->insert("full_path", sqlRecord.value("full_path").toString());
+    newObject->insert("rowid", sqlRecord.value("rowid").toInt());
+    newObject->insert("table_name", tableName);
+
+    this->disconnect();
+
+    return newObject;
+}
+
+QJsonObject *DBManager::getRandomRecordForTable(QString tableName) {
+    this->connect();
+    QSqlQuery query(this->m_db);
+    QString queryString = "SELECT rowid, song_name, file_name, full_path FROM " + tableName + " ORDER BY RANDOM() LIMIT 1;";
+    query.prepare(queryString);
+
+    if (! query.exec()) {
+        qWarning() << "Something went wrong with getting random record for " << tableName;
         qWarning() << getLastExecutedQuery(query);
     }
     else {
@@ -317,9 +357,10 @@ QJsonObject *DBManager::getRecordAt(int rowId, QString tableName) {
     newObject->insert("file_name", sqlRecord.value("file_name").toString());
     newObject->insert("song_name", sqlRecord.value("song_name").toString());
     newObject->insert("full_path", sqlRecord.value("full_path").toString());
-    newObject->insert("rowid", sqlRecord.value("rowid").toInt());
+    newObject->insert("rowid",     sqlRecord.value("rowid").toInt());
     newObject->insert("table_name", tableName);
 
+    this->disconnect();
     return newObject;
 }
 
@@ -419,7 +460,7 @@ int DBManager::getSongCountFromPlaylist(QString tableName) {
 
     QSqlQuery query(this->m_db);
 
-    query.prepare("select MAX(rowid) as max_rowid from " + tableName);
+    query.exec("select MAX(rowid) as max_rowid from " + tableName);
 
     if (! query.exec()) {
         qWarning() << "Something went wrong with counting songs from a playlist";
