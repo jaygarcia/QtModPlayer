@@ -283,6 +283,9 @@ bool DBManager::disconnect() {
 
 
 int DBManager::getNumRowsForPlaylist(QString tableName)  {
+    if (tableName.isEmpty() || tableName.isNull()) {
+        return 0;
+    }
     this->connect();
 
     QSqlQuery query(this->m_db);

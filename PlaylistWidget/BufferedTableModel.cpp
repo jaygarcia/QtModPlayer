@@ -49,13 +49,9 @@ void BufferedTableModel::refresh(QString tableName) {
     m_rows.clear();
     m_modFiles.clear();
     m_modFileNames.clear();
-    if (! tableName.isNull()) {
-        this->currentTableName = tableName;
-        m_count = this->m_dbManager->getNumRowsForPlaylist(this->currentTableName);
-    }
-    else {
-        m_count = 0;
-    }
+    this->currentTableName = tableName;
+
+    m_count = this->m_dbManager->getNumRowsForPlaylist(this->currentTableName);
 
     this->endResetModel();
 }

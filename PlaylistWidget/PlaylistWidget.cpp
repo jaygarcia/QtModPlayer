@@ -4,15 +4,8 @@
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     m_uiState = new UiStateObject("PlaylistWidget");
-//    if (! m_uiState->contains("test")) {
-//        m_uiState->setState("test",  (int)(random() % 1000));
-//    }
-//    qDebug() << Q_FUNC_INFO << m_uiState->keys();
-//    fflush(stdout);
-
 
     this->setWindowTitle("QtModPlayer :: Playlist");
-
     this->setAcceptDrops(true);
 
     this->m_progressDialog.cancel();
@@ -59,14 +52,11 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     connect(m_playlistControls->deletePlaylistButton(), &QPushButton::clicked, this, &PlaylistWidget::onDeletePlaylistButton);
 
     this->m_countingFiles = false;
-
 }
 
 void PlaylistWidget::loadPlaylist(QString playlistTableName) {
-
     this->m_playlistControls->selectPlaylistViaTableName(playlistTableName);
     m_uiState->setState("playlistTableName", playlistTableName);
-
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
