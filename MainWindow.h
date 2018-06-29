@@ -12,12 +12,14 @@
 #include "PlayerWidget.h"
 #include "PlaylistWidget/PlaylistWidget.h"
 #include "SoundManager.h"
-
+#include "UiStateObject.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    UiStateObject *m_uiState;
+
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;
     QString m_selectedPlaylistTable;

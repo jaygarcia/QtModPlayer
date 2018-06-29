@@ -214,13 +214,11 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     Q_UNUSED(deselected);
 
-//    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
+    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
     QModelIndexList list = selected.indexes();
 
     BufferedTableModel *tableModel = (BufferedTableModel*)list.at(0).model();
     int selectedRowIndex = list.at(0).row();
-
-//    WidgetStateStore::setStateValue("playlistwidget.selected");
 
     QJsonObject *rowObject = tableModel->fetchRow(selectedRowIndex);
 
@@ -237,7 +235,10 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
+    m_uiState->setState("selectedRowIndex", -1);
+    m_uiState->setState("selectedRowObject", QJsonObject());
     m_uiState->setState("selectedTableName", selectedTableName);
+
     emit playlistSelected(selectedTableName);
 }
 

@@ -5,6 +5,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     QDir homeDir = QDir::home();
+    m_uiState = new UiStateObject("MainWindow");
+
 
     if (! homeDir.exists(".QTModPlayer") && ! homeDir.mkdir(".QtModPlayer")) {
         qWarning() << "Cannot make data directory!";
@@ -42,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_playerWidget->m_songPositionSlider, &QSlider::valueChanged, this, [this](int sliderValue) {
         m_soundManager->setModPosition(sliderValue);
+
+        // Todo: think about moving this to the m_PlayerWidget class
         m_playerWidget->m_currentOrder = sliderValue;
         m_playerWidget->m_songStartLabel->setText(QString::number(sliderValue + 1));
     });
@@ -58,14 +62,14 @@ MainWindow::MainWindow(QWidget *parent)
         int newIndex = 0;
 
         int currentIndex = (m_currentModFileObject) ? this->m_currentModFileObject->value("rowid").toInt() : 0;
-        if (m_currentModFileObject) {
-            qDebug() << Q_FUNC_INFO << m_currentModFileObject->value("file_name").toString();
-        }
+//        if (m_currentModFileObject) {
+//            qDebug() << Q_FUNC_INFO << m_currentModFileObject->value("file_name").toString();
+//        }
 
         QJsonObject *newModFile;
         // Sequential song selection handling, forward direction
         if (! m_stateRandomOn) {
-            qDebug() << "********** SEQUENTIAL forward!!";
+//            qDebug() << "********** SEQUENTIAL forward!!";
             if (songCount > currentIndex) {
                 // we use currentIndex because rowId is always 1 value ahead of the tableview.
                 newIndex = currentIndex + 1;
@@ -75,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         //  Randomized
         else {
-            qDebug() << "********** RANDOM() forward!!";
+//            qDebug() << "********** RANDOM() forward!!";
 
             newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
             newIndex = newModFile->value("rowid").toInt();
@@ -93,8 +97,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         }
 
-        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
-        fflush(stdout);
+//        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
+//        fflush(stdout);
 
         if (m_playlistWindow) {
             // Normal workflow
@@ -107,6 +111,11 @@ MainWindow::MainWindow(QWidget *parent)
         else if (newModFile) {
             // Force a song load
             this->onSongSelectionChange(newModFile);
+            // Todo: update tableview state forceably
+
+            UiStateObject *tableViewState = new UiStateObject("PlaylistWidget");
+            tableViewState->setState("selectedRowIndex", newIndex);
+            tableViewState->setState("selectedRowObject", QJsonObject::fromVariantMap(newModFile->toVariantMap()));
         }
     });
 
@@ -121,14 +130,14 @@ MainWindow::MainWindow(QWidget *parent)
         int newIndex = 0;
 
         int currentIndex = (m_currentModFileObject) ? this->m_currentModFileObject->value("rowid").toInt() : 0;
-        if (m_currentModFileObject) {
-            qDebug() << Q_FUNC_INFO << m_currentModFileObject->value("file_name").toString();
-        }
+//        if (m_currentModFileObject) {
+//            qDebug() << Q_FUNC_INFO << m_currentModFileObject->value("file_name").toString();
+//        }
 
         QJsonObject *newModFile;
         // Sequential song selection handling, forward direction
         if (! m_stateRandomOn) {
-            qDebug() << "********** SEQUENTIAL backward!!";
+//            qDebug() << "********** SEQUENTIAL backward!!";
             if (currentIndex > 1) {
                 // we use currentIndex because rowId is always 1 value ahead of the tableview.
                 newIndex = currentIndex - 1;
@@ -141,8 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         //  Randomized
         else {
-            qDebug() << "********** RANDOM() backward!!";
-
+//            qDebug() << "********** RANDOM() backward!!";
 
             if (m_randomPlaylistStack.isEmpty() || m_randomPlaylistStackPosition <= 0) {
                 newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
@@ -160,8 +168,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         }
 
-        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
-        fflush(stdout);
+//        printf("currentIndex = %i \t newIndex = %i\t songCount =  %i\t m_randomPlaylistStackPosition = %i\n", currentIndex, newIndex, songCount, m_randomPlaylistStackPosition);
+//        fflush(stdout);
 
         if (m_playlistWindow) {
             // Normal workflow
@@ -173,10 +181,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else if (newModFile) {
             // Force a song load
-
             this->onSongSelectionChange(newModFile);
-        }
 
+            // Force state
+            UiStateObject *tableViewState = new UiStateObject("PlaylistWidget");
+            tableViewState->setState("selectedRowIndex", newIndex);
+            tableViewState->setState("selectedRowObject", QJsonObject::fromVariantMap(newModFile->toVariantMap()));
+        }
 
     });
 
@@ -346,7 +357,7 @@ void MainWindow::onModPositionChanged(QJsonObject *modInfoObject) {
 }
 
 void MainWindow::onSongSelectionChange(QJsonObject *fileObject) {
-    qDebug() << Q_FUNC_INFO << fileObject->value("rowid").toInt();
+//    qDebug() << Q_FUNC_INFO << fileObject->value("rowid").toInt();
 
     if (this->m_soundManager == nullptr) {
         this->m_soundManager = new SoundManager();
@@ -359,9 +370,8 @@ void MainWindow::onSongSelectionChange(QJsonObject *fileObject) {
         this->m_soundManager = new SoundManager();
     }
 
-
     QThread *thread = new QThread();
-    connect(thread, &QThread::started, m_soundManager, &SoundManager::run);
+    connect(thread, &QThread::started,  m_soundManager, &SoundManager::run);
     connect(thread, &QThread::finished, m_soundManager, &QObject::deleteLater);
 
     connect(m_soundManager, &SoundManager::modPositionChanged, this, &MainWindow::onModPositionChanged);
@@ -369,9 +379,6 @@ void MainWindow::onSongSelectionChange(QJsonObject *fileObject) {
     m_soundManager->moveToThread(thread);
 
     m_currentModFileObject = m_soundManager->loadFile(fileObject);
-//    m_currentModFileObject = modFileObject;
-
-//    modFileObject->insert("rowid", fileObject->value("rowid").toInt());
 
     m_playerWidget->setSongPositionSliderValueSilent(0);
     m_playerWidget->m_currentOrder = 0; // Make sure the order is flushed
