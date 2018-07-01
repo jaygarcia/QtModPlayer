@@ -36,7 +36,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     QVector<QJsonObject *> playlists = m_dbManager->getAllPlaylists();
     this->m_playlistControls->seedComboData(playlists);
 
-
     QRect geometry = m_playlistControls->geometry();
     m_playlistControls->setGeometry(geometry);
     this->layout()->addWidget(m_playlistControls);
