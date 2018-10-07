@@ -188,7 +188,11 @@ bool PlaylistWidget::getNewPlaylistNameFromUser() {
         QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
-        this->onPlaylistSelectorChange("playlist_" + QString::number(newPlaylistId));
+
+        QJsonObject *eventObject = new QJsonObject();
+        eventObject->insert("selectedName", newPlaylistName);
+        eventObject->insert("selectedTableName", "playlist_" + QString::number(newPlaylistId));
+        this->onPlaylistSelectorChange(eventObject);
 
         return true;
     }
@@ -218,8 +222,11 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 }
 
 
-void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
-//    qDebug() << Q_FUNC_INFO << selectedTableName;
+void PlaylistWidget::onPlaylistSelectorChange(QJsonObject *selectionEvent) {
+    QString selectedTableName = selectionEvent->take("tableName").toString(),
+            selectedPlaylistName = selectionEvent->take("playlistName").toString();
+
+    qDebug() << Q_FUNC_INFO << selectedTableName;
     this->m_selectedTableName = selectedTableName;
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
@@ -227,15 +234,37 @@ void PlaylistWidget::onPlaylistSelectorChange(QString selectedTableName) {
     m_uiState->setState("selectedRowIndex", -1);
     m_uiState->setState("selectedRowObject", QJsonObject());
     m_uiState->setState("selectedTableName", selectedTableName);
+    m_uiState->setState("selectedPlaylistName", selectedPlaylistName);
+//    m_uiState->setState("selectedTableName", selectedPlaylistName);
 
     emit playlistSelected(selectedTableName);
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {
+    QString selectedPlaylistName = m_uiState->getState("selectedPlaylistName").toString(),
+            selectedTableName = m_uiState->getState("selectedTableName").toString();
+
+    qDebug() << Q_FUNC_INFO << selectedPlaylistName;
+
+
+    QMessageBox msgBox;
+    msgBox.setText("Confirm deletion of \"" + selectedPlaylistName + "\"?");
+    msgBox.setIcon(QMessageBox::Question);
+
+    QPushButton *acceptButton = msgBox.addButton("Yes", QMessageBox::AcceptRole);
+    QPushButton *abortButton = msgBox.addButton(QMessageBox::Cancel);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == acceptButton) {
+        qWarning() << Q_FUNC_INFO << "TODO: Execute deletion of table " + selectedTableName + " & reset selection to index 0!";
+    }
     // Todo: Confirmation dialogue
     // on "YES" - Delete table (DBManager)
     //          - Clear table model
     //          - Clear selected item from drop down (maybe add item zero [empty] back in?)
+
+//    QString selectedTableName = m_
 }
 
 // Todo: remove this method, it's prototype and the related button

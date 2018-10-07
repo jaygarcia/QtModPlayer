@@ -56,7 +56,7 @@ signals:
 
 public slots:
     void onNewPlaylistButtonPress();
-    void onPlaylistSelectorChange(QString playlistTable);
+    void onPlaylistSelectorChange(QJsonObject * selectionEvent);
     void onSavePlaylistButtonPress();
     void onDeletePlaylistButton();
     void onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);

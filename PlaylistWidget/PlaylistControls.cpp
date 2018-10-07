@@ -177,17 +177,28 @@ void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
 //    qDebug() << "onPlaylistSelectorChangeIndex" << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
 
     QString indexZeroItem = m_playlistSelector->itemText(0);
+    QJsonObject *eventObject = new QJsonObject();
+    QString tableName,
+            playlistName;
+
     if (indexZeroItem.isEmpty()) {
         bool oldState = m_playlistSelector->blockSignals(true);
         m_playlistSelector->removeItem(0);
 
         m_playlistSelector->blockSignals(oldState);
-        emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex - 1).toString());
+        tableName = m_playlistSelector->itemData(itemIndex - 1).toString();
+        playlistName = m_playlistSelector->itemText(itemIndex - 1);
 
     }
     else {
-        emit playlistSelectionChange(m_playlistSelector->itemData(itemIndex).toString());
+        tableName = m_playlistSelector->itemData(itemIndex).toString();
+        playlistName = m_playlistSelector->itemText(itemIndex);
     }
+
+    eventObject->insert("tableName", tableName);
+    eventObject->insert("playlistName", playlistName);
+
+    emit playlistSelectionChange(eventObject);
 
 }
 
