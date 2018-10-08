@@ -29,6 +29,31 @@ DBManager::DBManager(QObject *parent) : QObject(parent)
     this->m_dbPath = destDbFile;
 }
 
+void DBManager::deleteTable(QString playlistName, int playlistId) {
+    this->connect();
+
+    this->m_db.commit();
+
+    QSqlQuery query(this->m_db);
+    QString deleteTableSql = "drop table if exists " + playlistName + "; ";
+    qDebug() << deleteTableSql;
+    query.exec(deleteTableSql);
+    qDebug() << query.lastError();
+
+    QString deletePlaylist = "delete from playlists where playlist_table_name = '" + playlistName + "'; ";
+    qDebug() << deletePlaylist;
+    query.exec(deletePlaylist);
+    qDebug() << query.lastError();
+
+
+    query.exec("vaccum;");
+
+    query.finish();
+
+    this->m_db.commit();
+    this->disconnect();
+}
+
 void DBManager::purgeCurrentPlaylist() {
     this->connect();
 

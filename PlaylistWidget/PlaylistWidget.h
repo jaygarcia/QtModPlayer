@@ -34,7 +34,6 @@ private:
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
-    QString m_selectedTableName;
 
 //    QtAwesome *qtAwesome;
 
@@ -56,7 +55,7 @@ signals:
 
 public slots:
     void onNewPlaylistButtonPress();
-    void onPlaylistSelectorChange(QString playlistTable);
+    void onPlaylistSelectorChange(QJsonObject * selectionEvent);
     void onSavePlaylistButtonPress();
     void onDeletePlaylistButton();
     void onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);

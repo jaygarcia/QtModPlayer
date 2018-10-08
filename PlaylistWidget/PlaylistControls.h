@@ -56,7 +56,7 @@ signals:
     //    void onSelectPlaylist(QJsonObject playlistObject);
 //    void onDeletePlaylist(QJsonObject playlistObject);
 //    void onSavePlaylist(QJsonObject playlistObject);
-    void playlistSelectionChange(QString playlistTableName);
+    void playlistSelectionChange(QJsonObject *selectionEvent);
 
 
 public slots:
