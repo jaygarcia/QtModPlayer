@@ -18,7 +18,6 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
-    UiStateObject *m_uiState;
 
     PlaylistWidget *m_playlistWindow;
     bool m_playlistWidgetShowing;

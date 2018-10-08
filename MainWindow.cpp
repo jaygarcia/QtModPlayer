@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(m_playerWidget->m_nextTrackButton, &QPushButton::clicked, this, [this]() {
-        if (globalStateObject->value("selectedTableName").isNull()) {
+        if (globalStateObject->value("selectedTableName").toString().isEmpty()) {
             qWarning() << Q_FUNC_INFO << "globalStateObject->value(\"selectedTableName\") is empty!";
             return;
         }
@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_playerWidget->m_previousTrackButton, &QPushButton::clicked, this, [this]() {
-        if (globalStateObject->value("selectedTableName").isNull()) {
+        if (globalStateObject->value("selectedTableName").toString().isEmpty()) {
             qWarning() << Q_FUNC_INFO << "globalStateObject->value(\"selectedTableName\") is empty!";
             return;
         }
