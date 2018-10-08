@@ -197,8 +197,6 @@ QWidget *PlayerWidget::buildBottomControlUI() {
     volumeHigh->setStyleSheet("border-radius:99px");
 
 
-
-
     widget->layout()->addWidget(volumeHigh);
 
     widget->layout()->addItem(new QSpacerItem(5, 0));

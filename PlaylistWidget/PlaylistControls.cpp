@@ -181,22 +181,27 @@ void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
     QString tableName,
             playlistName;
 
+    int tableId;
+
     if (indexZeroItem.isEmpty()) {
         bool oldState = m_playlistSelector->blockSignals(true);
         m_playlistSelector->removeItem(0);
 
+        tableId = itemIndex - 1;
         m_playlistSelector->blockSignals(oldState);
-        tableName = m_playlistSelector->itemData(itemIndex - 1).toString();
-        playlistName = m_playlistSelector->itemText(itemIndex - 1);
+        tableName = m_playlistSelector->itemData(tableId).toString();
+        playlistName = m_playlistSelector->itemText(tableId);
 
     }
     else {
         tableName = m_playlistSelector->itemData(itemIndex).toString();
         playlistName = m_playlistSelector->itemText(itemIndex);
+        tableId = itemIndex;
     }
 
     eventObject->insert("tableName", tableName);
     eventObject->insert("playlistName", playlistName);
+    eventObject->insert("tableId", tableId);
 
     emit playlistSelectionChange(eventObject);
 

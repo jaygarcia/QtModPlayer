@@ -215,7 +215,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else {
             m_playerWidget->m_repeatButton->setStyleSheet("height: 30px; width: 30px;");
-
         }
     });
 

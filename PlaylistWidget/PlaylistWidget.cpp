@@ -66,9 +66,9 @@ void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
 
 void PlaylistWidget::dropEvent(QDropEvent *e) {
     QVector<QString> droppedFiles;
-
-
-    if (this->m_selectedTableName.isEmpty() || this->m_selectedTableName.isNull()) {
+//    printf("************** DROP EVENT ***********\n"); fflush(stdout);
+    QString selectedTableName = m_uiState->getState("selectedTableName").toString();
+    if (selectedTableName.isEmpty() || selectedTableName.isNull()) {
         if (! this->getNewPlaylistNameFromUser()) {
             QMessageBox msgBox;
             msgBox.setText("A valid playlist is required to drop files.");
@@ -104,13 +104,15 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
 
     connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QJsonObject *modFile) {
+//        printf("fileCheckPercentUpdate\n");fflush(stdout);
         if (! this->m_progressDialog.isHidden()) {
             this->m_progressDialog.setValue(pctComplete);
 
             QString fileName = modFile->value("file_name").toString();
             if (!fileName.isEmpty() || !fileName.isNull()) {
                 this->m_progressDialog.setLabelText(fileName);
-                this->m_dbManager->addToPlaylist(this->m_selectedTableName, modFile);
+                QString selectedTableName = m_uiState->getState("selectedTableName").toString();
+                this->m_dbManager->addToPlaylist(selectedTableName, modFile);
 //                if (pctComplete % 10 == 0) {
 //                    this->m_model.refresh(this->m_selectedTableName);
 //                }
@@ -132,24 +134,23 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
     connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
         Q_UNUSED(results);
-        this->m_progressDialog.setLabelText("...");
-        this->m_progressDialog.setValue(0);
+//        printf("ThreadedModFileCheck::fileCheckComplete\n"); fflush(stdout);
         this->m_progressDialog.hide();
 
         thread->quit();
         thread->wait();
 
         this->m_countingFiles = false;
-        this->m_model.refresh(this->m_selectedTableName);
+        this->m_model.refresh(m_uiState->getState("selectedTableName").toString());
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
         thread->requestInterruption();
         thread->quit();
         thread->wait();
-//        this->thread()->msleep(10);
         m_progressDialog.hide();
         this->m_countingFiles = false;
+//        this->layout()->removeWidget(this->m_progressDialog);
     });
 
     thread->start();
@@ -157,7 +158,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
 
 
 void PlaylistWidget::appendFilesToModel(ThreadedModFileCheckResults *results){
-    BufferedTableModel *tableModel = (BufferedTableModel*) this->m_tableView->model();
+    BufferedTableModel *tableModel = (BufferedTableModel *) this->m_tableView->model();
 
     QVector<QJsonObject *> modFiles = results->goodFiles();
     tableModel->appendItems(modFiles);
@@ -192,6 +193,7 @@ bool PlaylistWidget::getNewPlaylistNameFromUser() {
         QJsonObject *eventObject = new QJsonObject();
         eventObject->insert("selectedName", newPlaylistName);
         eventObject->insert("selectedTableName", "playlist_" + QString::number(newPlaylistId));
+        eventObject->insert("selectedPlaylistId", QString::number(newPlaylistId));
         this->onPlaylistSelectorChange(eventObject);
 
         return true;
@@ -207,7 +209,7 @@ void PlaylistWidget::onNewPlaylistButtonPress() {
 void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     Q_UNUSED(deselected);
 
-    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
+//    qDebug() << Q_FUNC_INFO << "Selection Change " << selected;// << deselected;
     QModelIndexList list = selected.indexes();
 
     BufferedTableModel *tableModel = (BufferedTableModel*)list.at(0).model();
@@ -223,11 +225,11 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 
 
 void PlaylistWidget::onPlaylistSelectorChange(QJsonObject *selectionEvent) {
-    QString selectedTableName = selectionEvent->take("tableName").toString(),
-            selectedPlaylistName = selectionEvent->take("playlistName").toString();
+    QString selectedTableName = selectionEvent->value("tableName").toString(),
+            selectedPlaylistName = selectionEvent->value("playlistName").toString();
 
     qDebug() << Q_FUNC_INFO << selectedTableName;
-    this->m_selectedTableName = selectedTableName;
+//    this->m_selectedTableName = selectedTableName;
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
@@ -235,6 +237,8 @@ void PlaylistWidget::onPlaylistSelectorChange(QJsonObject *selectionEvent) {
     m_uiState->setState("selectedRowObject", QJsonObject());
     m_uiState->setState("selectedTableName", selectedTableName);
     m_uiState->setState("selectedPlaylistName", selectedPlaylistName);
+//    qDebug() << "value(\"playlistId\").toString()" << selectionEvent->value("tableId").toString();
+    m_uiState->setState("selectedTableId", selectionEvent->value("tableId").toInt());
 //    m_uiState->setState("selectedTableName", selectedPlaylistName);
 
     emit playlistSelected(selectedTableName);
@@ -244,6 +248,8 @@ void PlaylistWidget::onDeletePlaylistButton() {
     QString selectedPlaylistName = m_uiState->getState("selectedPlaylistName").toString(),
             selectedTableName = m_uiState->getState("selectedTableName").toString();
 
+    int selectedTableId  = m_uiState->getState("selectedTableId").toInt();
+
     qDebug() << Q_FUNC_INFO << selectedPlaylistName;
 
 
@@ -252,12 +258,25 @@ void PlaylistWidget::onDeletePlaylistButton() {
     msgBox.setIcon(QMessageBox::Question);
 
     QPushButton *acceptButton = msgBox.addButton("Yes", QMessageBox::AcceptRole);
-    QPushButton *abortButton = msgBox.addButton(QMessageBox::Cancel);
+
+    msgBox.addButton(QMessageBox::Cancel);
 
     msgBox.exec();
 
     if (msgBox.clickedButton() == acceptButton) {
-        qWarning() << Q_FUNC_INFO << "TODO: Execute deletion of table " + selectedTableName + " & reset selection to index 0!";
+        m_dbManager->deleteTable(selectedTableName, selectedTableId);
+        refreshTableView();
+
+        int newPlaylistId = 0;
+        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
+
+        this->m_playlistControls->refreshComboWithData(allPlaylists);
+
+        QJsonObject *eventObject = new QJsonObject();
+        eventObject->insert("selectedName", "<Empty Playlist>");
+        eventObject->insert("selectedTableName", "playlist_" + QString::number(newPlaylistId));
+        eventObject->insert("selectedPlaylistId", QString::number(newPlaylistId));
+        this->onPlaylistSelectorChange(eventObject);
     }
     // Todo: Confirmation dialogue
     // on "YES" - Delete table (DBManager)

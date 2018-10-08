@@ -29,6 +29,7 @@ public:
     bool checkForDeployedDatabase();
     bool connect();
     bool disconnect();
+    void deleteTable(QString tableName, int tableId);
     void purgeCurrentPlaylist();
 
     // Todo: Push into another class?
