@@ -1,5 +1,8 @@
 #include "UiStateObject.h"
 
+UiStateObject *globalStateObject = new UiStateObject("global");
+
+
 UiStateObject::UiStateObject(const QString &name)
 {
     this->insert("name", name);

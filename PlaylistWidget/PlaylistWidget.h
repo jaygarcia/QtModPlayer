@@ -28,8 +28,6 @@ class PlaylistWidget : public QWidget
     Q_OBJECT
 
 private:
-    UiStateObject *m_uiState;
-
     QProgressDialog m_progressDialog;
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;

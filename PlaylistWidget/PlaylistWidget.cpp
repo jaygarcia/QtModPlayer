@@ -3,7 +3,6 @@
 
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
-    m_uiState = new UiStateObject("PlaylistWidget");
 
     this->setWindowTitle("QtModPlayer :: Playlist");
     this->setAcceptDrops(true);
@@ -55,7 +54,7 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
 
 void PlaylistWidget::loadPlaylist(QString playlistTableName) {
     this->m_playlistControls->selectPlaylistViaTableName(playlistTableName);
-    m_uiState->setState("playlistTableName", playlistTableName);
+    globalStateObject->setState("playlistTableName", playlistTableName);
 }
 
 void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
@@ -67,7 +66,7 @@ void PlaylistWidget::dragEnterEvent(QDragEnterEvent *e) {
 void PlaylistWidget::dropEvent(QDropEvent *e) {
     QVector<QString> droppedFiles;
 //    printf("************** DROP EVENT ***********\n"); fflush(stdout);
-    QString selectedTableName = m_uiState->getState("selectedTableName").toString();
+    QString selectedTableName = globalStateObject->getState("selectedTableName").toString();
     if (selectedTableName.isEmpty() || selectedTableName.isNull()) {
         if (! this->getNewPlaylistNameFromUser()) {
             QMessageBox msgBox;
@@ -111,7 +110,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
             QString fileName = modFile->value("file_name").toString();
             if (!fileName.isEmpty() || !fileName.isNull()) {
                 this->m_progressDialog.setLabelText(fileName);
-                QString selectedTableName = m_uiState->getState("selectedTableName").toString();
+                QString selectedTableName = globalStateObject->getState("selectedTableName").toString();
                 this->m_dbManager->addToPlaylist(selectedTableName, modFile);
 //                if (pctComplete % 10 == 0) {
 //                    this->m_model.refresh(this->m_selectedTableName);
@@ -141,7 +140,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         thread->wait();
 
         this->m_countingFiles = false;
-        this->m_model.refresh(m_uiState->getState("selectedTableName").toString());
+        this->m_model.refresh(globalStateObject->getState("selectedTableName").toString());
     });
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
@@ -185,16 +184,10 @@ bool PlaylistWidget::getNewPlaylistNameFromUser() {
 
 
     if (okPressed && !newPlaylistName.isEmpty()) {
-        int newPlaylistId = this->m_dbManager->generateNewPlaylist(newPlaylistName);
-        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
+        int newTableId = this->m_dbManager->generateNewPlaylist(newPlaylistName);
+        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newTableId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
-
-        QJsonObject *eventObject = new QJsonObject();
-        eventObject->insert("selectedName", newPlaylistName);
-        eventObject->insert("selectedTableName", "playlist_" + QString::number(newPlaylistId));
-        eventObject->insert("selectedPlaylistId", QString::number(newPlaylistId));
-        this->onPlaylistSelectorChange(eventObject);
 
         return true;
     }
@@ -217,8 +210,8 @@ void PlaylistWidget::onTableViewSelectionChange(const QItemSelection &selected, 
 
     QJsonObject *rowObject = tableModel->fetchRow(selectedRowIndex);
 
-    m_uiState->setState("selectedRowIndex", selectedRowIndex);
-    m_uiState->setState("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
+    globalStateObject->setState("selectedRowIndex", selectedRowIndex);
+    globalStateObject->setState("selectedRowObject", QJsonObject::fromVariantMap(rowObject->toVariantMap()));
 
     emit songSelectionChange(rowObject);
 }
@@ -233,22 +226,22 @@ void PlaylistWidget::onPlaylistSelectorChange(QJsonObject *selectionEvent) {
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
 
-    m_uiState->setState("selectedRowIndex", -1);
-    m_uiState->setState("selectedRowObject", QJsonObject());
-    m_uiState->setState("selectedTableName", selectedTableName);
-    m_uiState->setState("selectedPlaylistName", selectedPlaylistName);
-//    qDebug() << "value(\"playlistId\").toString()" << selectionEvent->value("tableId").toString();
-    m_uiState->setState("selectedTableId", selectionEvent->value("tableId").toInt());
-//    m_uiState->setState("selectedTableName", selectedPlaylistName);
+    globalStateObject->setState("selectedRowIndex", -1);
+    globalStateObject->setState("selectedRowObject", QJsonObject());
+    globalStateObject->setState("selectedTableName", selectedTableName);
+    globalStateObject->setState("selectedPlaylistName", selectedPlaylistName);
+//    qDebug() << "value(\"TableId\").toString()" << selectionEvent->value("tableId").toString();
+    globalStateObject->setState("selectedTableId", selectionEvent->value("tableId").toInt());
+//    globalStateObject->setState("selectedTableName", selectedPlaylistName);
 
     emit playlistSelected(selectedTableName);
 }
 
 void PlaylistWidget::onDeletePlaylistButton() {
-    QString selectedPlaylistName = m_uiState->getState("selectedPlaylistName").toString(),
-            selectedTableName = m_uiState->getState("selectedTableName").toString();
+    QString selectedPlaylistName = globalStateObject->getState("selectedPlaylistName").toString(),
+            selectedTableName = globalStateObject->getState("selectedTableName").toString();
 
-    int selectedTableId  = m_uiState->getState("selectedTableId").toInt();
+    int selectedTableId  = globalStateObject->getState("selectedTableId").toInt();
 
     qDebug() << Q_FUNC_INFO << selectedPlaylistName;
 
@@ -267,15 +260,15 @@ void PlaylistWidget::onDeletePlaylistButton() {
         m_dbManager->deleteTable(selectedTableName, selectedTableId);
         refreshTableView();
 
-        int newPlaylistId = 0;
-        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newPlaylistId);
+        int newTableId = 0;
+        QVector<QJsonObject *> allPlaylists = this->m_dbManager->getAllPlaylists(newTableId);
 
         this->m_playlistControls->refreshComboWithData(allPlaylists);
 
         QJsonObject *eventObject = new QJsonObject();
         eventObject->insert("selectedName", "<Empty Playlist>");
-        eventObject->insert("selectedTableName", "playlist_" + QString::number(newPlaylistId));
-        eventObject->insert("selectedPlaylistId", QString::number(newPlaylistId));
+        eventObject->insert("selectedTableName", "playlist_" + QString::number(newTableId));
+        eventObject->insert("selectedTableId", QString::number(newTableId));
         this->onPlaylistSelectorChange(eventObject);
     }
     // Todo: Confirmation dialogue

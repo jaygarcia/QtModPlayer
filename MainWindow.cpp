@@ -5,7 +5,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     QDir homeDir = QDir::home();
-    m_uiState = new UiStateObject("MainWindow");
 
 
     if (! homeDir.exists(".QTModPlayer") && ! homeDir.mkdir(".QtModPlayer")) {
@@ -52,12 +51,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(m_playerWidget->m_nextTrackButton, &QPushButton::clicked, this, [this]() {
-        if (m_selectedPlaylistTable.isEmpty()) {
-            qWarning() << Q_FUNC_INFO << "m_selectedPlaylistTable is empty!";
+        if (globalStateObject->value("selectedTableName").isNull()) {
+            qWarning() << Q_FUNC_INFO << "globalStateObject->value(\"selectedTableName\") is empty!";
             return;
         }
 
-        int songCount = m_dbManager->getSongCountFromPlaylist(m_selectedPlaylistTable);
+        int songCount = m_dbManager->getSongCountFromPlaylist(globalStateObject->value("selectedTableName").toString());
 
         int newIndex = 0;
 
@@ -75,13 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
                 newIndex = currentIndex + 1;
             }
 
-            newModFile = this->m_dbManager->getRecordAt(newIndex, this->m_selectedPlaylistTable);
+            newModFile = this->m_dbManager->getRecordAt(newIndex, globalStateObject->value("selectedTableName").toString());
         }
         //  Randomized
         else {
 //            qDebug() << "********** RANDOM() forward!!";
 
-            newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
+            newModFile = this->m_dbManager->getRecordAt(-1, globalStateObject->value("selectedTableName").toString());
             newIndex = newModFile->value("rowid").toInt();
 
             if (m_randomPlaylistStackPosition < m_randomPlaylistStack.count() - 1) {
@@ -120,12 +119,12 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_playerWidget->m_previousTrackButton, &QPushButton::clicked, this, [this]() {
-        if (m_selectedPlaylistTable.isEmpty()) {
-            qWarning() << Q_FUNC_INFO << "m_selectedPlaylistTable is empty!";
+        if (globalStateObject->value("selectedTableName").isNull()) {
+            qWarning() << Q_FUNC_INFO << "globalStateObject->value(\"selectedTableName\") is empty!";
             return;
         }
 
-        int songCount = m_dbManager->getSongCountFromPlaylist(m_selectedPlaylistTable);
+        int songCount = m_dbManager->getSongCountFromPlaylist(globalStateObject->value("selectedTableName").toString());
 
         int newIndex = 0;
 
@@ -146,21 +145,21 @@ MainWindow::MainWindow(QWidget *parent)
                 newIndex = songCount;
             }
 
-            newModFile = this->m_dbManager->getRecordAt(newIndex, this->m_selectedPlaylistTable);
+            newModFile = this->m_dbManager->getRecordAt(newIndex, globalStateObject->value("selectedTableName").toString());
         }
         //  Randomized
         else {
 //            qDebug() << "********** RANDOM() backward!!";
 
             if (m_randomPlaylistStack.isEmpty() || m_randomPlaylistStackPosition <= 0) {
-                newModFile = this->m_dbManager->getRecordAt(-1, this->m_selectedPlaylistTable);
+                newModFile = this->m_dbManager->getRecordAt(-1, globalStateObject->value("selectedTableName").toString());
                 newIndex = newModFile->value("rowid").toInt();
 
                 m_randomPlaylistStack.push_front(newIndex);
                 m_randomPlaylistStackPosition = 0;
             }
             else {
-                newModFile = this->m_dbManager->getRecordAt(m_randomPlaylistStack.at(--m_randomPlaylistStackPosition), this->m_selectedPlaylistTable);
+                newModFile = this->m_dbManager->getRecordAt(m_randomPlaylistStack.at(--m_randomPlaylistStackPosition), globalStateObject->value("selectedTableName").toString());
                 newIndex = newModFile->value("rowid").toInt();
             }
 
@@ -274,7 +273,7 @@ void MainWindow::showPlaylistWindow() {
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
 
-        playlist->loadPlaylist(this->m_selectedPlaylistTable);
+        playlist->loadPlaylist(globalStateObject->value("selectedTableName").toString());
 
 
         this->m_playlistWidgetShowing = true;
@@ -287,7 +286,9 @@ void MainWindow::showPlaylistWindow() {
         });
 
         connect(playlist, &PlaylistWidget::playlistSelected, this, [this](QString playlistTable) {
-            this->m_selectedPlaylistTable = playlistTable;
+//            globalStateObject->value("selectedTableName").toString() = playlistTable;
+            Q_UNUSED(playlistTable);
+//            globalStateObject->value("selectedTableName");
             if (m_stateRandomOn) {
                 m_randomPlaylistStack.clear();
                 m_randomPlaylistStackPosition = 0;

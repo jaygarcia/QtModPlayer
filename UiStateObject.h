@@ -14,4 +14,6 @@ public:
     QJsonValue getState(const QString &key);
 };
 
+extern UiStateObject *globalStateObject;
+
 #endif // UISTATEOBJECT_H

@@ -21,8 +21,7 @@ signals:
 
 public slots:
 
-
-
 };
+
 
 #endif // WIDGETSTATESTORE_H

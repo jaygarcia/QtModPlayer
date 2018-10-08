@@ -118,10 +118,10 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
     for (int i = 0; i < playlistObjects.size(); ++i) {
         QJsonObject *playlistObj = playlistObjects.at(i);
 
-        QJsonValue selected = playlistObj->take("selected");
+        QJsonValue selected = playlistObj->value("selected");
 
         if (selected != QJsonValue::Undefined) {
-            selectedIndex = i;
+            selectedIndex = i + 1;
         }
 
         m_playlistSelector->addItem(
