@@ -36,14 +36,14 @@ void DBManager::deleteTable(QString playlistName, int playlistId) {
 
     QSqlQuery query(this->m_db);
     QString deleteTableSql = "drop table if exists " + playlistName + "; ";
-    qDebug() << deleteTableSql;
+//    qDebug() << deleteTableSql;
     query.exec(deleteTableSql);
-    qDebug() << query.lastError();
+//    qDebug() << query.lastError();
 
     QString deletePlaylist = "delete from playlists where playlist_table_name = '" + playlistName + "'; ";
-    qDebug() << deletePlaylist;
+//    qDebug() << deletePlaylist;
     query.exec(deletePlaylist);
-    qDebug() << query.lastError();
+//    qDebug() << query.lastError();
 
 
     query.exec("vaccum;");
@@ -130,6 +130,16 @@ void DBManager::addToPlaylist(QString tableName, QJsonObject *modFile) {
     }
     QSqlQuery query(this->m_db);
 
+    // Check for exisitng items
+    query.exec("SELECT MAX(rowid) FROM " + tableName + " where file_name = \"" + modFile->value("file_name").toString() + "\"");
+    query.seek(0);
+
+    int numItems =  query.record().value(0).toInt();
+    if (numItems > 0) {
+        qDebug() << modFile->value("file_name").toString() << "Exists! Aborting.";
+        return;
+    }
+
     query.prepare(
         "INSERT OR IGNORE INTO " + tableName + " (song_name, file_name, full_path) "
         "VALUES (:song_name, :file_name, :full_path) "
@@ -141,6 +151,7 @@ void DBManager::addToPlaylist(QString tableName, QJsonObject *modFile) {
     query.bindValue(":full_path", modFile->value("full_path").toString());
 
     if (query.exec()) {
+//        qDebug() << Q_FUNC_INFO << getLastExecutedQuery(query);
         query.finish();
         this->m_db.commit();
     }
