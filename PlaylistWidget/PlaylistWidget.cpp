@@ -1,9 +1,8 @@
 #include "PlaylistWidget.h"
-
+#include "ThreadedModFileCounter.h"
 
 
 PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
-
     this->setWindowTitle("QtModPlayer :: Playlist");
     this->setAcceptDrops(true);
 
@@ -84,7 +83,7 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
         droppedFiles.push_back(url.toLocalFile());
     }
 
-    ThreadedModFileCheck *checker = new ThreadedModFileCheck(droppedFiles);
+
 
     m_progressDialog.setParent(this);
     m_progressDialog.setMinimum(0);
@@ -94,75 +93,102 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
     m_progressDialog.setAutoClose(false);
     m_progressDialog.setFixedSize(this->geometry().width() - 30, m_progressDialog.geometry().height());
     m_progressDialog.open();
-
-    QThread *thread = new QThread();
-    connect(thread, &QThread::finished, checker, &QObject::deleteLater);
-
-    checker->moveToThread(thread);
-
-    connect(thread, &QThread::started, checker, &ThreadedModFileCheck::run);
-
-    connect(checker, &ThreadedModFileCheck::fileCheckPercentUpdate, this, [this](int pctComplete, QJsonObject *modFile) {
-//        printf("fileCheckPercentUpdate\n");fflush(stdout);
-        if (! this->m_progressDialog.isHidden()) {
-            this->m_progressDialog.setValue(pctComplete);
-
-            QString fileName = modFile->value("file_name").toString();
-            if (!fileName.isEmpty() || !fileName.isNull()) {
-                this->m_progressDialog.setLabelText(fileName);
-                QString selectedTableName = globalStateObject->getState("selectedTableName").toString();
-                this->m_dbManager->addToPlaylist(selectedTableName, modFile);
-//                if (pctComplete % 10 == 0) {
-//                    this->m_model.refresh(this->m_selectedTableName);
-//                }
-            }
-
-        }
-    });
-
-    connect(checker, &ThreadedModFileCheck::filesCounted, this, [this](unsigned int filesCounted) {
-        QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
-        this->m_progressDialog.setLabelText(QString("Validating %1 files").arg(friendlyNumber));
-    });
+    m_progressDialog.setValue(0);
 
 
-    connect(checker, &ThreadedModFileCheck::countingFiles, this, [=](unsigned int filesCounted) {
+    ThreadedModFileCounter *counter = new ThreadedModFileCounter(droppedFiles);
+
+    QThread *counterThread = new QThread();
+    connect(counterThread, &QThread::finished, counter, &QObject::deleteLater);
+
+    counter->moveToThread(counterThread);
+
+    connect(counterThread, &QThread::started, counter, &ThreadedModFileCounter::run);
+
+
+
+    connect(counter, &ThreadedModFileCounter::countingFiles, this, [=](int filesCounted) {
         QString friendlyNumber = QLocale(QLocale::English).toString((float)filesCounted, 'i', 0);
         this->m_progressDialog.setLabelText(QString("Files found: %1").arg(friendlyNumber));
     });
 
-    connect(checker, &ThreadedModFileCheck::fileCheckComplete, this, [=](ThreadedModFileCheckResults *results) {
-        Q_UNUSED(results);
-//        printf("ThreadedModFileCheck::fileCheckComplete\n"); fflush(stdout);
-        this->m_progressDialog.hide();
+    int totalThreads = QThread::idealThreadCount();
 
-        thread->quit();
-        thread->wait();
 
-        this->m_countingFiles = false;
-        this->m_model.refresh(globalStateObject->getState("selectedTableName").toString());
+    connect(counter, &ThreadedModFileCounter::filesCounted, this, [=, this](QJsonArray *allFiles) {
+
+        ThreadedModFileCheck::TOTAL_FILES = allFiles->size();
+        ThreadedModFileCheck::TOTAL_FILES_CHECKED = 0;
+        ThreadedModFileCheck::THREADS_COMPLETED = 0;
+        ThreadedModFileCheck::STOP_THREAD = false;
+
+        for (int threadNum = 0; threadNum < totalThreads; threadNum++) {
+
+            ThreadedModFileCheck *fileChecker = new ThreadedModFileCheck(allFiles);
+
+            QThread *checkerThread = new QThread();
+
+            connect(checkerThread, &QThread::finished, fileChecker, &QObject::deleteLater);
+
+            fileChecker->moveToThread(checkerThread);
+
+            connect(checkerThread, &QThread::started, fileChecker, &ThreadedModFileCheck::run);
+
+            connect(fileChecker, &ThreadedModFileCheck::fileChecked, this, [=](QJsonObject *fileChecked) mutable -> int {
+                ThreadedModFileCheck::TOTAL_FILES_CHECKED++;
+                QString fileName = fileChecked->value("file_name").toString();
+
+
+                if (! fileName.isEmpty() && ThreadedModFileCheck::STOP_THREAD == false) {
+                    int pctComplete = (int)(((float)ThreadedModFileCheck::TOTAL_FILES_CHECKED / (float)ThreadedModFileCheck::TOTAL_FILES) * 100.0);
+
+                    this->m_progressDialog.setLabelText(fileName);
+                    QString selectedTableName = globalStateObject->getState("selectedTableName").toString();
+                    this->m_dbManager->addToPlaylist(selectedTableName, fileChecked);
+
+                    this->m_progressDialog.setValue(pctComplete);
+
+                    if (pctComplete % 20 == 0) {
+                        this->m_model.refresh(selectedTableName);
+                    }
+                }
+            });
+
+            connect(fileChecker, &ThreadedModFileCheck::threadComplete, this, [=]() mutable -> int {
+                ThreadedModFileCheck::THREADS_COMPLETED += 1;
+//                qDebug() << "threadComplete!" << ThreadedModFileCheck::THREADS_COMPLETED;
+
+                if ((int)ThreadedModFileCheck::THREADS_COMPLETED == totalThreads - 1) {
+//                    qDebug() << "All done!";
+                    this->m_progressDialog.hide();
+                }
+            });
+
+            checkerThread->start();
+        }
+
+
+
+
+//        QString friendlyNumber = QLocale(QLocale::English).toString((float)ThreadedModFileCheck::TOTAL_FILES, 'i', 0);
+//        this->m_progressDialog.setLabelText(QString("Validating %1 files").arg(friendlyNumber));
     });
+
+
 
     connect(&m_progressDialog, &QProgressDialog::canceled, this, [=]() {
-        thread->requestInterruption();
-        thread->quit();
-        thread->wait();
+        ThreadedModFileCheck::STOP_THREAD = true;
+        QThread::msleep(100);
+        counterThread->requestInterruption();
+        counterThread->quit();
+        counterThread->wait();
         m_progressDialog.hide();
         this->m_countingFiles = false;
-//        this->layout()->removeWidget(this->m_progressDialog);
     });
 
-    thread->start();
+    counterThread->start();
 }
 
-
-void PlaylistWidget::appendFilesToModel(ThreadedModFileCheckResults *results){
-    BufferedTableModel *tableModel = (BufferedTableModel *) this->m_tableView->model();
-
-    QVector<QJsonObject *> modFiles = results->goodFiles();
-    tableModel->appendItems(modFiles);
-    m_playlistControls->appendFilesToModel(modFiles);
-}
 
 void PlaylistWidget::refreshTableView() {
     BufferedTableModel *model = (BufferedTableModel *)this->m_tableView->model();
@@ -221,7 +247,7 @@ void PlaylistWidget::onPlaylistSelectorChange(QJsonObject *selectionEvent) {
     QString selectedTableName = selectionEvent->value("tableName").toString(),
             selectedPlaylistName = selectionEvent->value("playlistName").toString();
 
-    qDebug() << Q_FUNC_INFO << selectedTableName;
+//    qDebug() << Q_FUNC_INFO << selectedTableName;
 //    this->m_selectedTableName = selectedTableName;
     this->m_model.refresh(selectedTableName);
     this->m_tableView->verticalScrollBar()->setSliderPosition(this->m_tableView->verticalScrollBar()->minimum());
@@ -243,7 +269,7 @@ void PlaylistWidget::onDeletePlaylistButton() {
 
     int selectedTableId  = globalStateObject->getState("selectedTableId").toInt();
 
-    qDebug() << Q_FUNC_INFO << selectedPlaylistName;
+//    qDebug() << Q_FUNC_INFO << selectedPlaylistName;
 
 
     QMessageBox msgBox;

@@ -43,7 +43,8 @@ SOURCES += \
     DBManager/ThreadedModFileInserter.cpp \
     SoundManager.cpp \
     WidgetStateStore.cpp \
-    UiStateObject.cpp
+    UiStateObject.cpp \
+    ThreadedModFileCounter.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -57,7 +58,8 @@ HEADERS += \
     DBManager/ThreadedModFileInserter.h \
     SoundManager.h \
     WidgetStateStore.h \
-    UiStateObject.h
+    UiStateObject.h \
+    ThreadedModFileCounter.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

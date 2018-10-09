@@ -32,7 +32,7 @@ private:
     BufferedTableModel m_model;
     PlaylistControls *m_playlistControls;
     DBManager *m_dbManager;
-
+    QThread *m_fileCheckerThreads;
 //    QtAwesome *qtAwesome;
 
 public:
@@ -42,7 +42,6 @@ public:
     PlaylistWidget(QWidget *parent = nullptr);
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dropEvent(QDropEvent *e) override;
-    void appendFilesToModel(ThreadedModFileCheckResults *results);
     void refreshTableView();
     bool getNewPlaylistNameFromUser();
     void loadPlaylist(QString playlistTableName);

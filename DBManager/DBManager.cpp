@@ -136,7 +136,7 @@ void DBManager::addToPlaylist(QString tableName, QJsonObject *modFile) {
 
     int numItems =  query.record().value(0).toInt();
     if (numItems > 0) {
-        qDebug() << modFile->value("file_name").toString() << "Exists! Aborting.";
+//        qDebug() << modFile->value("file_name").toString() << "Exists! Aborting.";
         return;
     }
 
