@@ -63,8 +63,8 @@ void ThreadedModFileCheck::run() {
             }
 
             file.close();
+//            delete fileInfo;
             if (ThreadedModFileCheck::STOP_THREAD == false) {
-                delete fileInfo;
                 emit fileChecked(checkResults);
             }
 
