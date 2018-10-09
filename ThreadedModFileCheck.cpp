@@ -37,11 +37,11 @@ void ThreadedModFileCheck::run() {
         }
 
         QFileInfo *fileInfo = new QFileInfo(this->allFiles->takeAt(0).toString());
-        QString filePath = fileInfo->absoluteFilePath();
 
         if (fileInfo->isFile()) {
             QJsonObject *checkResults = new QJsonObject();
 
+            QString filePath = fileInfo->absoluteFilePath();
             const char *fileString = filePath.toUtf8();
 
             std::ifstream file(fileString, std::ios::binary);
@@ -59,15 +59,21 @@ void ThreadedModFileCheck::run() {
                 checkResults->insert("parent_directory", fileInfo->absolutePath());
                 checkResults->insert("full_path", filePath);
                 checkResults->insert("song_name", songName.trimmed());
+                mod.~module();
             }
 
+            file.close();
             if (ThreadedModFileCheck::STOP_THREAD == false) {
+                delete fileInfo;
                 emit fileChecked(checkResults);
             }
 
         }
 
     }
+
+
+    QThread::msleep(500);
 
     emit threadComplete();
 

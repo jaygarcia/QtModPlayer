@@ -158,9 +158,13 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
                 ThreadedModFileCheck::THREADS_COMPLETED += 1;
 //                qDebug() << "threadComplete!" << ThreadedModFileCheck::THREADS_COMPLETED;
 
-                if ((int)ThreadedModFileCheck::THREADS_COMPLETED == totalThreads - 1) {
+                if ((int)ThreadedModFileCheck::THREADS_COMPLETED == (totalThreads - 1)) {
 //                    qDebug() << "All done!";
+                    this->m_progressDialog.setValue(100);
+
+                    QThread::msleep(250);
                     this->m_progressDialog.hide();
+                    this->m_countingFiles = false;
                 }
             });
 
