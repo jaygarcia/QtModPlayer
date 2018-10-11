@@ -20,11 +20,11 @@ class MainWindow : public QMainWindow {
 private:
 
     PlaylistWidget *m_playlistWindow;
-    bool m_playlistWidgetShowing;
+
     QString m_selectedPlaylistTable;
     SoundManager *m_soundManager = nullptr;
     PlayerWidget *m_playerWidget;
-    bool m_stateRandomOn;
+
     bool m_repeatStateOn;
 
     QList<int> m_randomPlaylistStack;
@@ -61,6 +61,15 @@ public slots:
     void onInserterComplete(int totalFiles);
     void onModPositionChanged(QJsonObject *modInfoObject);
     void onSongSelectionChange(QJsonObject *fileObject);
+
+    void onStopButtonPress();
+    void onPlayButtonPress();
+    void onPauseButtonPress();
+    void onRandomButtonPress();
+    void onRepeatButtonPress();
+    void onNextTrackButtonPress();
+    void onPreviousTrackButtonPress();
+    void onSongPositionSliderChange(int sliderValue);
 };
 
 #endif // MAINWINDOW_H
