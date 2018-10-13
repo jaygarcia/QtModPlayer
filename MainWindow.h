@@ -14,6 +14,9 @@
 #include "SoundManager.h"
 #include "UiStateObject.h"
 
+#define DEV_MODE 1
+
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
@@ -70,6 +73,7 @@ public slots:
   void onNextTrackButtonPress();
   void onPreviousTrackButtonPress();
   void onSongPositionSliderChange(int sliderValue);
+  void onVolumeSiderChange(int sliderValue);
 };
 
 #endif // MAINWINDOW_H

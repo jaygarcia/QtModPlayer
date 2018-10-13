@@ -1,4 +1,12 @@
-#include "DBManager/DBManager.h"
+#include "DBManager.h"
+
+
+
+#ifdef DEV_MODE
+const  QString DBManager::DataDir = ".QtModPlayerDebug";
+#else
+const  QString DBManager::DataDir = ".QtModPlayer";
+#endif
 
 
 
@@ -14,13 +22,13 @@ QString getLastExecutedQuery(const QSqlQuery& query) {
 }
 
 
-int connectionCount = 0;
+static int connectionCount = 0;
 
 
 DBManager::DBManager(QObject *parent) : QObject(parent) {
   m_dbFileName  = "modmusic.db";
 
-  QString destDbDir  = QDir::homePath() + "/.QtModPlayer/",
+  QString destDbDir  = QDir::homePath() + "/" + DBManager::DataDir + "/",
           destDbFile = destDbDir + m_dbFileName;
 
 //  qDebug() << "DBManager destDbFile = " << destDbFile;
@@ -28,6 +36,8 @@ DBManager::DBManager(QObject *parent) : QObject(parent) {
 }
 
 void DBManager::deleteTable(QString playlistName, int playlistId) {
+  (void) playlistId;
+
   this->connect();
 
   this->m_db.commit();
@@ -95,7 +105,7 @@ bool DBManager::checkForDeployedDatabase() {
   QString sourceDbFile = QDir::currentPath() + "/../Resources/db/" + m_dbFileName;
 
 
-  QString destDbDir = QDir::homePath() + "/.QtModPlayer/",
+  QString destDbDir = QDir::homePath() + "/" + DBManager::DataDir + "/",
       destDbFile  = destDbDir + m_dbFileName;
 
 //  qDebug() << "this->m_dbPath =" << destDbFile;
@@ -104,7 +114,7 @@ bool DBManager::checkForDeployedDatabase() {
   if (! QFile::exists(destDbDir) || ! QFile::exists(destDbFile)) {
     QDir homeDir = QDir::home();
 
-    if (! homeDir.exists(".QTModPlayer") && ! homeDir.mkdir(".QtModPlayer")) {
+    if (! homeDir.exists(DBManager::DataDir.toUtf8()) && ! homeDir.mkdir(DBManager::DataDir.toUtf8())) {
       qWarning() << "Cannot make directory :: " << destDbDir;
       return false;
     }
@@ -294,9 +304,6 @@ bool DBManager::connect() {
 
     return wasOpen;
   }
-
-
-  return true;
 
 }
 

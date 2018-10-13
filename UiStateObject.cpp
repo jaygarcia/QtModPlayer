@@ -3,8 +3,7 @@
 UiStateObject *globalStateObject = new UiStateObject("global");
 
 
-UiStateObject::UiStateObject(const QString &name)
-{
+UiStateObject::UiStateObject(const QString &name) {
   this->insert("name", name);
 //  qDebug() << Q_FUNC_INFO <<
 
@@ -33,5 +32,6 @@ void UiStateObject::setState(const QString &key, const QJsonValue &value) {
 
 
 QJsonValue UiStateObject::getState(const QString &key) {
+//  qDebug() << Q_FUNC_INFO << key;
   return this->value(key);
 }

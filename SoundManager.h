@@ -11,12 +11,12 @@
 
 
 #include <portaudio.h>
+#include "UiStateObject.h"
 
 class SoundManager : public QObject {
   Q_OBJECT
 
 private:
-
 
 public:
   explicit SoundManager(QObject *parent = nullptr);
@@ -29,7 +29,7 @@ public:
   QJsonObject *loadFile(QJsonObject *fileObject);
   QJsonObject *getModMetaData();
   void setModPosition(int position);
-
+  void setVolume(int newVolume);
 public slots:
 
 signals:

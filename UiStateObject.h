@@ -6,6 +6,7 @@
 
 #include "WidgetStateStore.h"
 
+
 class UiStateObject : public QJsonObject {
 public:
   UiStateObject(const QString &name);

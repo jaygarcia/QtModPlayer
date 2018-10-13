@@ -4,13 +4,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   QDir homeDir = QDir::home();
 
-#ifdef QT_DEBUG
-  QString dataDir = ".QtModPlayerDebug";
-#else
-  QString dataDir = ".QtModPlayer";
-#endif
 
-  if (! homeDir.exists(dataDir) && ! homeDir.mkdir(dataDir)) {
+  if (! homeDir.exists(DBManager::DataDir) && ! homeDir.mkdir(DBManager::DataDir)) {
     qWarning() << "Cannot make data directory!";
   }
 
@@ -29,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
   connect(m_playerWidget->m_playButton, &QPushButton::clicked, this, &MainWindow::onPlayButtonPress);
   connect(m_playerWidget->m_pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonPress);
+  connect(m_playerWidget->m_volumeSlider, &QSlider::valueChanged, this, &MainWindow::onVolumeSiderChange);
 
 //  connect(m_playerWidget, &PlayerWidget::stop, this, &MainWindow::onStopButtonPress);
 
@@ -370,24 +366,27 @@ void MainWindow::onSongPositionSliderChange(int sliderValue) {
   m_playerWidget->m_songStartLabel->setText(QString::number(sliderValue + 1));
 }
 
+void MainWindow::onVolumeSiderChange(int sliderValue) {
+//  qDebug() << "onVolumeSiderChange" << sliderValue;
+  globalStateObject->setState("volume", sliderValue);
+  m_soundManager->setVolume(sliderValue);
+}
 
-PlaylistWidget *MainWindow::getPlaylist() const
-{
+PlaylistWidget *MainWindow::getPlaylist() const {
   return m_playlistWindow;
 }
 
-void MainWindow::setPlaylist(PlaylistWidget *playlist)
-{
+void MainWindow::setPlaylist(PlaylistWidget *playlist) {
   m_playlistWindow = playlist;
 }
 
-DBManager *MainWindow::getDbManager() const
-{
+DBManager *MainWindow::getDbManager() const {
   return m_dbManager;
 }
 
 
 // Destructor
 MainWindow::~MainWindow() {
-
+  qDebug() << "~MainWindow()";
+  //TODO: Destruct sound manager!
 }

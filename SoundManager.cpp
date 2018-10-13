@@ -1,25 +1,26 @@
 #include "SoundManager.h"
 
-openmpt::module_ext *modFile = nullptr;
-QMutex *mutex;
-bool isLoaded = false;
+static openmpt::module_ext *modFile = nullptr;
+static QMutex *mutex;
 
 //QList<float> bufferLeft;
 //QList<float> bufferRight;
 
 #define bufferSize 1024
 
-int playMode = 0; // 0 stopped, 1 playing, 2 paused;
+static int playMode = 0; // 0 stopped, 1 playing, 2 paused;
+static double soundVolume = 0; //[ 0 - 200 ];
 
 typedef struct {
   float left_phase;
   float right_phase;
 } paTestData;
+
 static paTestData data;
 
 static int currentModData[4];
 
-QJsonObject *modInfoJsonObject;
+static QJsonObject *modInfoJsonObject;
 
 
 static int static_paStreamCallback(const void *inputBuffer,
@@ -36,8 +37,7 @@ static int static_paStreamCallback(const void *inputBuffer,
   (void) userData;
 
   if (statusFlags == paOutputUnderflow) {
-    printf("Underflow!!\n");
-    fflush(stdout);
+    qDebug() << "Underflow!!\n";
   }
 
   float *out = (float*)outputBuffer;
@@ -56,10 +56,10 @@ static int static_paStreamCallback(const void *inputBuffer,
 
   mutex->unlock();
 
-
   return 0;
 }
-PaStream *stream;
+
+static PaStream *stream;
 
 int initializePortAudio() {
   PaError err;
@@ -105,8 +105,8 @@ SoundManager::SoundManager(QObject *parent) : QObject(parent) {
 void SoundManager::run() {
 
   int currentOrder = -1,
-    currentPattern = -1,
-    currentRow = -1;
+      currentPattern = -1,
+      currentRow = -1;
 
 
   mutex->lock();
@@ -126,7 +126,7 @@ void SoundManager::run() {
 
       currentOrder   = currentModData[0];
       currentPattern = currentModData[1];
-      currentRow   = currentModData[2];
+      currentRow     = currentModData[2];
 
       modInfoJsonObject->insert("current_order", currentOrder);
       modInfoJsonObject->insert("current_pattern", currentPattern);
@@ -170,6 +170,9 @@ QJsonObject *SoundManager::loadFile(QJsonObject *fileObject) {
     // Todo:: Setup as a configuration option from the UI
     modFile->set_repeat_count(999999);
 
+    openmpt::ext::interactive *interactive = static_cast<openmpt::ext::interactive *>( modFile->get_interface( openmpt::ext::interactive_id ) );
+    interactive->set_global_volume((double)globalStateObject->getState("volume").toInt() * 0.01f);
+\
     QString songName = QString::fromUtf8(modFile->get_metadata("title").c_str());
     modInfoJsonObject->insert("file_name", fileObject->value("file_name").toString());
     modInfoJsonObject->insert("song_name", songName);
@@ -251,7 +254,21 @@ void SoundManager::stop() {
   playMode = 0;
   Pa_StopStream(stream);
 
-
   mutex->unlock();
+}
+
+void SoundManager::setVolume(int newVolume) {
+//  qDebug() << "newVolume " << newVolume; fflush(stdout);
+  if (newVolume == 0) {
+    soundVolume = 0;
+    return;
+  }
+
+  soundVolume = (std::int32_t)(200.0f * ((float)newVolume * 0.1f));
+
+  if (modFile != nullptr) {
+    openmpt::ext::interactive *interactive = static_cast<openmpt::ext::interactive *>( modFile->get_interface( openmpt::ext::interactive_id ) );
+    interactive->set_global_volume((double)globalStateObject->getState("volume").toInt() * 0.01f);
+  }
 }
 

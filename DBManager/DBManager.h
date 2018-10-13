@@ -8,6 +8,7 @@
 #include <libopenmpt/libopenmpt.hpp>
 #include <fstream>
 #include <QJsonObject>
+#include "UiStateObject.h"
 
 class DBManager : public QObject {
   Q_OBJECT
@@ -21,6 +22,9 @@ private:
 
 
 public:
+  static const QString DataDir;
+
+
   explicit DBManager(QObject *parent = nullptr);
   void addToPlaylist(QString tableName, QJsonObject *modFile);
   void queueAddToPlaylist(int playlistId, QVector<QJsonObject *> filesToInsert);
@@ -63,5 +67,4 @@ signals:
 
 public slots:
 };
-
 #endif // DBMANAGER_H

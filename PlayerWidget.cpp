@@ -1,4 +1,6 @@
 #include "PlayerWidget.h"
+#include "UiStateObject.h"
+
 
 PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
   m_qtAwesome = new QtAwesome(qApp);
@@ -6,13 +8,6 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
 //  this->configure();
   this->addChildren();
 }
-
-
-
-void PlayerWidget::configure() {
-//  this->setFixedSize(300, 155);
-}
-
 
 void PlayerWidget::addChildren() {
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -189,8 +184,18 @@ QWidget *PlayerWidget::buildBottomControlUI() {
   volumeLow->setStyleSheet("border-radius:99px");
   widget->layout()->addWidget(volumeLow);
 
-  QSlider *volumeSlider = new QSlider(Qt::Horizontal);
-  widget->layout()->addWidget(volumeSlider);
+  m_volumeSlider = new QSlider(Qt::Horizontal);
+  widget->layout()->addWidget(m_volumeSlider);
+
+  int volume = 50;
+  if (! globalStateObject->getState("volume").isUndefined()) {
+    volume = globalStateObject->getState("volume").toInt();
+  }
+  else {
+    globalStateObject->setState("volume", volume);
+  }
+
+  m_volumeSlider->setValue(volume);
 
   QPushButton *volumeHigh = new QPushButton(this->m_qtAwesome->icon("volumeup", options), "");
   volumeHigh->setStyleSheet("border-radius:99px");
@@ -202,14 +207,12 @@ QWidget *PlayerWidget::buildBottomControlUI() {
   m_favoriteButton = this->buildButton("star");
   widget->layout()->addWidget(m_favoriteButton);
 
-
   return widget;
 }
 
 void PlayerWidget::setSongText(QString songText) {
   m_songLabel->setText(songText);
 }
-
 
 void PlayerWidget::updateSongInformation(QJsonObject *modInfoObject) {
   QString songName;

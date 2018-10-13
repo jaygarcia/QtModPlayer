@@ -13,12 +13,15 @@ public:
   explicit PlayerWidget(QWidget *parent = nullptr);
   ~PlayerWidget();
 
+  int m_currentOrder = -1;
+
   // Members
   QLabel *m_songLabel;
   QtAwesome *m_qtAwesome;
   QLabel *m_songStartLabel;
   QLabel *m_songEndLabel;
   QSlider *m_songPositionSlider;
+  QSlider *m_volumeSlider;
 
   QPushButton *m_playButton;
   QPushButton *m_pauseButton;
@@ -33,9 +36,7 @@ public:
   QPushButton *m_favoriteButton;
 
 
-  int m_currentOrder = -1;
   // Methods
-  void configure();
   void addChildren();
 
   QWidget *buildSongInformationUI();
