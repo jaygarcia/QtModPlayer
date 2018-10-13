@@ -42,7 +42,6 @@ public:
     QJsonArray *playlistSelectionObjects() const;
     void setPlaylistSelectionObjects(QJsonArray *playlistSelectionObjects);
     QVector<QJsonObject *> copyJsonArrayToVector(QJsonArray inObject);
-    void appendCurrentPlaylistToSelector();
 
     QPushButton *newPlaylistButton() const;
     QPushButton *savePlaylistButton() const;

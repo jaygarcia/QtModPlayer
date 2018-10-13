@@ -116,13 +116,14 @@ void PlaylistControls::seedComboData(QVector<QJsonObject *> playlistObjects) {
 
   m_playlistSelector->blockSignals(oldState);
 
-
   if (selectedIndex > -1) {
     m_playlistSelector->setCurrentIndex(selectedIndex);
   }
 
-
 }
+
+
+
 void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjects) {
   this->m_playlistObjects = playlistObjects;
 
@@ -169,29 +170,8 @@ void PlaylistControls::selectPlaylistViaTableName(QString tableName) {
   }
 }
 
-// Todo: Convert to DBManager usage
-void PlaylistControls::appendCurrentPlaylistToSelector() {
-//  QJsonObject rootObj = m_currentPlaylistDocument->object();
-//  QString playlistName = rootObj.value("playlist_name").toString();
-
-//  QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
-
-//  QFile file(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
-
-//  int selectedIndex = this->m_playlistSelector->findData(m_dataDir.absolutePath() + "/" + playlistName + ".qmp");
-
-//  this->disconnectPlaylistSelectorEvents();
-//  this->m_playlistSelector->setCurrentIndex(selectedIndex);
-
-//  QVector<QJsonObject *> filesVector = this->copyJsonArrayToVector(m_currentPlaylistDocument->object().value("files").toArray());
-//  emit onPlaylistSelectionRefreshPlaylist(filesVector);
-
-//  this->connectPlaylistSelectorEvents();
-}
-
 
 void PlaylistControls::onPlaylistSelectorChangeIndex(int itemIndex) {
-//  qDebug() << "onPlaylistSelectorChangeIndex" << itemIndex << m_playlistSelector->itemData(itemIndex).toString();
 
   QString indexZeroItem = m_playlistSelector->itemText(0);
   QJsonObject *eventObject = new QJsonObject();
