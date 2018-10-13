@@ -28,6 +28,20 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     this->layout()->addWidget(m_tableView);
     boxLayout->setStretch(0,1);
 
+
+    // Restore list & selected item
+    QString selectedTableName = globalStateObject->getState("selectedTableName").toString();
+    if (! selectedTableName.isNull() && ! selectedTableName.isEmpty()) {
+        this->m_model.refresh(selectedTableName);
+    }
+
+    QItemSelectionModel *selectionModel = m_tableView->selectionModel();
+    if (! globalStateObject->getState("selectedRowIndex").isNull()) {
+//        qDebug() << "selectedRowIndex" < globalStateObject->getState("selectedRowIndex").toInt();
+        selectionModel->selectedRows(globalStateObject->getState("selectedRowIndex").toInt());
+        m_tableView->selectRow(globalStateObject->getState("selectedRowIndex").toInt());
+    }
+
     m_playlistControls = new PlaylistControls(this);
 
     m_dbManager = new DBManager(this);
@@ -38,7 +52,6 @@ PlaylistWidget::PlaylistWidget(QWidget *parent) : QWidget(parent) {
     m_playlistControls->setGeometry(geometry);
     this->layout()->addWidget(m_playlistControls);
 
-    QItemSelectionModel *selectionModel = m_tableView->selectionModel();
 
     connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &PlaylistWidget::onTableViewSelectionChange);
 
@@ -287,6 +300,10 @@ void PlaylistWidget::onDeletePlaylistButton() {
     msgBox.exec();
 
     if (msgBox.clickedButton() == acceptButton) {
+
+        globalStateObject->setState("selectedTableName", "");
+        globalStateObject->setState("selectedTableId", -1);
+
         m_dbManager->deleteTable(selectedTableName, selectedTableId);
         refreshTableView();
 

@@ -25,13 +25,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(m_playerWidget->m_playButton, &QPushButton::clicked, this, &MainWindow::onPlayButtonPress);
-
     connect(m_playerWidget->m_pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonPress);
 
-    connect(m_playerWidget, &PlayerWidget::stop, this, &MainWindow::onStopButtonPress);
+//    connect(m_playerWidget, &PlayerWidget::stop, this, &MainWindow::onStopButtonPress);
 
     connect(m_playerWidget->m_songPositionSlider, &QSlider::valueChanged, this, &MainWindow::onSongPositionSliderChange);
-
 
     connect(m_playerWidget->m_nextTrackButton, &QPushButton::clicked, this, &MainWindow::onNextTrackButtonPress);
 
@@ -39,10 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_playerWidget->m_randomButton, &QPushButton::clicked, this, &MainWindow::onRandomButtonPress);
 
-
     connect(m_playerWidget->m_repeatButton, &QPushButton::clicked, this, &MainWindow::onRepeatButtonPress);
-
-
 
     this->setAnimated(true);
     this->setFixedSize(300, 150);
@@ -96,8 +91,6 @@ void MainWindow::showPlaylistWindow() {
         playlist->move(this->pos().x() - (playlist->geometry().width() / 4), this->pos().y() + this->geometry().height() + 23);
         playlist->show();
 
-        playlist->loadPlaylist(globalStateObject->value("selectedTableName").toString());
-
 
         globalStateObject->setState("playlistWidgetShowing", true);
         this->m_playlistWindow = playlist;
@@ -112,15 +105,15 @@ void MainWindow::showPlaylistWindow() {
 //            globalStateObject->value("selectedTableName").toString() = playlistTable;
             Q_UNUSED(playlistTable);
 //            globalStateObject->value("selectedTableName");
-            if (globalStateObject->getState("randomState").toBool()) {
-                m_randomPlaylistStack.clear();
-                m_randomPlaylistStackPosition = 0;
-            }
+//            if (globalStateObject->getState("randomState").toBool()) {
+            m_randomPlaylistStack.clear();
+            m_randomPlaylistStackPosition = 0;
+//            }
             if (m_soundManager) {
-                this->m_soundManager->stop();
-                this->m_soundManager->thread()->quit();
-                this->m_soundManager->thread()->wait();
-                this->m_soundManager = nullptr;
+//                this->m_soundManager->stop();
+//                this->m_soundManager->thread()->quit();
+//                this->m_soundManager->thread()->wait();
+//                this->m_soundManager = nullptr;
             }
         });
 

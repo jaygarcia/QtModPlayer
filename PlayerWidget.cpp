@@ -1,7 +1,6 @@
 #include "PlayerWidget.h"
 
-PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent)
-{
+PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
     m_qtAwesome = new QtAwesome(qApp);
     m_qtAwesome->initFontAwesome();     // This line is important as it loads the font and initializes the named icon map
 //    this->configure();

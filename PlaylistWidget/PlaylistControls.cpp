@@ -1,6 +1,6 @@
 #include "PlaylistControls.h"
 
-
+#include "../UiStateObject.h"
 
 PlaylistControls::PlaylistControls(QWidget *parent) : QWidget(parent)
 {
@@ -53,6 +53,8 @@ void PlaylistControls::configure() {
     m_deletePlaylistButton = this->buildButton("trash", "");
     m_deletePlaylistButton->setToolTip("Delete playlist");
     layout->addWidget(m_deletePlaylistButton);
+
+
 }
 
 QPushButton *PlaylistControls::buildButton(const char *iconType, const char *label) {
@@ -94,8 +96,18 @@ void PlaylistControls::seedComboData(QVector<QJsonObject *> playlistObjects) {
 
     m_playlistSelector->addItem("<Empty Playlist>","");
 
+    int selectedTableId = globalStateObject->getState("selectedTableId").toInt();
+
+    int selectedIndex = -1;
+
+
     for (int i = 0; i < playlistObjects.size(); ++i) {
         QJsonObject *playlistObj = playlistObjects.at(i);
+
+        if (playlistObj->value("id") == selectedTableId) {
+            selectedIndex = i;
+        }
+
 
         m_playlistSelector->addItem(
             playlistObj->value("playlist_name").toString(),
@@ -104,6 +116,12 @@ void PlaylistControls::seedComboData(QVector<QJsonObject *> playlistObjects) {
     }
 
     m_playlistSelector->blockSignals(oldState);
+
+
+    if (selectedIndex > -1) {
+        m_playlistSelector->setCurrentIndex(selectedIndex);
+    }
+
 
 }
 void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjects) {
@@ -114,6 +132,10 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
     m_playlistSelector->addItem("<Empty Playlist>","");
 
     int selectedIndex = -1;
+
+
+//    qDebug() << "globalStateObject->getState(\"selectedTableName\").toString()" << globalStateObject->getState("selectedTableName").toString();
+    int selectedTableId = globalStateObject->getState("selectedTableId").toInt();
 
     for (int i = 0; i < playlistObjects.size(); ++i) {
         QJsonObject *playlistObj = playlistObjects.at(i);
