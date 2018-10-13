@@ -4,8 +4,13 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   QDir homeDir = QDir::home();
 
+#ifdef QT_DEBUG
+  QString dataDir = ".QtModPlayerDebug";
+#else
+  QString dataDir = ".QtModPlayer";
+#endif
 
-  if (! homeDir.exists(".QTModPlayer") && ! homeDir.mkdir(".QtModPlayer")) {
+  if (! homeDir.exists(dataDir) && ! homeDir.mkdir(dataDir)) {
     qWarning() << "Cannot make data directory!";
   }
 
