@@ -272,3 +272,9 @@ void SoundManager::setVolume(int newVolume) {
   }
 }
 
+
+SoundManager::~SoundManager() {
+//  qDebug() << Q_FUNC_INFO;
+  Pa_StopStream(stream);
+  Pa_CloseStream(stream);
+}

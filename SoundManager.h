@@ -20,6 +20,7 @@ private:
 
 public:
   explicit SoundManager(QObject *parent = nullptr);
+  ~SoundManager();
 
   void run(); // For the thread
 

@@ -26,6 +26,7 @@ static int connectionCount = 0;
 
 
 DBManager::DBManager(QObject *parent) : QObject(parent) {
+  qDebug() << Q_FUNC_INFO << "Using" << DBManager::DataDir;
   m_dbFileName  = "modmusic.db";
 
   QString destDbDir  = QDir::homePath() + "/" + DBManager::DataDir + "/",

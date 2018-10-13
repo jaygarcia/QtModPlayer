@@ -267,7 +267,6 @@ void MainWindow::onNextTrackButtonPress() {
       newIndex = m_randomPlaylistStack.at(++m_randomPlaylistStackPosition);
     }
     else {
-
       m_randomPlaylistStackPosition = m_randomPlaylistStack.count();
       // Push to the stack
       m_randomPlaylistStack.push_back(newIndex);
