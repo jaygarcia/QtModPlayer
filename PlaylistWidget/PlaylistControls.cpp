@@ -240,15 +240,6 @@ void PlaylistControls::setPlaylistSelectionObjects(QJsonArray *playlistSelection
 }
 
 
-
-// Todo: Purge
-void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) {
-  Q_UNUSED(incomingFiles);
-
-}
-
-
-
 QVector<QJsonObject *> PlaylistControls::copyJsonArrayToVector(QJsonArray jsonFiles) {
   QVector<QJsonObject *> returnVector;
 
@@ -263,18 +254,15 @@ QVector<QJsonObject *> PlaylistControls::copyJsonArrayToVector(QJsonArray jsonFi
 
 
 
-QPushButton *PlaylistControls::deletePlaylistButton() const
-{
+QPushButton *PlaylistControls::deletePlaylistButton() const {
   return m_deletePlaylistButton;
 }
 
-QPushButton *PlaylistControls::savePlaylistButton() const
-{
+QPushButton *PlaylistControls::savePlaylistButton() const {
   return m_savePlaylistButton;
 }
 
-QPushButton *PlaylistControls::newPlaylistButton() const
-{
+QPushButton *PlaylistControls::newPlaylistButton() const {
   return m_newPlaylistButton;
 }
 
