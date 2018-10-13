@@ -188,11 +188,6 @@ void PlaylistWidget::dropEvent(QDropEvent *e) {
       return 0;
     }
 
-
-
-
-//    QString friendlyNumber = QLocale(QLocale::English).toString((float)ThreadedModFileCheck::TOTAL_FILES, 'i', 0);
-//    this->m_progressDialog.setLabelText(QString("Validating %1 files").arg(friendlyNumber));
   });
 
 

@@ -132,10 +132,6 @@ void PlaylistControls::refreshComboWithData(QVector<QJsonObject *> playlistObjec
 
   int selectedIndex = -1;
 
-
-//  qDebug() << "globalStateObject->getState(\"selectedTableName\").toString()" << globalStateObject->getState("selectedTableName").toString();
-  int selectedTableId = globalStateObject->getState("selectedTableId").toInt();
-
   for (int i = 0; i < playlistObjects.size(); ++i) {
     QJsonObject *playlistObj = playlistObjects.at(i);
 
