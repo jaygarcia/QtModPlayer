@@ -15,61 +15,61 @@
 #include "UiStateObject.h"
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+  Q_OBJECT
 
 private:
 
-    PlaylistWidget *m_playlistWindow;
+  PlaylistWidget *m_playlistWindow;
 
-    QString m_selectedPlaylistTable;
-    SoundManager *m_soundManager = nullptr;
-    PlayerWidget *m_playerWidget;
+  QString m_selectedPlaylistTable;
+  SoundManager *m_soundManager = nullptr;
+  PlayerWidget *m_playerWidget;
 
-    bool m_repeatStateOn;
+  bool m_repeatStateOn;
 
-    QList<int> m_randomPlaylistStack;
-    int m_randomPlaylistStackPosition = 0;
+  QList<int> m_randomPlaylistStack;
+  int m_randomPlaylistStackPosition = 0;
 
 public:
-    MainWindow(QWidget *parent = 0);
+  MainWindow(QWidget *parent = 0);
 
-    DBManager *m_dbManager;
-    QJsonObject *m_currentModFileObject;
+  DBManager *m_dbManager;
+  QJsonObject *m_currentModFileObject;
 
-    void dragEnterEvent(QDragEnterEvent *e);
-    void dropEvent(QDropEvent *e);
-    void onPlayerWidgetShowPlayList();
+  void dragEnterEvent(QDragEnterEvent *e);
+  void dropEvent(QDropEvent *e);
+  void onPlayerWidgetShowPlayList();
 
 
-    void togglePlaylistWindow();
-    void showPlaylistWindow();
-    void hidePlaylistWindow();
+  void togglePlaylistWindow();
+  void showPlaylistWindow();
+  void hidePlaylistWindow();
 
-    ~MainWindow();
+  ~MainWindow();
 
-    PlaylistWidget *getPlaylist() const;
-    void setPlaylist(PlaylistWidget *playlist);
+  PlaylistWidget *getPlaylist() const;
+  void setPlaylist(PlaylistWidget *playlist);
 
-    DBManager *getDbManager() const;
+  DBManager *getDbManager() const;
 
 signals :
 
 
 public slots:
-    //    void onFileCountComplete(ThreadedModFileCheckResults);
-    void onInserterPercentUpdate(int pctComplete);
-    void onInserterComplete(int totalFiles);
-    void onModPositionChanged(QJsonObject *modInfoObject);
-    void onSongSelectionChange(QJsonObject *fileObject);
+  //  void onFileCountComplete(ThreadedModFileCheckResults);
+  void onInserterPercentUpdate(int pctComplete);
+  void onInserterComplete(int totalFiles);
+  void onModPositionChanged(QJsonObject *modInfoObject);
+  void onSongSelectionChange(QJsonObject *fileObject);
 
-    void onStopButtonPress();
-    void onPlayButtonPress();
-    void onPauseButtonPress();
-    void onRandomButtonPress();
-    void onRepeatButtonPress();
-    void onNextTrackButtonPress();
-    void onPreviousTrackButtonPress();
-    void onSongPositionSliderChange(int sliderValue);
+  void onStopButtonPress();
+  void onPlayButtonPress();
+  void onPauseButtonPress();
+  void onRandomButtonPress();
+  void onRepeatButtonPress();
+  void onNextTrackButtonPress();
+  void onPreviousTrackButtonPress();
+  void onSongPositionSliderChange(int sliderValue);
 };
 
 #endif // MAINWINDOW_H

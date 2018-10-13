@@ -40,11 +40,10 @@ SOURCES += \
     MainWindow.cpp \
     PlayerWidget.cpp \
     DBManager/DBManager.cpp \
-    DBManager/ThreadedModFileInserter.cpp \
     SoundManager.cpp \
     WidgetStateStore.cpp \
     UiStateObject.cpp \
-    ThreadedModFileCounter.cpp
+    ThreadedModFileCount.cpp
 
 HEADERS += \
     QtDarkStyle/DarkStyle.h \
@@ -55,11 +54,10 @@ HEADERS += \
     MainWindow.h \
     PlayerWidget.h \
     DBManager/DBManager.h \
-    DBManager/ThreadedModFileInserter.h \
     SoundManager.h \
     WidgetStateStore.h \
     UiStateObject.h \
-    ThreadedModFileCounter.h
+    ThreadedModFileCount.h
 
 RESOURCES += \
         QtDarkStyle/darkstyle.qrc

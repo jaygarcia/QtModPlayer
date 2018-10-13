@@ -13,27 +13,27 @@
 #include <portaudio.h>
 
 class SoundManager : public QObject {
-    Q_OBJECT
+  Q_OBJECT
 
 private:
 
 
 public:
-    explicit SoundManager(QObject *parent = nullptr);
+  explicit SoundManager(QObject *parent = nullptr);
 
-    void run(); // For the thread
+  void run(); // For the thread
 
-    void pause();
-    void play();
-    void stop();
-    QJsonObject *loadFile(QJsonObject *fileObject);
-    QJsonObject *getModMetaData();
-    void setModPosition(int position);
+  void pause();
+  void play();
+  void stop();
+  QJsonObject *loadFile(QJsonObject *fileObject);
+  QJsonObject *getModMetaData();
+  void setModPosition(int position);
 
 public slots:
 
 signals:
-    void modPositionChanged(QJsonObject *modInfoObject);
+  void modPositionChanged(QJsonObject *modInfoObject);
 };
 
 #endif // SOUNDMANAGER_H

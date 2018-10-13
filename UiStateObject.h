@@ -6,12 +6,11 @@
 
 #include "WidgetStateStore.h"
 
-class UiStateObject : public QJsonObject
-{
+class UiStateObject : public QJsonObject {
 public:
-    UiStateObject(const QString &name);
-    void setState(const QString &key, const QJsonValue &value);
-    QJsonValue getState(const QString &key);
+  UiStateObject(const QString &name);
+  void setState(const QString &key, const QJsonValue &value);
+  QJsonValue getState(const QString &key);
 };
 
 extern UiStateObject *globalStateObject;

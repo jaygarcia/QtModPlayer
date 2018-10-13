@@ -20,8 +20,7 @@
 #include <QFont>
 #include <QFile>
 
-class DarkStyle : public QProxyStyle
-{
+class DarkStyle : public QProxyStyle {
   Q_OBJECT
 
 public:

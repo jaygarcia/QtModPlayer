@@ -8,26 +8,25 @@
 #include <fstream>
 
 
-class ThreadedModFileCheck : public QObject
-{
-    Q_OBJECT
+class ThreadedModFileCheck : public QObject {
+  Q_OBJECT
 
 public:
-    static bool STOP_THREAD;
-    static int TOTAL_FILES;
-    static int TOTAL_FILES_CHECKED;
-    static int THREADS_COMPLETED;
+  static bool STOP_THREAD;
+  static int TOTAL_FILES;
+  static int TOTAL_FILES_CHECKED;
+  static int THREADS_COMPLETED;
 public:
-    ThreadedModFileCheck(QJsonArray *droppedFiles);
-    void run();
-    QJsonArray *allFiles;
+  ThreadedModFileCheck(QJsonArray *droppedFiles);
+  void run();
+  QJsonArray *allFiles;
 
 signals:
-//    void filesCounted(unsigned int filesCounted);
-//    void countingFiles(unsigned int filesCounted);
-    void fileCheckPercentUpdate(int pctComplete, QJsonObject *modFile);
-    void fileChecked(QJsonObject *checkResults);
-    void threadComplete();
+//  void filesCounted(unsigned int filesCounted);
+//  void countingFiles(unsigned int filesCounted);
+  void fileCheckPercentUpdate(int pctComplete, QJsonObject *modFile);
+  void fileChecked(QJsonObject *checkResults);
+  void threadComplete();
 };
 
 

@@ -7,71 +7,70 @@
 #include <QtAwesome.h>
 #include <QProgressDialog>
 
-class PlayerWidget : public QWidget
-{
-    Q_OBJECT
+class PlayerWidget : public QWidget {
+  Q_OBJECT
 public:
-    explicit PlayerWidget(QWidget *parent = nullptr);
-    ~PlayerWidget();
+  explicit PlayerWidget(QWidget *parent = nullptr);
+  ~PlayerWidget();
 
-    // Members
-    QLabel *m_songLabel;
-    QtAwesome *m_qtAwesome;
-    QLabel *m_songStartLabel;
-    QLabel *m_songEndLabel;
-    QSlider *m_songPositionSlider;
+  // Members
+  QLabel *m_songLabel;
+  QtAwesome *m_qtAwesome;
+  QLabel *m_songStartLabel;
+  QLabel *m_songEndLabel;
+  QSlider *m_songPositionSlider;
 
-    QPushButton *m_playButton;
-    QPushButton *m_pauseButton;
-    QPushButton *m_previousPatternButton;
-    QPushButton *m_nextPatternButton;
+  QPushButton *m_playButton;
+  QPushButton *m_pauseButton;
+  QPushButton *m_previousPatternButton;
+  QPushButton *m_nextPatternButton;
 
-    QPushButton *m_previousTrackButton;
-    QPushButton *m_nextTrackButton;
+  QPushButton *m_previousTrackButton;
+  QPushButton *m_nextTrackButton;
 
-    QPushButton *m_repeatButton;
-    QPushButton *m_randomButton;
-    QPushButton *m_favoriteButton;
+  QPushButton *m_repeatButton;
+  QPushButton *m_randomButton;
+  QPushButton *m_favoriteButton;
 
 
-    int m_currentOrder = -1;
-    // Methods
-    void configure();
-    void addChildren();
+  int m_currentOrder = -1;
+  // Methods
+  void configure();
+  void addChildren();
 
-    QWidget *buildSongInformationUI();
-    QWidget *buildPlayerControlUI();
-    QPushButton *buildButton(const char *iconType);
-    QWidget *buildBottomControlUI();
+  QWidget *buildSongInformationUI();
+  QWidget *buildPlayerControlUI();
+  QPushButton *buildButton(const char *iconType);
+  QWidget *buildBottomControlUI();
 
-    void setSongText(QString songText);
-    void initializeSlider();
-    void updateSongInformation(QJsonObject *modInfoObject);
-    void setSongPositionSliderValueSilent(int value);
+  void setSongText(QString songText);
+  void initializeSlider();
+  void updateSongInformation(QJsonObject *modInfoObject);
+  void setSongPositionSliderValueSilent(int value);
 
-    void showPlayHidePauseButton();
+  void showPlayHidePauseButton();
 
-    void hidePauseShowPlayButton();
-    QSpacerItem *buildLargeSpacer();
-    QSpacerItem *buildSmallSpacer();
+  void hidePauseShowPlayButton();
+  QSpacerItem *buildLargeSpacer();
+  QSpacerItem *buildSmallSpacer();
 
 signals:
-    void play();
-    void pause();
-    void stop();
+  void play();
+  void pause();
+  void stop();
 
-    void next();
-    void previous();
-
-
-//    void nextPattern();
-//    void prevoiusPattern();
-
-    void shuffle();
+  void next();
+  void previous();
 
 
-    void repeat();
-    void showPlaylist();
+//  void nextPattern();
+//  void prevoiusPattern();
+
+  void shuffle();
+
+
+  void repeat();
+  void showPlaylist();
 
 public slots:
 };
