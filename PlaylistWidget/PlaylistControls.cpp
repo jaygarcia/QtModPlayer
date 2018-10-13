@@ -244,28 +244,7 @@ void PlaylistControls::setPlaylistSelectionObjects(QJsonArray *playlistSelection
 // Todo: Purge
 void PlaylistControls::appendFilesToModel(QVector<QJsonObject *> incomingFiles) {
   Q_UNUSED(incomingFiles);
-//  QJsonObject rootObj = m_currentPlaylistDocument->object();
 
-//  QJsonArray filesArray = QJsonArray(rootObj.value("files").toArray());
-
-//  for (int i = 0; i < incomingFiles.size(); ++i) {
-//    QJsonObject *srcObj = incomingFiles.at(i);
-//    QJsonObject destObj;
-
-//    QStringList keys = srcObj->keys();
-//    for (int k = 0; k < keys.size(); ++k) {
-//      QString key = keys.at(k);
-//      destObj.insert(key, srcObj->value(key));
-//    }
-
-//    filesArray.append(destObj);
-//  }
-
-
-//  rootObj.remove("files");
-//  rootObj.insert("files", filesArray);
-
-//  m_currentPlaylistDocument->setObject(rootObj);
 }
 
 
