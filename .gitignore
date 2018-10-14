@@ -1,4 +1,8 @@
 *.DS_Store
+moc_*
+*.o
+qrc_*
+Makefile
 
 *.pro.user*
 
@@ -36,4 +40,3 @@
 *.out
 *.app
 
-*.DS_Store
