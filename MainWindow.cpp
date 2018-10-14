@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   QDir homeDir = QDir::home();
 
@@ -42,6 +41,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   this->setFixedSize(300, 150);
   this->setWindowTitle("QtModPlayer");
   this->setAcceptDrops(true);
+
+  setWindowFlags(Qt::Window);
+}
+void MainWindow::closeEvent (QCloseEvent *event) {
+    QMessageBox::StandardButton resBtn = QMessageBox::question(
+      this,
+      "QtModPlayer",
+      tr("Quit QtModPlayer?\nAre you sure?\n"),
+      QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+      QMessageBox::Yes
+    );
+
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+    } else {
+    event->accept();
+    QCoreApplication::exit(0);
+
+    }
 }
 
 // Todo: Move to playlist?

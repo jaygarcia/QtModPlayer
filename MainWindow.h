@@ -5,6 +5,7 @@
 #include <QProgressDialog>
 #include <QThread>
 #include <QtCore>
+#include <QCloseEvent>
 
 #include "ThreadedModFileCheck.h"
 #include "DBManager/DBManager.h"
@@ -43,7 +44,7 @@ public:
   void dropEvent(QDropEvent *e);
   void onPlayerWidgetShowPlayList();
 
-
+  void closeEvent(QCloseEvent *event);
   void togglePlaylistWindow();
   void showPlaylistWindow();
   void hidePlaylistWindow();
