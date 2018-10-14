@@ -20,6 +20,7 @@ case $OS in
   *) ;;
 esac
 
+export PATH=$PATH:~/Qt/5.12.0/clang_64/bin/
 
 if [[ $OS == "Mac" ]]; then
 
